@@ -5,7 +5,7 @@ https://github.com/Mehni/ModSorter
   
   
   
-This tool was designed to be very light-weight; it has no dependancies or resources, and is just a single executable file.  
+This tool is designed to be very light weight; it has no dependencies or resources, and is just a single executable file.  
 
 ![Layout image](Layout.jpg "Interface layout")
 
@@ -17,7 +17,7 @@ This tool was designed to be very light-weight; it has no dependancies or resour
 2. The middle list is the list of enabled/active mods
     - All currently active mods are listed here in the current load order.
     - Mods can be reordered by drag and drop inside the list.
-    - Simmilar to the list of inactive mods, mods can be disabled by either double clicking or dragging them back into the inactive list.
+    - Similar to the list of inactive mods, mods can be disabled by either double clicking or dragging them back into the inactive list.
     - Multiple mods can be dragged at once.
     - Because the active mods are listed by load order, this list does not support sorting by column.
 3. The right side shows information about the selected mod.
