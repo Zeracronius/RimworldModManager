@@ -56,6 +56,7 @@ stages:
             Write-Output "Build.BuildNumber before: $(Build.BuildNumber)"
         
     - task: GitHubRelease@1
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       inputs:
         gitHubConnection: 'Github'
         repositoryName: 'Zeracronius/RimworldModManager'
