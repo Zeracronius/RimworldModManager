@@ -4,7 +4,8 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 trigger:
-- master
+    branches:
+    - master
 
 pool:
   vmImage: 'windows-latest'
@@ -40,20 +41,18 @@ stages:
 
 
         
-  - task: PowerShell@2
-    displayName: 'Read version no. from primary EXE/AssemblyInfo'
-    inputs:
-      targetType: 'inline'
-      script: |
-        # Use reflection to get the assembly version (as defined in AssemblyInfo.cs) from the main assembly:
-        $asm = "$(Build.ArtifactStagingDirectory)\ModManager.exe"
-        Write-Output "Reading ReleaseVersion from: $asm"
-        
-        $version = [System.Reflection.AssemblyName]::GetAssemblyName("$asm").Version.ToString(3)
-               
-        # Update the Build Number to match (this happens when the task completes):
-        Write-Host ("##vso[build.updatebuildnumber]$version")
-        Write-Output "Build.BuildNumber before: $(Build.BuildNumber)"
+    - task: PowerShell@2
+        displayName: 'Read version no. from primary EXE/AssemblyInfo'
+        inputs:
+        targetType: 'inline'
+        script: |
+            # Use reflection to get the assembly version (as defined in AssemblyInfo.cs) from the main assembly:
+            $asm = "$(Build.ArtifactStagingDirectory)\ModManager.exe"
+            Write-Output "Reading ReleaseVersion from: $asm"
+            $version = [System.Reflection.AssemblyName]::GetAssemblyName("$asm").Version.ToString(3)
+            # Update the Build Number to match (this happens when the task completes):
+            Write-Host ("##vso[build.updatebuildnumber]$version")
+            Write-Output "Build.BuildNumber before: $(Build.BuildNumber)"
         
     - task: GitHubRelease@1
       inputs:
