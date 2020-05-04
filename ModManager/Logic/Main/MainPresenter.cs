@@ -22,6 +22,8 @@ namespace ModManager.Logic.Main
         public event EventHandler LoadComplete;
         public bool Loaded { get; private set; }
 
+        private bool _loading;
+
         public Model.ModMetaData SelectedMod
         {
             get => _selectedMod;
@@ -53,7 +55,11 @@ namespace ModManager.Logic.Main
 
         public async void LoadData()
         {
+            if (_loading)
+                return;
+            
             Loaded = false;
+            _loading = true;
 
             Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
             Task<Dictionary<string, Model.ModMetaData>> loadModsTask = Task.Run(() => LoadMods());
@@ -85,6 +91,7 @@ namespace ModManager.Logic.Main
             _availableMods = mods;
 
             Loaded = true;
+            _loading = false;
             LoadComplete?.Invoke(this, new EventArgs());
         }
 
@@ -140,24 +147,31 @@ namespace ModManager.Logic.Main
             Dictionary<string, Model.ModMetaData> availableMods = new Dictionary<string, Model.ModMetaData>(200);
             Settings settings = Settings.Default;
 
-            // Load workshop mods
-            foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.WorkshopPath).Select(x => new DirectoryInfo(x)))
+            if (Directory.Exists(settings.WorkshopPath))
             {
-                if (availableMods.ContainsKey(modDirectory.Name))
-                    continue;
-
-                Model.ModMetaData modMeta = LoadModMeta(modDirectory);
-                if (modMeta != null)
+                // Load workshop mods
+                foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.WorkshopPath).Select(x => new DirectoryInfo(x)))
                 {
-                    modMeta.WorkshopPath = "steam://url/CommunityFilePage/" + modDirectory.Name;
-                    modMeta.Downloaded = modDirectory.CreationTime;
-                    modMeta.DirectoryName = modDirectory.Name;
-                    availableMods.Add(modMeta.PackageId ?? modMeta.DirectoryName, modMeta);
+                    if (availableMods.ContainsKey(modDirectory.Name))
+                        continue;
+
+                    Model.ModMetaData modMeta = LoadModMeta(modDirectory);
+                    if (modMeta != null)
+                    {
+                        modMeta.WorkshopPath = "steam://url/CommunityFilePage/" + modDirectory.Name;
+                        modMeta.Downloaded = modDirectory.CreationTime;
+                        modMeta.DirectoryName = modDirectory.Name;
+                        availableMods.Add(modMeta.PackageId ?? modMeta.DirectoryName, modMeta);
+                    }
                 }
             }
 
+
+            List<DirectoryInfo> modDirectories = new List<DirectoryInfo>();
+            
             // Load local mods
-            List<DirectoryInfo> modDirectories = Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)).ToList();
+            if (Directory.Exists(settings.LocalModsPath))
+                modDirectories.AddRange(Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)));
 
             // Load expansions
             modDirectories.AddRange(Directory.GetDirectories(settings.ExpansionsPath).Select(x => new DirectoryInfo(x)));
