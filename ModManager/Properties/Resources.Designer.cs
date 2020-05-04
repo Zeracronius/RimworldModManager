@@ -59,5 +59,23 @@ namespace ModManager.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ModsConfig.xml.
+        /// </summary>
+        internal static string ConfigFilename {
+            get {
+                return ResourceManager.GetString("ConfigFilename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 294100.
+        /// </summary>
+        internal static string SteamId {
+            get {
+                return ResourceManager.GetString("SteamId", resourceCulture);
+            }
+        }
     }
 }

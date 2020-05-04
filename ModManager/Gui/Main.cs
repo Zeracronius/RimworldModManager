@@ -8,8 +8,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ModManager.Logic.Configuration;
 using ModManager.Logic.Main;
 using ModManager.Logic.Model;
+using ModManager.Properties;
 
 namespace ModManager.Gui
 {
@@ -311,6 +313,43 @@ namespace ModManager.Gui
             ModsListView.Items.Remove(selectedItem);
             ActiveModsListView.Items.Add(selectedItem);
             RefreshInterface();
+        }
+
+        private void ConfigurationsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ConfigurationPresenter configPresenter = new ConfigurationPresenter();
+            using (Configuration configDialog = new Configuration(configPresenter))
+            {
+                configDialog.ShowDialog(this);
+            }
+        }
+
+        private void ConfigFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BrowseFolder(Settings.Default.ConfigPath);
+        }
+
+        private void ExpansionsFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BrowseFolder(Settings.Default.ExpansionsPath);
+        }
+
+        private void WorkshopFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BrowseFolder(Settings.Default.WorkshopPath);
+        }
+
+        private void ModsFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BrowseFolder(Settings.Default.LocalModsPath);
+        }
+
+        private void BrowseFolder(string path)
+        {
+            if (System.IO.Directory.Exists(path))
+                System.Diagnostics.Process.Start(path);
+            else
+                MessageBox.Show("Browse folder", "Folder does not exist.", MessageBoxButtons.OK);
         }
     }
 }
