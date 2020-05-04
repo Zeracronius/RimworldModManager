@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModManager.Properties;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -10,15 +11,9 @@ namespace ModManager.Logic.Main
 {
     public class MainPresenter
     {
-        const string RimworldSteamId = "294100";
-        const string ConfigFile = "ModsConfig.xml";
-
         public readonly Color IncompatibleColor = Color.Red;
         public readonly Color WarningColor = Color.Orange;
 
-
-        readonly string _installationPath;
-        readonly string _configPath;
         Model.ModsConfigData _config;
         Dictionary<string, Model.ModMetaData> _activeMods;
         Dictionary<string, Model.ModMetaData> _availableMods;
@@ -51,10 +46,8 @@ namespace ModManager.Logic.Main
 
 
 
-        public MainPresenter(string installationPath)
+        public MainPresenter()
         {
-            _installationPath = installationPath;
-            _configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "Ludeon Studios", "RimWorld by Ludeon Studios", "Config", ConfigFile);
         }
 
 
@@ -98,12 +91,12 @@ namespace ModManager.Logic.Main
 
         public void SaveConfig()
         {
-            FileInfo modConfig = new FileInfo(_configPath);
-
+            FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
+            
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
             using (FileStream file = modConfig.Open(FileMode.Create, FileAccess.Write))
                 xmlSerializer.Serialize(file, _config);
-
+            
         }
 
 
@@ -130,7 +123,7 @@ namespace ModManager.Logic.Main
 
         public Model.ModsConfigData LoadConfig()
         {
-            FileInfo modConfig = new FileInfo(_configPath);
+            FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
 
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
 
@@ -145,12 +138,10 @@ namespace ModManager.Logic.Main
         public Dictionary<string, Model.ModMetaData> LoadMods()
         {
             Dictionary<string, Model.ModMetaData> availableMods = new Dictionary<string, Model.ModMetaData>(200);
-
+            Settings settings = Settings.Default;
 
             // Load workshop mods
-            DirectoryInfo steamApps = Directory.GetParent(_installationPath).Parent;
-            string modsFolderPath = Path.Combine(steamApps.FullName, "workshop", "content", RimworldSteamId);
-            foreach (DirectoryInfo modDirectory in Directory.GetDirectories(modsFolderPath).Select(x => new DirectoryInfo(x)))
+            foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.WorkshopPath).Select(x => new DirectoryInfo(x)))
             {
                 if (availableMods.ContainsKey(modDirectory.Name))
                     continue;
@@ -166,12 +157,10 @@ namespace ModManager.Logic.Main
             }
 
             // Load local mods
-            string localMods = Path.Combine(_installationPath, "Mods");
-            List<DirectoryInfo> modDirectories = Directory.GetDirectories(localMods).Select(x => new DirectoryInfo(x)).ToList();
+            List<DirectoryInfo> modDirectories = Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)).ToList();
 
             // Load expansions
-            string expansions = Path.Combine(_installationPath, "Data");
-            modDirectories.AddRange(Directory.GetDirectories(expansions).Select(x => new DirectoryInfo(x)));
+            modDirectories.AddRange(Directory.GetDirectories(settings.ExpansionsPath).Select(x => new DirectoryInfo(x)));
 
 
             foreach (DirectoryInfo modDirectory in modDirectories)
@@ -188,7 +177,7 @@ namespace ModManager.Logic.Main
                     if (modDirectory.Name == "Core")
                     {
                         modMeta.Name = "Core";
-                        modMeta.TargetVersion = File.ReadAllText(Path.Combine(_installationPath, "Version.txt"));
+                        modMeta.TargetVersion = File.ReadAllText(Path.Combine(settings.InstallationPath, "Version.txt"));
                     }
                     else
                         modMeta.Name += " (local)";

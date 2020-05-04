@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ModManager.Gui;
+using ModManager.Logic.Configuration;
+using ModManager.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,8 +40,18 @@ namespace ModManager
 
                     if (exeFile != null && exeFile.Exists)
                     {
-                        Properties.Settings.Default.InstallationPath = exeFile.DirectoryName;
-                        Properties.Settings.Default.Save();
+                        Settings settings = Settings.Default;
+                        settings.InstallationPath = exeFile.DirectoryName;
+
+                        settings.ConfigPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low", "Ludeon Studios", "RimWorld by Ludeon Studios", "Config");
+
+                        System.IO.DirectoryInfo steamApps = System.IO.Directory.GetParent(settings.InstallationPath).Parent;
+                        settings.WorkshopPath = System.IO.Path.Combine(steamApps.FullName, "workshop", "content", Resources.SteamId);
+                        settings.LocalModsPath = System.IO.Path.Combine(settings.InstallationPath, "Mods");
+                        settings.ExpansionsPath = System.IO.Path.Combine(settings.InstallationPath, "Data");
+
+
+                        settings.Save();
                     }
                     else
                         return;
@@ -46,7 +59,21 @@ namespace ModManager
 
             }
 
-            var presenter = new Logic.Main.MainPresenter(Properties.Settings.Default.InstallationPath);
+
+            if (System.IO.Directory.Exists(Settings.Default.ConfigPath) == false || System.IO.Directory.Exists(Settings.Default.ExpansionsPath) == false)
+            {
+                ConfigurationPresenter configPresenter = new ConfigurationPresenter();
+                using (Configuration configDialog = new Configuration(configPresenter))
+                {
+                    if (configDialog.ShowDialog() == DialogResult.Cancel)
+                    {
+                        MessageBox.Show("The program cannot work without a valid path to the configuration file and core expansion, and will now close.");
+                        return;
+                    }
+                }
+            }
+
+            var presenter = new Logic.Main.MainPresenter();
 
             Application.Run(new Gui.Main(presenter));
         }
