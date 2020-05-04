@@ -4,7 +4,8 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 trigger:
-    branches:
+  branches:
+    include:
     - master
 
 pool:
@@ -42,8 +43,8 @@ stages:
 
         
     - task: PowerShell@2
-        displayName: 'Read version no. from primary EXE/AssemblyInfo'
-        inputs:
+      displayName: 'Read version no. from primary EXE/AssemblyInfo'
+      inputs:
         targetType: 'inline'
         script: |
             # Use reflection to get the assembly version (as defined in AssemblyInfo.cs) from the main assembly:
