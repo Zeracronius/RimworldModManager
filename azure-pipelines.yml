@@ -2,6 +2,7 @@
 # Build and run tests for .NET Desktop or Windows classic desktop solutions.
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+name: 1.$(Rev:r)
 
 trigger:
 - master
@@ -31,16 +32,21 @@ stages:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
 
-  # - job: Tests
-  #   steps:
-  # - task: VSTest@2
-  #   inputs:
-  #     platform: '$(buildPlatform)'
-  #     configuration: '$(buildConfiguration)'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: drop'
+    - task: CopyFiles@2
+      displayName: 'Copy artifacts to staging'
       inputs:
-        PathtoPublish: '$(build.sourcesdirectory)/Release'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+        SourceFolder: '$(build.sourcesdirectory)/Release'
+        Contents: '*.exe'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        
+    - task: GitHubRelease@1
+      inputs:
+        gitHubConnection: 'Github'
+        repositoryName: 'Zeracronius/RimworldModManager'
+        action: 'create'
+        target: '$(Build.SourceVersion)'
+        tagSource: 'userSpecifiedTag'
+        tag: 'v$(Build.BuildNumber)'
+        title: 'v$(Build.BuildNumber)'
+        changeLogCompareToRelease: 'lastFullRelease'
+        changeLogType: 'commitBased'
