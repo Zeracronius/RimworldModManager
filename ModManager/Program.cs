@@ -19,6 +19,7 @@ namespace ModManager
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.ThreadException += Application_ThreadException;
 
 
             if (System.IO.File.Exists(System.IO.Path.Combine(Properties.Settings.Default.InstallationPath, "Version.txt")) == false)
@@ -76,6 +77,12 @@ namespace ModManager
             var presenter = new Logic.Main.MainPresenter();
 
             Application.Run(new Gui.Main(presenter));
+        }
+
+        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            MessageBox.Show("An unhandled exception occurred: " + e.Exception.Message + " - " + e.Exception.StackTrace);
+
         }
     }
 }
