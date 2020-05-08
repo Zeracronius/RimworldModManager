@@ -31,5 +31,5 @@ Mods displayed in red are incompatible with the current version of core, while m
 Hover the cursor over a colored mod to see a description of the issue(s).
 
 Note that there is no functionality to auto-sort load order.  
-A more advanced alternative that does support that is RimPy:  
+RimPy is a more advanced and powerful alternative that does support that auto-sorting load order.  
 https://steamcommunity.com/sharedfiles/filedetails/?id=1847679158
