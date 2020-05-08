@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ModManager.Logic.Main
 {
@@ -21,6 +22,8 @@ namespace ModManager.Logic.Main
 
         public event EventHandler LoadComplete;
         public bool Loaded { get; private set; }
+
+        private bool _loading;
 
         public Model.ModMetaData SelectedMod
         {
@@ -53,50 +56,70 @@ namespace ModManager.Logic.Main
 
         public async void LoadData()
         {
-            Loaded = false;
+            if (_loading)
+                return;
 
-            Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
-            Task<Dictionary<string, Model.ModMetaData>> loadModsTask = Task.Run(() => LoadMods());
-
-            await Task.WhenAll(loadConfigTask, loadModsTask);
-
-
-            _config = loadConfigTask.Result;
-
-            Dictionary<string, Model.ModMetaData> mods = loadModsTask.Result;
-
-            _activeMods = new Dictionary<string, Model.ModMetaData>();
-            foreach (string mod in _config.ActiveMods)
+            try
             {
-                Model.ModMetaData meta = null;
-                if (mods.ContainsKey(mod))
-                    meta = mods[mod];
-                else
+                Loaded = false;
+                _loading = true;
+
+                Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
+                Task<Dictionary<string, Model.ModMetaData>> loadModsTask = Task.Run(() => LoadMods());
+
+                await Task.WhenAll(loadConfigTask, loadModsTask);
+
+
+                _config = loadConfigTask.Result;
+
+                Dictionary<string, Model.ModMetaData> mods = loadModsTask.Result;
+
+                _activeMods = new Dictionary<string, Model.ModMetaData>();
+                if (_config != null)
                 {
-                    meta = mods.Values.FirstOrDefault(x => x.DirectoryName == mod);
-                    if (meta == null)
-                        continue;
+                    foreach (string mod in _config.ActiveMods)
+                    {
+                        Model.ModMetaData meta = null;
+                        if (mods.ContainsKey(mod))
+                            meta = mods[mod];
+                        else
+                        {
+                            meta = mods.Values.FirstOrDefault(x => x.Directory.Name == mod);
+                            if (meta == null)
+                                continue;
+                        }
+
+                        _activeMods.Add(meta.PackageId, meta);
+                        mods.Remove(mod);
+                    }
+
+                    _availableMods = mods;
+                    LoadComplete?.Invoke(this, new EventArgs());
                 }
-
-                _activeMods.Add(meta.PackageId, meta);
-                mods.Remove(mod);
             }
-
-            _availableMods = mods;
-
-            Loaded = true;
-            LoadComplete?.Invoke(this, new EventArgs());
+            finally
+            {
+                Loaded = true;
+                _loading = false;
+            }
         }
 
 
         public void SaveConfig()
         {
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
-            
+            modConfig.IsReadOnly = false;
+
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
-            using (FileStream file = modConfig.Open(FileMode.Create, FileAccess.Write))
-                xmlSerializer.Serialize(file, _config);
-            
+            try
+            {
+                using (FileStream file = modConfig.Open(FileMode.Create, FileAccess.Write))
+                    xmlSerializer.Serialize(file, _config);
+            }
+	        catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
+            {
+                MessageBox.Show("Unable to save the changes because config file was locked by another program.");
+	        }
         }
 
 
@@ -105,7 +128,7 @@ namespace ModManager.Logic.Main
             if (SelectedMod == null)
                 return;
 
-            System.Diagnostics.Process.Start(SelectedMod.DirectoryPath);
+            System.Diagnostics.Process.Start(SelectedMod.Directory.FullName);
         }
 
         public void OpenWorkshopPage()
@@ -127,9 +150,17 @@ namespace ModManager.Logic.Main
 
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
 
+
             Model.ModsConfigData config = null;
-            using (FileStream file = modConfig.Open(FileMode.Open, FileAccess.Read))
-                config = xmlSerializer.Deserialize(file) as Model.ModsConfigData;
+            try
+            {
+                using (FileStream file = modConfig.Open(FileMode.Open, FileAccess.Read))
+                    config = xmlSerializer.Deserialize(file) as Model.ModsConfigData;
+            }
+            catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
+            {
+                MessageBox.Show("Unable to load mod list because config file was locked by another program.");
+            }
 
             return config;
         }
@@ -140,24 +171,30 @@ namespace ModManager.Logic.Main
             Dictionary<string, Model.ModMetaData> availableMods = new Dictionary<string, Model.ModMetaData>(200);
             Settings settings = Settings.Default;
 
-            // Load workshop mods
-            foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.WorkshopPath).Select(x => new DirectoryInfo(x)))
+            if (Directory.Exists(settings.WorkshopPath))
             {
-                if (availableMods.ContainsKey(modDirectory.Name))
-                    continue;
-
-                Model.ModMetaData modMeta = LoadModMeta(modDirectory);
-                if (modMeta != null)
+                // Load workshop mods
+                foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.WorkshopPath).Select(x => new DirectoryInfo(x)))
                 {
-                    modMeta.WorkshopPath = "steam://url/CommunityFilePage/" + modDirectory.Name;
-                    modMeta.Downloaded = modDirectory.CreationTime;
-                    modMeta.DirectoryName = modDirectory.Name;
-                    availableMods.Add(modMeta.PackageId ?? modMeta.DirectoryName, modMeta);
+                    if (availableMods.ContainsKey(modDirectory.Name))
+                        continue;
+
+                    Model.ModMetaData modMeta = LoadModMeta(modDirectory);
+                    if (modMeta != null)
+                    {
+                        modMeta.WorkshopPath = "steam://url/CommunityFilePage/" + modDirectory.Name;
+                        modMeta.Downloaded = modDirectory.CreationTime;
+                        availableMods.Add(modMeta.PackageId ?? modMeta.Directory.Name, modMeta);
+                    }
                 }
             }
 
+
+            List<DirectoryInfo> modDirectories = new List<DirectoryInfo>();
+            
             // Load local mods
-            List<DirectoryInfo> modDirectories = Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)).ToList();
+            if (Directory.Exists(settings.LocalModsPath))
+                modDirectories.AddRange(Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)));
 
             // Load expansions
             modDirectories.AddRange(Directory.GetDirectories(settings.ExpansionsPath).Select(x => new DirectoryInfo(x)));
@@ -172,7 +209,6 @@ namespace ModManager.Logic.Main
                 if (modMeta != null)
                 {
                     modMeta.Downloaded = modDirectory.CreationTime;
-                    modMeta.DirectoryName = modDirectory.Name;
 
                     if (modDirectory.Name == "Core")
                     {
@@ -206,7 +242,7 @@ namespace ModManager.Logic.Main
             if (File.Exists(imagePath))
                 modMeta.PreviewPath = imagePath;
 
-            modMeta.DirectoryPath = modDirectory.FullName;
+            modMeta.Directory = modDirectory;
             modMeta.PackageId = modMeta.PackageId?.ToLower();
 
             return modMeta;

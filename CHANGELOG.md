@@ -1,6 +1,3 @@
-
-## 1.1
-Added configurable paths to allow usage with special folder paths
-
-## 1.0
-Initial version
+Added very basic crash handling.
+Slightly improved error handling.
+Added handling in case of failed loading.

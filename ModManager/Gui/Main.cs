@@ -69,6 +69,7 @@ namespace ModManager.Gui
             PresenterBindingSource.ResetBindings(false);
             
             RefreshInterface();
+            SaveButton.Enabled = true;
         }
 
         private ListViewItem CreateItem(KeyValuePair<string, Logic.Model.ModMetaData> mod)
@@ -103,7 +104,7 @@ namespace ModManager.Gui
             {
                 string modKey = view.SelectedItems[0].Name;
 
-                Logic.Model.ModMetaData selectedMod;
+                ModMetaData selectedMod;
                 _presenter.ActiveMods.TryGetValue(modKey, out selectedMod);
 
                 if (selectedMod == null)

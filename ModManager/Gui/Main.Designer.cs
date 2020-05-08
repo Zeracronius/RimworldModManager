@@ -181,6 +181,7 @@
 			// SaveButton
 			// 
 			this.SaveButton.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.SaveButton.Enabled = false;
 			this.SaveButton.Location = new System.Drawing.Point(3, 3);
 			this.SaveButton.Name = "SaveButton";
 			this.SaveButton.Size = new System.Drawing.Size(56, 23);
@@ -421,28 +422,28 @@
 			// configFolderToolStripMenuItem
 			// 
 			this.configFolderToolStripMenuItem.Name = "configFolderToolStripMenuItem";
-			this.configFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.configFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
 			this.configFolderToolStripMenuItem.Text = "Config folder";
 			this.configFolderToolStripMenuItem.Click += new System.EventHandler(this.ConfigFolderToolStripMenuItem_Click);
 			// 
 			// expansionsFolderToolStripMenuItem
 			// 
 			this.expansionsFolderToolStripMenuItem.Name = "expansionsFolderToolStripMenuItem";
-			this.expansionsFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.expansionsFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
 			this.expansionsFolderToolStripMenuItem.Text = "Expansions folder";
 			this.expansionsFolderToolStripMenuItem.Click += new System.EventHandler(this.ExpansionsFolderToolStripMenuItem_Click);
 			// 
 			// workshopFolderToolStripMenuItem
 			// 
 			this.workshopFolderToolStripMenuItem.Name = "workshopFolderToolStripMenuItem";
-			this.workshopFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.workshopFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
 			this.workshopFolderToolStripMenuItem.Text = "Workshop folder";
 			this.workshopFolderToolStripMenuItem.Click += new System.EventHandler(this.WorkshopFolderToolStripMenuItem_Click);
 			// 
 			// modsFolderToolStripMenuItem
 			// 
 			this.modsFolderToolStripMenuItem.Name = "modsFolderToolStripMenuItem";
-			this.modsFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.modsFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
 			this.modsFolderToolStripMenuItem.Text = "Mods folder";
 			this.modsFolderToolStripMenuItem.Click += new System.EventHandler(this.ModsFolderToolStripMenuItem_Click);
 			// 
@@ -515,7 +516,6 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
         private System.Windows.Forms.Label ActiveModsFooterLabel;
         private System.Windows.Forms.WebBrowser DescriptionWebBrowser;
-		private System.Windows.Forms.MenuStrip menuStrip2;
 		private System.Windows.Forms.MenuStrip menuStrip3;
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem configurationsToolStripMenuItem;
