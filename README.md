@@ -30,4 +30,6 @@ The Reload button reloads both available and active mods.
 Mods displayed in red are incompatible with the current version of core, while mods displayed in orange are warnings.  
 Hover the cursor over a colored mod to see a description of the issue(s).
 
-*Note that there is no functionality to auto-sort load order.*
+Note that there is no functionality to auto-sort load order.  
+RimPy is a more advanced and powerful alternative that does support that auto-sorting load order.  
+https://steamcommunity.com/sharedfiles/filedetails/?id=1847679158
