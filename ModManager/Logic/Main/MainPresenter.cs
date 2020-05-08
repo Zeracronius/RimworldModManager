@@ -84,7 +84,7 @@ namespace ModManager.Logic.Main
                             meta = mods[mod];
                         else
                         {
-                            meta = mods.Values.FirstOrDefault(x => x.DirectoryName == mod);
+                            meta = mods.Values.FirstOrDefault(x => x.Directory.Name == mod);
                             if (meta == null)
                                 continue;
                         }
@@ -128,7 +128,7 @@ namespace ModManager.Logic.Main
             if (SelectedMod == null)
                 return;
 
-            System.Diagnostics.Process.Start(SelectedMod.DirectoryPath);
+            System.Diagnostics.Process.Start(SelectedMod.Directory.FullName);
         }
 
         public void OpenWorkshopPage()
@@ -184,8 +184,7 @@ namespace ModManager.Logic.Main
                     {
                         modMeta.WorkshopPath = "steam://url/CommunityFilePage/" + modDirectory.Name;
                         modMeta.Downloaded = modDirectory.CreationTime;
-                        modMeta.DirectoryName = modDirectory.Name;
-                        availableMods.Add(modMeta.PackageId ?? modMeta.DirectoryName, modMeta);
+                        availableMods.Add(modMeta.PackageId ?? modMeta.Directory.Name, modMeta);
                     }
                 }
             }
@@ -210,7 +209,6 @@ namespace ModManager.Logic.Main
                 if (modMeta != null)
                 {
                     modMeta.Downloaded = modDirectory.CreationTime;
-                    modMeta.DirectoryName = modDirectory.Name;
 
                     if (modDirectory.Name == "Core")
                     {
@@ -244,7 +242,7 @@ namespace ModManager.Logic.Main
             if (File.Exists(imagePath))
                 modMeta.PreviewPath = imagePath;
 
-            modMeta.DirectoryPath = modDirectory.FullName;
+            modMeta.Directory = modDirectory;
             modMeta.PackageId = modMeta.PackageId?.ToLower();
 
             return modMeta;

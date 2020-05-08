@@ -61,15 +61,12 @@ namespace ModManager.Logic.Model
         public string PreviewPath { get; set; }
 
         [XmlIgnore]
-        public string DirectoryPath { get; set; }
+        public System.IO.DirectoryInfo Directory { get; set; }
 
         [XmlIgnore]
         public string WorkshopPath { get; set; }
 
         [XmlIgnore]
         public DateTime Downloaded { get; set; }
-
-        [XmlIgnore]
-        public string DirectoryName { get; set; }
     }
 }
