@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ModManager.Logic.Main
 {
@@ -57,53 +58,68 @@ namespace ModManager.Logic.Main
         {
             if (_loading)
                 return;
-            
-            Loaded = false;
-            _loading = true;
 
-            Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
-            Task<Dictionary<string, Model.ModMetaData>> loadModsTask = Task.Run(() => LoadMods());
-
-            await Task.WhenAll(loadConfigTask, loadModsTask);
-
-
-            _config = loadConfigTask.Result;
-
-            Dictionary<string, Model.ModMetaData> mods = loadModsTask.Result;
-
-            _activeMods = new Dictionary<string, Model.ModMetaData>();
-            foreach (string mod in _config.ActiveMods)
+            try
             {
-                Model.ModMetaData meta = null;
-                if (mods.ContainsKey(mod))
-                    meta = mods[mod];
-                else
+                Loaded = false;
+                _loading = true;
+
+                Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
+                Task<Dictionary<string, Model.ModMetaData>> loadModsTask = Task.Run(() => LoadMods());
+
+                await Task.WhenAll(loadConfigTask, loadModsTask);
+
+
+                _config = loadConfigTask.Result;
+
+                Dictionary<string, Model.ModMetaData> mods = loadModsTask.Result;
+
+                _activeMods = new Dictionary<string, Model.ModMetaData>();
+                if (_config != null)
                 {
-                    meta = mods.Values.FirstOrDefault(x => x.DirectoryName == mod);
-                    if (meta == null)
-                        continue;
+                    foreach (string mod in _config.ActiveMods)
+                    {
+                        Model.ModMetaData meta = null;
+                        if (mods.ContainsKey(mod))
+                            meta = mods[mod];
+                        else
+                        {
+                            meta = mods.Values.FirstOrDefault(x => x.DirectoryName == mod);
+                            if (meta == null)
+                                continue;
+                        }
+
+                        _activeMods.Add(meta.PackageId, meta);
+                        mods.Remove(mod);
+                    }
+
+                    _availableMods = mods;
+                    LoadComplete?.Invoke(this, new EventArgs());
                 }
-
-                _activeMods.Add(meta.PackageId, meta);
-                mods.Remove(mod);
             }
-
-            _availableMods = mods;
-
-            Loaded = true;
-            _loading = false;
-            LoadComplete?.Invoke(this, new EventArgs());
+            finally
+            {
+                Loaded = true;
+                _loading = false;
+            }
         }
 
 
         public void SaveConfig()
         {
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
-            
+            modConfig.IsReadOnly = false;
+
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
-            using (FileStream file = modConfig.Open(FileMode.Create, FileAccess.Write))
-                xmlSerializer.Serialize(file, _config);
-            
+            try
+            {
+                using (FileStream file = modConfig.Open(FileMode.Create, FileAccess.Write))
+                    xmlSerializer.Serialize(file, _config);
+            }
+	        catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
+            {
+                MessageBox.Show("Unable to save the changes because config file was locked by another program.");
+	        }
         }
 
 
@@ -134,9 +150,17 @@ namespace ModManager.Logic.Main
 
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
 
+
             Model.ModsConfigData config = null;
-            using (FileStream file = modConfig.Open(FileMode.Open, FileAccess.Read))
-                config = xmlSerializer.Deserialize(file) as Model.ModsConfigData;
+            try
+            {
+                using (FileStream file = modConfig.Open(FileMode.Open, FileAccess.Read))
+                    config = xmlSerializer.Deserialize(file) as Model.ModsConfigData;
+            }
+            catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
+            {
+                MessageBox.Show("Unable to load mod list because config file was locked by another program.");
+            }
 
             return config;
         }
