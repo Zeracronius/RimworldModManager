@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -109,6 +110,17 @@ namespace ModManager.Logic.Main
         {
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
             modConfig.IsReadOnly = false;
+
+            // If rolling backups are enabled in configuration
+            if (Settings.Default.RollingBackups > 0)
+            {
+                int currentBackup = Settings.Default.CurrentBackup % Settings.Default.RollingBackups;
+
+                modConfig.CopyTo(Path.Combine(modConfig.Directory.FullName, modConfig.Name + $"_Backup{currentBackup + 1}.xml"), true);
+
+                Settings.Default.CurrentBackup += 1;
+                Settings.Default.Save();
+            }
 
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
             try

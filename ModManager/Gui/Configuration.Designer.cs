@@ -45,8 +45,11 @@
 			this.FormCancelButton = new System.Windows.Forms.Button();
 			this.SaveButton = new System.Windows.Forms.Button();
 			this.tooltip = new System.Windows.Forms.ToolTip(this.components);
+			this.RollingBackupsLabel = new System.Windows.Forms.Label();
+			this.RollingBackupsNumericUpDown = new System.Windows.Forms.NumericUpDown();
 			this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.tableLayoutPanel1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.RollingBackupsNumericUpDown)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -55,22 +58,25 @@
 			this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tableLayoutPanel1.ColumnCount = 3;
+			this.tableLayoutPanel1.ColumnCount = 4;
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 36.97479F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 63.02521F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+			this.tableLayoutPanel1.Controls.Add(this.RollingBackupsLabel, 0, 4);
 			this.tableLayoutPanel1.Controls.Add(this.RimworldConfigPathLabel, 0, 0);
 			this.tableLayoutPanel1.Controls.Add(this.RimworldConfigPathTextBox, 1, 0);
 			this.tableLayoutPanel1.Controls.Add(this.WorkshopPathPathLabel, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.WorkshopPathTextBox, 1, 1);
 			this.tableLayoutPanel1.Controls.Add(this.LocalModPathLabel, 0, 2);
 			this.tableLayoutPanel1.Controls.Add(this.LocalModPathTextBox, 1, 2);
-			this.tableLayoutPanel1.Controls.Add(this.ConfigPathButton, 2, 0);
-			this.tableLayoutPanel1.Controls.Add(this.WorkshopPathButton, 2, 1);
-			this.tableLayoutPanel1.Controls.Add(this.LocalModPathButton, 2, 2);
+			this.tableLayoutPanel1.Controls.Add(this.ConfigPathButton, 3, 0);
+			this.tableLayoutPanel1.Controls.Add(this.WorkshopPathButton, 3, 1);
+			this.tableLayoutPanel1.Controls.Add(this.LocalModPathButton, 3, 2);
 			this.tableLayoutPanel1.Controls.Add(this.ExpansionPathTextBox, 1, 3);
 			this.tableLayoutPanel1.Controls.Add(this.ExpansionPathLabel, 0, 3);
-			this.tableLayoutPanel1.Controls.Add(this.ExpansionsPathButton, 2, 3);
+			this.tableLayoutPanel1.Controls.Add(this.ExpansionsPathButton, 3, 3);
+			this.tableLayoutPanel1.Controls.Add(this.RollingBackupsNumericUpDown, 1, 4);
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.RowCount = 5;
@@ -94,12 +100,13 @@
 			// 
 			// RimworldConfigPathTextBox
 			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.RimworldConfigPathTextBox, 2);
 			this.RimworldConfigPathTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.PresenterBindingSource, "ConfigPath", true));
 			this.RimworldConfigPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.RimworldConfigPathTextBox.Location = new System.Drawing.Point(125, 3);
 			this.RimworldConfigPathTextBox.Name = "RimworldConfigPathTextBox";
 			this.RimworldConfigPathTextBox.ReadOnly = true;
-			this.RimworldConfigPathTextBox.Size = new System.Drawing.Size(427, 20);
+			this.RimworldConfigPathTextBox.Size = new System.Drawing.Size(426, 20);
 			this.RimworldConfigPathTextBox.TabIndex = 1;
 			// 
 			// WorkshopPathPathLabel
@@ -114,12 +121,13 @@
 			// 
 			// WorkshopPathTextBox
 			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.WorkshopPathTextBox, 2);
 			this.WorkshopPathTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.PresenterBindingSource, "WorkshopPath", true));
 			this.WorkshopPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.WorkshopPathTextBox.Location = new System.Drawing.Point(125, 32);
 			this.WorkshopPathTextBox.Name = "WorkshopPathTextBox";
 			this.WorkshopPathTextBox.ReadOnly = true;
-			this.WorkshopPathTextBox.Size = new System.Drawing.Size(427, 20);
+			this.WorkshopPathTextBox.Size = new System.Drawing.Size(426, 20);
 			this.WorkshopPathTextBox.TabIndex = 1;
 			// 
 			// LocalModPathLabel
@@ -134,17 +142,18 @@
 			// 
 			// LocalModPathTextBox
 			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.LocalModPathTextBox, 2);
 			this.LocalModPathTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.PresenterBindingSource, "LocalModPath", true));
 			this.LocalModPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.LocalModPathTextBox.Location = new System.Drawing.Point(125, 61);
 			this.LocalModPathTextBox.Name = "LocalModPathTextBox";
 			this.LocalModPathTextBox.ReadOnly = true;
-			this.LocalModPathTextBox.Size = new System.Drawing.Size(427, 20);
+			this.LocalModPathTextBox.Size = new System.Drawing.Size(426, 20);
 			this.LocalModPathTextBox.TabIndex = 1;
 			// 
 			// ConfigPathButton
 			// 
-			this.ConfigPathButton.Location = new System.Drawing.Point(558, 3);
+			this.ConfigPathButton.Location = new System.Drawing.Point(557, 3);
 			this.ConfigPathButton.Name = "ConfigPathButton";
 			this.ConfigPathButton.Size = new System.Drawing.Size(75, 23);
 			this.ConfigPathButton.TabIndex = 2;
@@ -154,7 +163,7 @@
 			// 
 			// WorkshopPathButton
 			// 
-			this.WorkshopPathButton.Location = new System.Drawing.Point(558, 32);
+			this.WorkshopPathButton.Location = new System.Drawing.Point(557, 32);
 			this.WorkshopPathButton.Name = "WorkshopPathButton";
 			this.WorkshopPathButton.Size = new System.Drawing.Size(75, 23);
 			this.WorkshopPathButton.TabIndex = 2;
@@ -164,7 +173,7 @@
 			// 
 			// LocalModPathButton
 			// 
-			this.LocalModPathButton.Location = new System.Drawing.Point(558, 61);
+			this.LocalModPathButton.Location = new System.Drawing.Point(557, 61);
 			this.LocalModPathButton.Name = "LocalModPathButton";
 			this.LocalModPathButton.Size = new System.Drawing.Size(75, 23);
 			this.LocalModPathButton.TabIndex = 2;
@@ -174,12 +183,13 @@
 			// 
 			// ExpansionPathTextBox
 			// 
+			this.tableLayoutPanel1.SetColumnSpan(this.ExpansionPathTextBox, 2);
 			this.ExpansionPathTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.PresenterBindingSource, "ExpansionsPath", true));
 			this.ExpansionPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ExpansionPathTextBox.Location = new System.Drawing.Point(125, 90);
 			this.ExpansionPathTextBox.Name = "ExpansionPathTextBox";
 			this.ExpansionPathTextBox.ReadOnly = true;
-			this.ExpansionPathTextBox.Size = new System.Drawing.Size(427, 20);
+			this.ExpansionPathTextBox.Size = new System.Drawing.Size(426, 20);
 			this.ExpansionPathTextBox.TabIndex = 1;
 			// 
 			// ExpansionPathLabel
@@ -194,7 +204,7 @@
 			// 
 			// ExpansionsPathButton
 			// 
-			this.ExpansionsPathButton.Location = new System.Drawing.Point(558, 90);
+			this.ExpansionsPathButton.Location = new System.Drawing.Point(557, 90);
 			this.ExpansionsPathButton.Name = "ExpansionsPathButton";
 			this.ExpansionsPathButton.Size = new System.Drawing.Size(75, 23);
 			this.ExpansionsPathButton.TabIndex = 2;
@@ -224,6 +234,30 @@
 			this.SaveButton.UseVisualStyleBackColor = true;
 			this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
 			// 
+			// RollingBackupsLabel
+			// 
+			this.RollingBackupsLabel.AutoSize = true;
+			this.RollingBackupsLabel.Location = new System.Drawing.Point(3, 121);
+			this.RollingBackupsLabel.Margin = new System.Windows.Forms.Padding(3, 5, 5, 5);
+			this.RollingBackupsLabel.Name = "RollingBackupsLabel";
+			this.RollingBackupsLabel.Size = new System.Drawing.Size(86, 13);
+			this.RollingBackupsLabel.TabIndex = 0;
+			this.RollingBackupsLabel.Text = "Rolling backups:";
+			// 
+			// RollingBackupsNumericUpDown
+			// 
+			this.RollingBackupsNumericUpDown.DataBindings.Add(new System.Windows.Forms.Binding("Value", this.PresenterBindingSource, "RollingBackups", true));
+			this.RollingBackupsNumericUpDown.Dock = System.Windows.Forms.DockStyle.Top;
+			this.RollingBackupsNumericUpDown.Location = new System.Drawing.Point(125, 119);
+			this.RollingBackupsNumericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.RollingBackupsNumericUpDown.Name = "RollingBackupsNumericUpDown";
+			this.RollingBackupsNumericUpDown.Size = new System.Drawing.Size(154, 20);
+			this.RollingBackupsNumericUpDown.TabIndex = 3;
+			// 
 			// PresenterBindingSource
 			// 
 			this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Configuration.ConfigurationPresenter);
@@ -244,6 +278,7 @@
 			this.Text = "Mod manager configuration";
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.RollingBackupsNumericUpDown)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
 			this.ResumeLayout(false);
 
@@ -268,5 +303,7 @@
 		private System.Windows.Forms.Button ExpansionsPathButton;
 		private System.Windows.Forms.BindingSource PresenterBindingSource;
 		private System.Windows.Forms.ToolTip tooltip;
+		private System.Windows.Forms.Label RollingBackupsLabel;
+		private System.Windows.Forms.NumericUpDown RollingBackupsNumericUpDown;
 	}
 }
