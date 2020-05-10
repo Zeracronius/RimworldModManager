@@ -17,16 +17,16 @@ namespace ModManager.Logic.Main
         public readonly Color WarningColor = Color.Orange;
 
         Model.ModsConfigData _config;
-        Dictionary<string, Model.ModMetaData> _activeMods;
-        Dictionary<string, Model.ModMetaData> _availableMods;
-        Model.ModMetaData _selectedMod;
+        Dictionary<string, ViewModels.ModViewModel> _activeMods;
+        Dictionary<string, ViewModels.ModViewModel> _availableMods;
+        ViewModels.ModViewModel _selectedMod;
 
         public event EventHandler LoadComplete;
         public bool Loaded { get; private set; }
 
         private bool _loading;
 
-        public Model.ModMetaData SelectedMod
+        public ViewModels.ModViewModel SelectedMod
         {
             get => _selectedMod;
 
@@ -44,8 +44,8 @@ namespace ModManager.Logic.Main
 
 
         public Model.ModsConfigData Config => _config;
-        public Dictionary<string, Model.ModMetaData> AvailableMods => _availableMods;
-        public Dictionary<string, Model.ModMetaData> ActiveMods => _activeMods;
+        public Dictionary<string, ViewModels.ModViewModel> AvailableMods => _availableMods;
+        public Dictionary<string, ViewModels.ModViewModel> ActiveMods => _activeMods;
 
 
 
@@ -66,33 +66,38 @@ namespace ModManager.Logic.Main
                 _loading = true;
 
                 Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
-                Task<Dictionary<string, Model.ModMetaData>> loadModsTask = Task.Run(() => LoadMods());
+                Task<Dictionary<string, ViewModels.ModViewModel>> loadModsTask = Task.Run(() => LoadMods());
 
                 await Task.WhenAll(loadConfigTask, loadModsTask);
 
 
                 _config = loadConfigTask.Result;
 
-                Dictionary<string, Model.ModMetaData> mods = loadModsTask.Result;
+                Dictionary<string, ViewModels.ModViewModel> mods = loadModsTask.Result;
 
-                _activeMods = new Dictionary<string, Model.ModMetaData>();
+                _activeMods = new Dictionary<string, ViewModels.ModViewModel>();
                 if (_config != null)
                 {
+
+                    StringBuilder stringBuilder = new StringBuilder();
                     foreach (string mod in _config.ActiveMods)
                     {
-                        Model.ModMetaData meta = null;
+                        ViewModels.ModViewModel modView = null;
                         if (mods.ContainsKey(mod))
-                            meta = mods[mod];
+                            modView = mods[mod];
                         else
                         {
-                            meta = mods.Values.FirstOrDefault(x => x.Directory.Name == mod);
-                            if (meta == null)
-                                continue;
+                            // Unable to load active mod
+                            stringBuilder.AppendLine("Missing mod: " + mod);
+                            continue;
                         }
 
-                        _activeMods.Add(meta.PackageId, meta);
+                        _activeMods.Add(modView.PackageId, modView);
                         mods.Remove(mod);
                     }
+
+                    if (stringBuilder.Length > 0)
+                        MessageBox.Show("Some mods were missing:" + Environment.NewLine + stringBuilder.ToString());
 
                     _availableMods = mods;
                     LoadComplete?.Invoke(this, new EventArgs());
@@ -178,9 +183,9 @@ namespace ModManager.Logic.Main
         }
 
 
-        public Dictionary<string, Model.ModMetaData> LoadMods()
+        public Dictionary<string, ViewModels.ModViewModel> LoadMods()
         {
-            Dictionary<string, Model.ModMetaData> availableMods = new Dictionary<string, Model.ModMetaData>(200);
+            Dictionary<string, ViewModels.ModViewModel> availableMods = new Dictionary<string, ViewModels.ModViewModel>(200);
             Settings settings = Settings.Default;
 
             if (Directory.Exists(settings.WorkshopPath))
@@ -191,13 +196,9 @@ namespace ModManager.Logic.Main
                     if (availableMods.ContainsKey(modDirectory.Name))
                         continue;
 
-                    Model.ModMetaData modMeta = LoadModMeta(modDirectory);
-                    if (modMeta != null)
-                    {
-                        modMeta.WorkshopPath = "steam://url/CommunityFilePage/" + modDirectory.Name;
-                        modMeta.Downloaded = modDirectory.CreationTime;
-                        availableMods.Add(modMeta.PackageId ?? modMeta.Directory.Name, modMeta);
-                    }
+                    ViewModels.ModViewModel mod = LoadModMeta(modDirectory, ViewModels.ModViewModel.ModType.Workshop);
+                    if (mod != null)
+                        availableMods.Add(mod.PackageId, mod);
                 }
             }
 
@@ -206,39 +207,36 @@ namespace ModManager.Logic.Main
             
             // Load local mods
             if (Directory.Exists(settings.LocalModsPath))
-                modDirectories.AddRange(Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)));
+            {
+                foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.LocalModsPath).Select(x => new DirectoryInfo(x)))
+                {
+                    if (availableMods.ContainsKey(modDirectory.Name))
+                        continue;
+
+                    ViewModels.ModViewModel mod = LoadModMeta(modDirectory, ViewModels.ModViewModel.ModType.Local);
+                    if (mod != null)
+                        availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
+                }
+
+            }
+
 
             // Load expansions
-            modDirectories.AddRange(Directory.GetDirectories(settings.ExpansionsPath).Select(x => new DirectoryInfo(x)));
-
-
-            foreach (DirectoryInfo modDirectory in modDirectories)
+            foreach (DirectoryInfo modDirectory in Directory.GetDirectories(settings.ExpansionsPath).Select(x => new DirectoryInfo(x)))
             {
                 if (availableMods.ContainsKey(modDirectory.Name))
                     continue;
 
-                Model.ModMetaData modMeta = LoadModMeta(modDirectory);
-                if (modMeta != null)
-                {
-                    modMeta.Downloaded = modDirectory.CreationTime;
-
-                    if (modDirectory.Name == "Core")
-                    {
-                        modMeta.Name = "Core";
-                        modMeta.TargetVersion = File.ReadAllText(Path.Combine(settings.InstallationPath, "Version.txt"));
-                    }
-                    else
-                        modMeta.Name += " (local)";
-
-                    availableMods.Add(modMeta.PackageId ?? modDirectory.Name, modMeta);
-                }
+                ViewModels.ModViewModel mod = LoadModMeta(modDirectory, ViewModels.ModViewModel.ModType.Expansion);
+                if (mod != null)
+                    availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
             }
 
 
             return availableMods;
         }
 
-        private Model.ModMetaData LoadModMeta(DirectoryInfo modDirectory)
+        private ViewModels.ModViewModel LoadModMeta(DirectoryInfo modDirectory, ViewModels.ModViewModel.ModType type)
         {
             string aboutPath = Path.Combine(modDirectory.FullName, "About", "About.xml");
 
@@ -250,14 +248,10 @@ namespace ModManager.Logic.Main
             using (FileStream file = File.Open(aboutPath, FileMode.Open, FileAccess.Read))
                 modMeta = xmlSerializer.Deserialize(file) as Model.ModMetaData;
 
-            string imagePath = Path.Combine(modDirectory.FullName, "About", "Preview.png");
-            if (File.Exists(imagePath))
-                modMeta.PreviewPath = imagePath;
 
-            modMeta.Directory = modDirectory;
-            modMeta.PackageId = modMeta.PackageId?.ToLower();
+            ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, type);
 
-            return modMeta;
+            return mod;
         }
 
     }
