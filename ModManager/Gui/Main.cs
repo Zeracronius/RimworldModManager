@@ -216,7 +216,11 @@ namespace ModManager.Gui
                     continue;
                 }
 
-                ModViewModel mod = _presenter.ActiveMods[item.Name];
+                ModViewModel mod;
+                _presenter.ActiveMods.TryGetValue(item.Name, out mod);
+
+                if (mod == null)
+                    _presenter.AvailableMods.TryGetValue(item.Name, out mod);
 
 
                 StringBuilder tooltip = new StringBuilder();
