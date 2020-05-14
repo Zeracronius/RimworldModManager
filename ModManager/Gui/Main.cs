@@ -113,15 +113,15 @@ namespace ModManager.Gui
                 if (selectedMod != null)
                 {
                     menuStrip1.Enabled = true;
+                    _presenter.SelectedMod = selectedMod;
 
                     if (String.IsNullOrWhiteSpace(selectedMod.WorkshopPath))
                         openWorkshopPageToolStripMenuItem.Visible = false;
                     else
                         openWorkshopPageToolStripMenuItem.Visible = true;
 
-                    _presenter.SelectedMod = selectedMod;
 
-
+                    // Convert Unity rich text format to HTML
                     string richFormat = "<html><body>" + selectedMod.Description + "</body></html>";
 
                     // Parse size tags
@@ -165,7 +165,7 @@ namespace ModManager.Gui
                 int warnings = issues.Count(x => x.BackColor == _presenter.WarningColor);
                 int incompatibles = issues.Count(x => x.BackColor == _presenter.IncompatibleColor);
 
-                DialogResult result = MessageBox.Show($"There is currently {0} warnings and {1} incompatible mods.", "Save mods", MessageBoxButtons.OKCancel);
+                DialogResult result = MessageBox.Show($"There is currently {warnings} warnings and {incompatibles} incompatible mods.", "Save mods", MessageBoxButtons.OKCancel);
                 if (result == DialogResult.Cancel)
                     return;
             }
