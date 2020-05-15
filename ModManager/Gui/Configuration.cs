@@ -27,6 +27,7 @@ namespace ModManager.Gui
 			tooltip.SetToolTip(ExpansionPathLabel, @"Path to rimworld's configuration folder. (Typically 'C:\Users\[user]\AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\Config').");
 			tooltip.SetToolTip(WorkshopPathPathLabel, @"Path to rimworld's workshop mods folder. (Typically 'steamapps\workshop\content\294100\').");
 			tooltip.SetToolTip(LocalModPathLabel, @"Path to rimworld's local mods folder. (Typically 'steamapps\common\RimWorld\Mods'.");
+			tooltip.SetToolTip(RollingBackupsLabel, @"Sets the number of backups to keep before overwriting the oldest when saving, set to 0 to disable.");
 		}
 
 		private void ExpansionsPathButton_Click(object sender, EventArgs e)

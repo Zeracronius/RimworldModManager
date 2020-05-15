@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using ModManager.Logic.Configuration;
 using ModManager.Logic.Main;
+using ModManager.Logic.Main.ViewModels;
 using ModManager.Logic.Model;
 using ModManager.Properties;
 
@@ -72,23 +73,21 @@ namespace ModManager.Gui
             SaveButton.Enabled = true;
         }
 
-        private ListViewItem CreateItem(KeyValuePair<string, Logic.Model.ModMetaData> mod)
+        private ListViewItem CreateItem(KeyValuePair<string, ModViewModel> mod)
         {
             ListViewItem listItem;
 
-            Logic.Model.ModMetaData modMeta = mod.Value;
+            ModViewModel modMeta = mod.Value;
             listItem = new ListViewItem(new string[] 
             {
-                modMeta.Name,
-                modMeta.Downloaded.ToString("yyyy/MM/dd hh:mm"),
-                modMeta.SupportedVersions != null ? String.Join(", ", modMeta.SupportedVersions.Select(x => x.Trim())) : modMeta.TargetVersion,
+                modMeta.Caption,
+                modMeta.Downloaded,
+                modMeta.SupportedVersions,
             });
 
 
             listItem.Name = mod.Key;
-            int minorIndex = _presenter.ActiveMods["ludeon.rimworld"].TargetVersion.LastIndexOf(".");
-            string coreVersion = _presenter.ActiveMods["ludeon.rimworld"].TargetVersion.Substring(0, minorIndex);
-            if (listItem.SubItems[2].Text.Contains(coreVersion) == false)
+            if (listItem.SubItems[2].Text.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
                 listItem.BackColor = _presenter.IncompatibleColor;
 
             return listItem;
@@ -104,7 +103,7 @@ namespace ModManager.Gui
             {
                 string modKey = view.SelectedItems[0].Name;
 
-                ModMetaData selectedMod;
+                ModViewModel selectedMod;
                 _presenter.ActiveMods.TryGetValue(modKey, out selectedMod);
 
                 if (selectedMod == null)
@@ -114,15 +113,15 @@ namespace ModManager.Gui
                 if (selectedMod != null)
                 {
                     menuStrip1.Enabled = true;
+                    _presenter.SelectedMod = selectedMod;
 
                     if (String.IsNullOrWhiteSpace(selectedMod.WorkshopPath))
                         openWorkshopPageToolStripMenuItem.Visible = false;
                     else
                         openWorkshopPageToolStripMenuItem.Visible = true;
 
-                    _presenter.SelectedMod = selectedMod;
 
-
+                    // Convert Unity rich text format to HTML
                     string richFormat = "<html><body>" + selectedMod.Description + "</body></html>";
 
                     // Parse size tags
@@ -166,7 +165,7 @@ namespace ModManager.Gui
                 int warnings = issues.Count(x => x.BackColor == _presenter.WarningColor);
                 int incompatibles = issues.Count(x => x.BackColor == _presenter.IncompatibleColor);
 
-                DialogResult result = MessageBox.Show($"There is currently {0} warnings and {1} incompatible mods.", "Save mods", MessageBoxButtons.OKCancel);
+                DialogResult result = MessageBox.Show($"There is currently {warnings} warnings and {incompatibles} incompatible mods.", "Save mods", MessageBoxButtons.OKCancel);
                 if (result == DialogResult.Cancel)
                     return;
             }
@@ -217,17 +216,21 @@ namespace ModManager.Gui
                     continue;
                 }
 
-                ModMetaData mod = _presenter.ActiveMods[item.Name];
+                ModViewModel mod;
+                _presenter.ActiveMods.TryGetValue(item.Name, out mod);
+
+                if (mod == null)
+                    _presenter.AvailableMods.TryGetValue(item.Name, out mod);
 
 
                 StringBuilder tooltip = new StringBuilder();
 
                 if (mod.Dependencies != null)
                 {
-                    foreach (ModMetaData.ModDependancy dependancy in mod.Dependencies)
+                    foreach (KeyValuePair<string, string> dependancy in mod.Dependencies)
                     {
-                        if (ActiveModsListView.Items.ContainsKey(dependancy.PackageId.ToLower()) == false)
-                            tooltip.AppendLine("Missing dependancy: " + dependancy.Name);
+                        if (ActiveModsListView.Items.ContainsKey(dependancy.Key) == false)
+                            tooltip.AppendLine("Missing dependancy: " + dependancy.Value);
                     }
                 }
 

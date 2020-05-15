@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="Logic\Configuration\ConfigurationPresenter.cs" />
     <Compile Include="Logic\Main\MainPresenter.cs" />
+    <Compile Include="Logic\Main\ViewModels\ModViewModel.cs" />
     <Compile Include="Logic\Model\ModMetaData.cs" />
     <Compile Include="Logic\Model\ModsConfigData.cs" />
     <Compile Include="Program.cs" />
@@ -112,6 +113,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="..\CHANGELOG.md">
+      <Link>CHANGELOG.md</Link>
+    </None>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

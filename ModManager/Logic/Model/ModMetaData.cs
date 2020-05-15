@@ -8,6 +8,9 @@ using System.Xml.Serialization;
 
 namespace ModManager.Logic.Model
 {
+    /// <summary>
+    /// Serialization model matching \About\About.xml
+    /// </summary>
     public class ModMetaData
     {
         public struct ModDependancy
@@ -53,20 +56,5 @@ namespace ModManager.Logic.Model
         [XmlArray("loadAfter")]
         [XmlArrayItem("li")]
         public string[] LoadAfter { get; set; }
-
-
-
-
-        [XmlIgnore]
-        public string PreviewPath { get; set; }
-
-        [XmlIgnore]
-        public System.IO.DirectoryInfo Directory { get; set; }
-
-        [XmlIgnore]
-        public string WorkshopPath { get; set; }
-
-        [XmlIgnore]
-        public DateTime Downloaded { get; set; }
     }
 }

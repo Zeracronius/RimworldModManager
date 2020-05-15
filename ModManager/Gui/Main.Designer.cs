@@ -32,7 +32,6 @@
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.ModNameLabel = new System.Windows.Forms.Label();
 			this.ModBindingSource = new System.Windows.Forms.BindingSource(this.components);
-			this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.DescriptionWebBrowser = new System.Windows.Forms.WebBrowser();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.browseFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,16 +43,8 @@
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-			this.ModsListView = new ModManager.Gui.Components.ReorderableListView();
-			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.AvailableModsFooterLabel = new System.Windows.Forms.Label();
-			this.ActiveModsListView = new ModManager.Gui.Components.ReorderableListView();
-			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			this.ActiveModsFooterLabel = new System.Windows.Forms.Label();
 			this.menuStrip3 = new System.Windows.Forms.MenuStrip();
@@ -64,9 +55,17 @@
 			this.expansionsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.workshopFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.modsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ModsListView = new ModManager.Gui.Components.ReorderableListView();
+			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ActiveModsListView = new ModManager.Gui.Components.ReorderableListView();
+			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.flowLayoutPanel2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.ModPictureBox)).BeginInit();
@@ -82,6 +81,7 @@
 			this.flowLayoutPanel1.SuspendLayout();
 			this.flowLayoutPanel3.SuspendLayout();
 			this.menuStrip3.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -109,7 +109,7 @@
 			// 
 			this.ModNameLabel.AutoSize = true;
 			this.ModNameLabel.BackColor = System.Drawing.SystemColors.ControlLight;
-			this.ModNameLabel.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.ModBindingSource, "Name", true));
+			this.ModNameLabel.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.ModBindingSource, "Caption", true));
 			this.ModNameLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.ModNameLabel.Location = new System.Drawing.Point(0, 0);
 			this.ModNameLabel.Margin = new System.Windows.Forms.Padding(0);
@@ -125,10 +125,6 @@
 			this.ModBindingSource.AllowNew = false;
 			this.ModBindingSource.DataMember = "SelectedMod";
 			this.ModBindingSource.DataSource = this.PresenterBindingSource;
-			// 
-			// PresenterBindingSource
-			// 
-			this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Main.MainPresenter);
 			// 
 			// DescriptionWebBrowser
 			// 
@@ -265,43 +261,6 @@
 			this.splitContainer2.SplitterDistance = 373;
 			this.splitContainer2.TabIndex = 1;
 			// 
-			// ModsListView
-			// 
-			this.ModsListView.AllowDrop = true;
-			this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3});
-			this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ModsListView.FullRowSelect = true;
-			this.ModsListView.HideSelection = false;
-			this.ModsListView.Location = new System.Drawing.Point(0, 0);
-			this.ModsListView.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.ModsListView.Name = "ModsListView";
-			this.ModsListView.Size = new System.Drawing.Size(373, 401);
-			this.ModsListView.TabIndex = 0;
-			this.ModsListView.UseCompatibleStateImageBehavior = false;
-			this.ModsListView.View = System.Windows.Forms.View.Details;
-			this.ModsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ModsListView_ColumnClick);
-			this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-			this.ModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
-			this.ModsListView.DoubleClick += new System.EventHandler(this.ModsListView_DoubleClick);
-			// 
-			// columnHeader1
-			// 
-			this.columnHeader1.Text = "Name";
-			this.columnHeader1.Width = 240;
-			// 
-			// columnHeader2
-			// 
-			this.columnHeader2.Text = "Downloaded";
-			this.columnHeader2.Width = 73;
-			// 
-			// columnHeader3
-			// 
-			this.columnHeader3.Text = "Supports";
-			this.columnHeader3.Width = 54;
-			// 
 			// flowLayoutPanel1
 			// 
 			this.flowLayoutPanel1.AutoSize = true;
@@ -322,44 +281,6 @@
 			this.AvailableModsFooterLabel.Size = new System.Drawing.Size(45, 13);
 			this.AvailableModsFooterLabel.TabIndex = 0;
 			this.AvailableModsFooterLabel.Text = "Loading";
-			// 
-			// ActiveModsListView
-			// 
-			this.ActiveModsListView.AllowDrop = true;
-			this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader6});
-			this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ActiveModsListView.FullRowSelect = true;
-			this.ActiveModsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.ActiveModsListView.HideSelection = false;
-			this.ActiveModsListView.Location = new System.Drawing.Point(0, 0);
-			this.ActiveModsListView.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-			this.ActiveModsListView.Name = "ActiveModsListView";
-			this.ActiveModsListView.ShowItemToolTips = true;
-			this.ActiveModsListView.Size = new System.Drawing.Size(380, 401);
-			this.ActiveModsListView.TabIndex = 1;
-			this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
-			this.ActiveModsListView.View = System.Windows.Forms.View.Details;
-			this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-			this.ActiveModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
-			this.ActiveModsListView.DoubleClick += new System.EventHandler(this.ActiveModsListView_DoubleClick);
-			// 
-			// columnHeader4
-			// 
-			this.columnHeader4.Text = "Name";
-			this.columnHeader4.Width = 243;
-			// 
-			// columnHeader5
-			// 
-			this.columnHeader5.Text = "Downloaded";
-			this.columnHeader5.Width = 79;
-			// 
-			// columnHeader6
-			// 
-			this.columnHeader6.Text = "Supports";
-			this.columnHeader6.Width = 54;
 			// 
 			// flowLayoutPanel3
 			// 
@@ -447,6 +368,85 @@
 			this.modsFolderToolStripMenuItem.Text = "Mods folder";
 			this.modsFolderToolStripMenuItem.Click += new System.EventHandler(this.ModsFolderToolStripMenuItem_Click);
 			// 
+			// ModsListView
+			// 
+			this.ModsListView.AllowDrop = true;
+			this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+			this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ModsListView.FullRowSelect = true;
+			this.ModsListView.HideSelection = false;
+			this.ModsListView.Location = new System.Drawing.Point(0, 0);
+			this.ModsListView.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.ModsListView.Name = "ModsListView";
+			this.ModsListView.Size = new System.Drawing.Size(373, 401);
+			this.ModsListView.TabIndex = 0;
+			this.ModsListView.UseCompatibleStateImageBehavior = false;
+			this.ModsListView.View = System.Windows.Forms.View.Details;
+			this.ModsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ModsListView_ColumnClick);
+			this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
+			this.ModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
+			this.ModsListView.DoubleClick += new System.EventHandler(this.ModsListView_DoubleClick);
+			// 
+			// columnHeader1
+			// 
+			this.columnHeader1.Text = "Name";
+			this.columnHeader1.Width = 240;
+			// 
+			// columnHeader2
+			// 
+			this.columnHeader2.Text = "Downloaded";
+			this.columnHeader2.Width = 73;
+			// 
+			// columnHeader3
+			// 
+			this.columnHeader3.Text = "Supports";
+			this.columnHeader3.Width = 54;
+			// 
+			// ActiveModsListView
+			// 
+			this.ActiveModsListView.AllowDrop = true;
+			this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader4,
+            this.columnHeader5,
+            this.columnHeader6});
+			this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ActiveModsListView.FullRowSelect = true;
+			this.ActiveModsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.ActiveModsListView.HideSelection = false;
+			this.ActiveModsListView.Location = new System.Drawing.Point(0, 0);
+			this.ActiveModsListView.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+			this.ActiveModsListView.Name = "ActiveModsListView";
+			this.ActiveModsListView.ShowItemToolTips = true;
+			this.ActiveModsListView.Size = new System.Drawing.Size(380, 401);
+			this.ActiveModsListView.TabIndex = 1;
+			this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
+			this.ActiveModsListView.View = System.Windows.Forms.View.Details;
+			this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
+			this.ActiveModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
+			this.ActiveModsListView.DoubleClick += new System.EventHandler(this.ActiveModsListView_DoubleClick);
+			// 
+			// columnHeader4
+			// 
+			this.columnHeader4.Text = "Name";
+			this.columnHeader4.Width = 243;
+			// 
+			// columnHeader5
+			// 
+			this.columnHeader5.Text = "Downloaded";
+			this.columnHeader5.Width = 79;
+			// 
+			// columnHeader6
+			// 
+			this.columnHeader6.Text = "Supports";
+			this.columnHeader6.Width = 54;
+			// 
+			// PresenterBindingSource
+			// 
+			this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Main.MainPresenter);
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -461,7 +461,6 @@
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.flowLayoutPanel2.ResumeLayout(false);
@@ -484,6 +483,7 @@
 			this.flowLayoutPanel3.PerformLayout();
 			this.menuStrip3.ResumeLayout(false);
 			this.menuStrip3.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
 			this.ResumeLayout(false);
 
         }

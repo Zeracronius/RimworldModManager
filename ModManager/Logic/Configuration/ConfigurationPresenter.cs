@@ -14,6 +14,7 @@ namespace ModManager.Logic.Configuration
 		public string ExpansionsPath { get; set; }
 		public string LocalModPath { get; set; }
 		public string WorkshopPath { get; set; }
+		public int RollingBackups { get; set; }
 
 
 		public ConfigurationPresenter()
@@ -22,6 +23,7 @@ namespace ModManager.Logic.Configuration
 			ExpansionsPath = Settings.Default.ExpansionsPath;
 			LocalModPath = Settings.Default.LocalModsPath;
 			WorkshopPath = Settings.Default.WorkshopPath;
+			RollingBackups = Settings.Default.RollingBackups;
 		}
 
 		public void Save()
@@ -31,6 +33,7 @@ namespace ModManager.Logic.Configuration
 			settings.ExpansionsPath = ExpansionsPath;
 			settings.LocalModsPath = LocalModPath;
 			settings.WorkshopPath = WorkshopPath;
+			settings.RollingBackups = RollingBackups;
 			settings.Save();
 		}
 	}

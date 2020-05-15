@@ -21,8 +21,15 @@ namespace ModManager
             Application.SetCompatibleTextRenderingDefault(false);
             Application.ThreadException += Application_ThreadException;
 
+            if (Settings.Default.UpgradeRequired)
+            {
+                Settings.Default.Upgrade();
+                Settings.Default.UpgradeRequired = false;
+                Settings.Default.Save();
+            }
 
-            if (System.IO.File.Exists(System.IO.Path.Combine(Properties.Settings.Default.InstallationPath, "Version.txt")) == false)
+
+            if (System.IO.File.Exists(System.IO.Path.Combine(Settings.Default.InstallationPath, "Version.txt")) == false)
             {
                 OpenFileDialog fileDialog = new OpenFileDialog()
                 {
