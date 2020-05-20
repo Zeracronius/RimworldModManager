@@ -188,6 +188,11 @@ namespace ModManager.Logic.Main
             Dictionary<string, ViewModels.ModViewModel> availableMods = new Dictionary<string, ViewModels.ModViewModel>(200);
             Settings settings = Settings.Default;
 
+
+
+            string coreVersion = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
+            coreVersion = coreVersion.Substring(0, coreVersion.LastIndexOf("."));
+
             if (Directory.Exists(settings.WorkshopPath))
             {
                 // Load workshop mods
@@ -196,7 +201,7 @@ namespace ModManager.Logic.Main
                     if (availableMods.ContainsKey(modDirectory.Name))
                         continue;
 
-                    ViewModels.ModViewModel mod = LoadModMeta(modDirectory, ViewModels.ModViewModel.ModType.Workshop);
+                    ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Workshop);
                     if (mod != null)
                         availableMods.Add(mod.PackageId, mod);
                 }
@@ -213,7 +218,7 @@ namespace ModManager.Logic.Main
                     if (availableMods.ContainsKey(modDirectory.Name))
                         continue;
 
-                    ViewModels.ModViewModel mod = LoadModMeta(modDirectory, ViewModels.ModViewModel.ModType.Local);
+                    ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Local);
                     if (mod != null)
                         availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
                 }
@@ -227,7 +232,7 @@ namespace ModManager.Logic.Main
                 if (availableMods.ContainsKey(modDirectory.Name))
                     continue;
 
-                ViewModels.ModViewModel mod = LoadModMeta(modDirectory, ViewModels.ModViewModel.ModType.Expansion);
+                ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Expansion);
                 if (mod != null)
                     availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
             }
@@ -236,7 +241,7 @@ namespace ModManager.Logic.Main
             return availableMods;
         }
 
-        private ViewModels.ModViewModel LoadModMeta(DirectoryInfo modDirectory, ViewModels.ModViewModel.ModType type)
+        private ViewModels.ModViewModel LoadModMeta(DirectoryInfo modDirectory, string coreVersion, ViewModels.ModViewModel.ModType type)
         {
             string aboutPath = Path.Combine(modDirectory.FullName, "About", "About.xml");
 
@@ -245,11 +250,13 @@ namespace ModManager.Logic.Main
 
             Model.ModMetaData modMeta;
             var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModMetaData));
+
+
             using (FileStream file = File.Open(aboutPath, FileMode.Open, FileAccess.Read))
                 modMeta = xmlSerializer.Deserialize(file) as Model.ModMetaData;
 
 
-            ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, type);
+            ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);
 
             return mod;
         }

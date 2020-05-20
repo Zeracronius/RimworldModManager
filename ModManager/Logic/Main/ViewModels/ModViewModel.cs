@@ -2,6 +2,7 @@
 using ModManager.Properties;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,22 @@ namespace ModManager.Logic.Main.ViewModels
 		}
 
 
-		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, ModType type)
+		private T[] GetByVersion<T>(string coreVersion, ModMetaData.ByVersion<T> versioned)
+		{
+			switch (coreVersion)
+			{
+				case "1.0":
+					return versioned.V10;
+
+				case "1.1":
+					return versioned.V11;
+			}
+
+			return null;
+		}
+
+
+		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, string coreVersion, ModType type)
 		{
 			Type = type;
 			Directory = directory;
@@ -31,14 +47,34 @@ namespace ModManager.Logic.Main.ViewModels
 			SupportedVersions = modMeta.SupportedVersions != null ? String.Join(", ", modMeta.SupportedVersions.Select(x => x.Trim())) : modMeta.TargetVersion;
 			Description = modMeta.Description;
 
+
+			LoadBefore = new List<string>();
 			if (modMeta.LoadBefore != null)
-				LoadBefore = modMeta.LoadBefore.Select(x => x.ToLower()).ToArray();
+				LoadBefore.AddRange(modMeta.LoadBefore.Select(x => x.ToLower()));
 
+			LoadAfter = new List<string>();
 			if (modMeta.LoadAfter != null)
-				LoadAfter = modMeta.LoadAfter.Select(x => x.ToLower()).ToArray();
+				LoadAfter.AddRange(modMeta.LoadAfter.Select(x => x.ToLower()));
 
+			Dependencies = new Dictionary<string, string>();
 			if (modMeta.Dependencies != null)
-				Dependencies = modMeta.Dependencies.ToDictionary(x => x.PackageId.ToLower(), x => x.Name);
+			{
+				foreach (ModMetaData.ModDependancy dependancy in modMeta.Dependencies)
+					Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
+			}
+
+			// Couldn't figure out a better way to make xml deserialization dynamically create object members based on available version nodes.
+			if (modMeta.LoadBeforeByVersion != null)
+				LoadBefore.AddRange(GetByVersion(coreVersion, modMeta.LoadBeforeByVersion).Select(x => x.ToLower()));
+
+			if (modMeta.LoadAfterByVersion != null)
+				LoadAfter.AddRange(GetByVersion(coreVersion, modMeta.LoadAfterByVersion).Select(x => x.ToLower()));
+
+			if (modMeta.DependenciesByVersion != null)
+			{
+				foreach (ModMetaData.ModDependancy dependancy in GetByVersion(coreVersion, modMeta.DependenciesByVersion))
+					Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
+			}
 
 
 			string imagePath = Path.Combine(directory.FullName, "About", "Preview.png");
@@ -61,8 +97,7 @@ namespace ModManager.Logic.Main.ViewModels
 					break;
 
 				case ModType.Expansion:
-					string coreVersion = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
-					SupportedVersions = coreVersion.Substring(0, coreVersion.LastIndexOf("."));
+					SupportedVersions = coreVersion;
 					break;
 			}
 
@@ -77,8 +112,8 @@ namespace ModManager.Logic.Main.ViewModels
 
 
 		public Dictionary<string, string> Dependencies { get; set; }
-		public string[] LoadBefore { get; set; }
-		public string[] LoadAfter { get; set; }
+		public List<string> LoadBefore { get; set; }
+		public List<string> LoadAfter { get; set; }
 
 
 		public string SupportedVersions { get; private set; }
