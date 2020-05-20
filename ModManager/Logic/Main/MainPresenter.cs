@@ -89,15 +89,14 @@ namespace ModManager.Logic.Main
                         {
                             // Unable to load active mod
                             stringBuilder.AppendLine("Missing mod: " + mod);
-                            continue;
                         }
 
-                        _activeMods.Add(modView.PackageId, modView);
+                        _activeMods.Add(mod, modView);
                         mods.Remove(mod);
                     }
 
                     if (stringBuilder.Length > 0)
-                        MessageBox.Show("Some mods were missing:" + Environment.NewLine + stringBuilder.ToString());
+                        MessageBox.Show(stringBuilder.ToString(), "Missing mods");
 
                     _availableMods = mods;
                     LoadComplete?.Invoke(this, new EventArgs());

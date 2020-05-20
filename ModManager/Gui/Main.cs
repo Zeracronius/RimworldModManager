@@ -78,17 +78,37 @@ namespace ModManager.Gui
             ListViewItem listItem;
 
             ModViewModel modMeta = mod.Value;
-            listItem = new ListViewItem(new string[] 
+            if (modMeta != null)
             {
-                modMeta.Caption,
-                modMeta.Downloaded,
-                modMeta.SupportedVersions,
-            });
+                listItem = new ListViewItem(new string[] 
+                {
+                    modMeta.Caption,
+                    modMeta.Downloaded,
+                    modMeta.SupportedVersions,
+                });
+            }
+            else
+            {
+                listItem = new ListViewItem(new string[]
+                {
+                    mod.Key,
+                    null,
+                    null,
+                });
+            }
 
 
             listItem.Name = mod.Key;
-            if (listItem.SubItems[2].Text.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
+            if (modMeta == null)
+            {
+                listItem.ToolTipText = "This mod is missing";
                 listItem.BackColor = _presenter.IncompatibleColor;
+            }
+            else if (listItem.SubItems[2].Text.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
+            {
+                listItem.ToolTipText = "Incompatible with current version.";
+                listItem.BackColor = _presenter.IncompatibleColor;
+            }
 
             return listItem;
         }
@@ -150,6 +170,8 @@ namespace ModManager.Gui
 
             menuStrip1.Enabled = false;
             _presenter.SelectedMod = null;
+            DescriptionWebBrowser.DocumentText = String.Empty;
+            PresenterBindingSource.ResetBindings(false);
         }
 
         private void RefreshButton_Click(object sender, EventArgs e)
@@ -211,17 +233,14 @@ namespace ModManager.Gui
             foreach (var item in ActiveModsListView.Items.Cast<ListViewItem>())
             {
                 if (item.BackColor == _presenter.IncompatibleColor)
-                {
-                    item.ToolTipText = "Incompatible with current version.";
-                    continue;
-                }
+                    continue; 
+
 
                 ModViewModel mod;
                 _presenter.ActiveMods.TryGetValue(item.Name, out mod);
 
                 if (mod == null)
                     _presenter.AvailableMods.TryGetValue(item.Name, out mod);
-
 
                 StringBuilder tooltip = new StringBuilder();
 
@@ -263,9 +282,6 @@ namespace ModManager.Gui
                 else
                     item.BackColor = Color.Transparent;
             }
-
-
-
         }
 
         private void ModsListView_ColumnClick(object sender, ColumnClickEventArgs e)
