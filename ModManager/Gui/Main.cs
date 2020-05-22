@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -370,6 +371,37 @@ namespace ModManager.Gui
                 System.Diagnostics.Process.Start(path);
             else
                 MessageBox.Show("Browse folder", "Folder does not exist.", MessageBoxButtons.OK);
+        }
+
+        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.AddExtension = true;
+                dialog.Filter = "mod list (*.modlist)|*.modlist";
+
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                    _presenter.ExportModlist(dialog.FileName);
+            }
+        }
+
+        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "Ludeon Studios", "RimWorld by Ludeon Studios", "Saves");
+            using (OpenFileDialog dialog = new OpenFileDialog())
+            {
+                dialog.AddExtension = true;
+                dialog.Filter = "All|*.modlist;*.rws|mod list (*.modlist)|*.modlist|rimworld save (*.rws)|*.rws";
+                dialog.CheckFileExists = true;
+                dialog.Multiselect = false;
+                dialog.FilterIndex = 1;
+
+                if (Directory.Exists(savePath))
+                    dialog.InitialDirectory = savePath;
+
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                    _presenter.ImportModlist(dialog.FileName);
+            }
         }
     }
 }

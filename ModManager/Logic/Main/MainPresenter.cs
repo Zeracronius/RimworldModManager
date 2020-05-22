@@ -1,4 +1,5 @@
-﻿using ModManager.Properties;
+﻿using ModManager.Logic.Model;
+using ModManager.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -53,6 +54,114 @@ namespace ModManager.Logic.Main
         public MainPresenter()
         {
         }
+
+        /// <summary>
+        /// Import active mods from a .rws (rimworld save) or .modlist (exported mod list) and replace the current active mods
+        /// </summary>
+        /// <param name="filepath"></param>
+        public void ImportModlist(string filepath)
+        {
+            if (Loaded == false)
+                return;
+
+            FileInfo file = new FileInfo(filepath);
+
+            if (file.Exists == false)
+                throw new FileNotFoundException();
+
+            string[] mods;
+            switch (file.Extension)
+            {
+                case (".rws"):
+                    // Rimworld save
+                    Model.SavegameData.Meta saveMeta = DeserializeFile<Model.SavegameData>(file)?.SaveMeta;
+                    mods = saveMeta?.ModPackageIds;
+                    break;
+
+                case (".modlist"):
+                    // Exported mod list
+                    mods = DeserializeFile<Model.ModlistData>(file)?.ModPackageIds;
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Unknown file format");
+            }
+
+
+            if (mods != null)
+            {
+                // Deactivate all current mods
+                foreach (var item in _activeMods)
+                    _availableMods.Add(item.Key, item.Value);
+                _activeMods.Clear();
+
+                // Activate mods from loaded file
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (string mod in mods)
+                {
+                    ViewModels.ModViewModel modView = null;
+                    if (_availableMods.ContainsKey(mod))
+                        modView = _availableMods[mod];
+                    else
+                    {
+                        // Unable to load active mod
+                        stringBuilder.AppendLine("Missing mod: " + mod);
+                    }
+
+                    _activeMods.Add(mod, modView);
+                    _availableMods.Remove(mod);
+                }
+
+                if (stringBuilder.Length > 0)
+                    MessageBox.Show(stringBuilder.ToString(), "Missing mods");
+
+                LoadComplete?.Invoke(this, new EventArgs());
+            }
+        }
+
+
+
+        public void ExportModlist(string filepath)
+        {
+            ModlistData modlist = new ModlistData();
+            modlist.ModPackageIds = _activeMods.Keys.ToArray();
+            modlist.Version = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
+            SerializeFile(new FileInfo(filepath), modlist);
+        }
+
+
+        private T DeserializeFile<T>(FileInfo file) where T : class
+        {
+            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
+
+            T result = null;
+            try
+            {
+                using (FileStream filesStream = file.Open(FileMode.Open, FileAccess.Read))
+                    result = xmlSerializer.Deserialize(filesStream) as T;
+            }
+            catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
+            {
+                MessageBox.Show($"Unable to open file '{file.FullName}' because it was locked by another program.");
+            }
+
+            return result;
+        }
+
+        private void SerializeFile<T>(FileInfo file, T serializableObject) where T : class
+        {
+            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
+            try
+            {
+                using (FileStream fileStream = file.Open(FileMode.Create, FileAccess.Write))
+                    xmlSerializer.Serialize(fileStream, serializableObject);
+            }
+            catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
+            {
+                MessageBox.Show($"Unable to overwrite the file '{file.FullName}' because it was locked by another program.");
+            }
+        }
+
 
 
         public async void LoadData()
@@ -126,16 +235,7 @@ namespace ModManager.Logic.Main
                 Settings.Default.Save();
             }
 
-            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
-            try
-            {
-                using (FileStream file = modConfig.Open(FileMode.Create, FileAccess.Write))
-                    xmlSerializer.Serialize(file, _config);
-            }
-	        catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
-            {
-                MessageBox.Show("Unable to save the changes because config file was locked by another program.");
-	        }
+            SerializeFile(modConfig, _config);
         }
 
 
@@ -163,22 +263,7 @@ namespace ModManager.Logic.Main
         public Model.ModsConfigData LoadConfig()
         {
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
-
-            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModsConfigData));
-
-
-            Model.ModsConfigData config = null;
-            try
-            {
-                using (FileStream file = modConfig.Open(FileMode.Open, FileAccess.Read))
-                    config = xmlSerializer.Deserialize(file) as Model.ModsConfigData;
-            }
-            catch (IOException e) when ((e.HResult & 0x0000FFFF) == 32)
-            {
-                MessageBox.Show("Unable to load mod list because config file was locked by another program.");
-            }
-
-            return config;
+            return DeserializeFile<Model.ModsConfigData>(modConfig);
         }
 
 
@@ -247,12 +332,7 @@ namespace ModManager.Logic.Main
             if (File.Exists(aboutPath) == false)
                 return null;
 
-            Model.ModMetaData modMeta;
-            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(Model.ModMetaData));
-
-
-            using (FileStream file = File.Open(aboutPath, FileMode.Open, FileAccess.Read))
-                modMeta = xmlSerializer.Deserialize(file) as Model.ModMetaData;
+            Model.ModMetaData modMeta = DeserializeFile<Model.ModMetaData>(new FileInfo(aboutPath));
 
 
             ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);

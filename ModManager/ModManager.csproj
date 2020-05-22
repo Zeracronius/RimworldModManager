@@ -85,8 +85,10 @@
     <Compile Include="Logic\Configuration\ConfigurationPresenter.cs" />
     <Compile Include="Logic\Main\MainPresenter.cs" />
     <Compile Include="Logic\Main\ViewModels\ModViewModel.cs" />
+    <Compile Include="Logic\Model\ModlistData.cs" />
     <Compile Include="Logic\Model\ModMetaData.cs" />
     <Compile Include="Logic\Model\ModsConfigData.cs" />
+    <Compile Include="Logic\Model\SavegameData.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
