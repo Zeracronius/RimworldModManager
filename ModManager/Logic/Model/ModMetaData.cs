@@ -25,6 +25,18 @@ namespace ModManager.Logic.Model
             public string WorkshopURL { get; set; }
         }
 
+        public class ByVersion<T>
+        {
+            [XmlArray("v1.0")]
+            [XmlArrayItem("li")]
+            public T[] V10 { get; set; }
+
+
+            [XmlArray("v1.1")]
+            [XmlArrayItem("li")]
+            public T[] V11 { get; set; }
+        }
+
         [XmlElement("name")]
         public string Name { get; set; }
 
@@ -56,5 +68,17 @@ namespace ModManager.Logic.Model
         [XmlArray("loadAfter")]
         [XmlArrayItem("li")]
         public string[] LoadAfter { get; set; }
+
+
+
+        [XmlElement("loadAfterByVersion")]
+        public ByVersion<string> LoadAfterByVersion { get; set; }
+
+        [XmlElement("loadBeforeByVersion")]
+        public ByVersion<string> LoadBeforeByVersion { get; set; }
+
+        [XmlElement("modDependenciesByVersion")]
+        public ByVersion<ModDependancy> DependenciesByVersion { get; set; }
+
     }
 }

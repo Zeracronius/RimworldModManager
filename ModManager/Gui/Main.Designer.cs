@@ -50,6 +50,8 @@
 			this.menuStrip3 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.configurationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.browseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.configFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.expansionsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -317,7 +319,9 @@
 			// fileToolStripMenuItem
 			// 
 			this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.configurationsToolStripMenuItem});
+            this.configurationsToolStripMenuItem,
+            this.importToolStripMenuItem,
+            this.exportToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
 			this.fileToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
 			this.fileToolStripMenuItem.Text = "Edit";
@@ -325,9 +329,25 @@
 			// configurationsToolStripMenuItem
 			// 
 			this.configurationsToolStripMenuItem.Name = "configurationsToolStripMenuItem";
-			this.configurationsToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+			this.configurationsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.configurationsToolStripMenuItem.Text = "Configurations";
 			this.configurationsToolStripMenuItem.Click += new System.EventHandler(this.ConfigurationsToolStripMenuItem_Click);
+			// 
+			// importToolStripMenuItem
+			// 
+			this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+			this.importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.importToolStripMenuItem.Text = "Import mod list";
+			this.importToolStripMenuItem.ToolTipText = "Import active mods from either an exported list or a rimworld save";
+			this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+			// 
+			// exportToolStripMenuItem
+			// 
+			this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+			this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.exportToolStripMenuItem.Text = "Export mod list";
+			this.exportToolStripMenuItem.ToolTipText = "Export active mods as an importable mod list";
+			this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
 			// 
 			// browseToolStripMenuItem
 			// 
@@ -343,28 +363,28 @@
 			// configFolderToolStripMenuItem
 			// 
 			this.configFolderToolStripMenuItem.Name = "configFolderToolStripMenuItem";
-			this.configFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.configFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.configFolderToolStripMenuItem.Text = "Config folder";
 			this.configFolderToolStripMenuItem.Click += new System.EventHandler(this.ConfigFolderToolStripMenuItem_Click);
 			// 
 			// expansionsFolderToolStripMenuItem
 			// 
 			this.expansionsFolderToolStripMenuItem.Name = "expansionsFolderToolStripMenuItem";
-			this.expansionsFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.expansionsFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.expansionsFolderToolStripMenuItem.Text = "Expansions folder";
 			this.expansionsFolderToolStripMenuItem.Click += new System.EventHandler(this.ExpansionsFolderToolStripMenuItem_Click);
 			// 
 			// workshopFolderToolStripMenuItem
 			// 
 			this.workshopFolderToolStripMenuItem.Name = "workshopFolderToolStripMenuItem";
-			this.workshopFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.workshopFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.workshopFolderToolStripMenuItem.Text = "Workshop folder";
 			this.workshopFolderToolStripMenuItem.Click += new System.EventHandler(this.WorkshopFolderToolStripMenuItem_Click);
 			// 
 			// modsFolderToolStripMenuItem
 			// 
 			this.modsFolderToolStripMenuItem.Name = "modsFolderToolStripMenuItem";
-			this.modsFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.modsFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.modsFolderToolStripMenuItem.Text = "Mods folder";
 			this.modsFolderToolStripMenuItem.Click += new System.EventHandler(this.ModsFolderToolStripMenuItem_Click);
 			// 
@@ -524,5 +544,7 @@
 		private System.Windows.Forms.ToolStripMenuItem expansionsFolderToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem workshopFolderToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem modsFolderToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
 	}
 }
