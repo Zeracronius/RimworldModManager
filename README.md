@@ -1,35 +1,49 @@
-# Rimworld mod manager
+# Rimworld Mod Manager
 
+## Download
+Can be downloaded from [releases](https://github.com/Zeracronius/RimworldModManager/releases).
+
+## Description
 Originally inspired by ModSorter by Mehni  
 https://github.com/Mehni/ModSorter
-  
-  
-  
-This tool is designed to be very light weight; A single executable file with no dependencies or resources.
+ 
+This tool is designed to be very light weight; A single executable file with no dependencies or resources.  
+**Currently only supports Windows.**
+
 
 ![Layout image](Layout.jpg "Interface layout")
 
-1. The list on the left is all the inactive mods available.
+
+1. List of inactive mods available.
     - All mods available but not currently active is listed here.
     - Can be sorted by clicking the column headers.
     - Mods can be activated by either double clicking or dragging them into the list on the right. 
     - Multiple mods can be dragged at once.
-2. The center list contains the enabled/active mods
+2. List of enabled/active mods
     - All currently active mods are listed here in the current load order.
     - Load order can be changed using drag and drop inside the list.
     - Similar to the list of inactive mods, mods can be disabled by either double clicking or dragging them back into the inactive list.
     - Multiple mods can be dragged at once.
     - Because the active mods are listed by load order, this list does not support sorting by column.
-3. The right side shows information about the selected mod.
+3. Information about the selected mod.
     - The 'Directory' button opens the mod's local folder in a file browser.
     - The 'Steam Workshop' button is only visible for steam-workshop mods, and attempts to open the mod's workshop page in steam.
+4. Edit button.
+    - Modify configurations.
+    - Export active mods as a mod list file.
+    - Import active mods from a rimworld save or an exported mod list.
+5. Browse button.
+    - Provides shortcuts to open various related folders in windows.
+6. Incompatible or missing mods.
+    - Mods that are incompatible with the current game version - or completely missing - will show up as red.
+7. Warnings about load order mod dependancies.
+    - Hover over the highlighted mod to see details about the issue(s).
+8. Save button.
+    - overwrites rimworld's mod list config with the new list as defined in the program.  
+9. Reload button.
+    - rediscovers mods from mod folders, and reloads the current active mods from the rimworld configuration file.  
 
-The Save button in the bottom right overwrites rimworld's mod list config with the new list as defined in the program.  
-The Reload button reloads both available and active mods.  
-  
-Mods displayed in red are incompatible with the current version of core, while mods displayed in orange are warnings.  
-Hover the cursor over a colored mod to see a description of the issue(s).
 
-Note that there is no functionality to auto-sort load order.  
-RimPy is a more advanced and powerful alternative that does support that auto-sorting load order.  
+Note that there is no functionality to auto-sort load order.
+RimPy is a much more powerful alternative that does support auto-sorting the load order.  
 https://steamcommunity.com/sharedfiles/filedetails/?id=1847679158
