@@ -304,7 +304,12 @@ namespace ModManager.Logic.Main
 
                     ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Local);
                     if (mod != null)
-                        availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
+                    {
+                        //if (availableMods.ContainsKey(mod.PackageId))
+                        //    MessageBox.Show("The local version of the mod " + mod.Caption + " was prioritised.");
+
+                        availableMods[mod.PackageId ?? modDirectory.Name] = mod;
+                    }
                 }
 
             }

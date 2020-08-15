@@ -29,6 +29,9 @@ namespace ModManager.Logic.Main.ViewModels
 
 				case "1.1":
 					return versioned.V11;
+
+				case "1.2":
+					return versioned.V12;
 			}
 
 			return null;
@@ -65,15 +68,27 @@ namespace ModManager.Logic.Main.ViewModels
 
 			// Couldn't figure out a better way to make xml deserialization dynamically create object members based on available version nodes.
 			if (modMeta.LoadBeforeByVersion != null)
-				LoadBefore.AddRange(GetByVersion(coreVersion, modMeta.LoadBeforeByVersion).Select(x => x.ToLower()));
+			{
+				var loadBefore = GetByVersion(coreVersion, modMeta.LoadBeforeByVersion);
+				if (loadBefore != null)
+					LoadBefore.AddRange(loadBefore.Select(x => x.ToLower()));
+			}
 
 			if (modMeta.LoadAfterByVersion != null)
-				LoadAfter.AddRange(GetByVersion(coreVersion, modMeta.LoadAfterByVersion).Select(x => x.ToLower()));
+			{
+				var loadAfter = GetByVersion(coreVersion, modMeta.LoadAfterByVersion);
+				if (loadAfter != null)
+					LoadAfter.AddRange(loadAfter.Select(x => x.ToLower()));
+			}
 
 			if (modMeta.DependenciesByVersion != null)
 			{
-				foreach (ModMetaData.ModDependancy dependancy in GetByVersion(coreVersion, modMeta.DependenciesByVersion))
-					Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
+				var versionDependancies = GetByVersion(coreVersion, modMeta.DependenciesByVersion);
+				if (versionDependancies != null)
+				{
+					foreach (ModMetaData.ModDependancy dependancy in versionDependancies)
+						Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
+				}
 			}
 
 
