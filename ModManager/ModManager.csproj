@@ -1,131 +1,30 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F68BF19B-B8A1-4D52-B627-535A1F7572AA}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ModManager</RootNamespace>
-    <AssemblyName>ModManager</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>ModManager.Program</StartupObject>
+    <TargetFramework>net472</TargetFramework>
+    <Platforms>AnyCPU;x86</Platforms>
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateManifests>true</GenerateManifests>
+    <Copyright>Copyright © Zeracronius 2021</Copyright>
+    <Version>1.4</Version>
+    <Authors>Zeracronius</Authors>
+    <Company />
+    <PackageId>ModManager</PackageId>
+    <Product>ModManager</Product>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/Zeracronius/RimworldModManager</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Gui\Components\ListViewColumnSorter.cs" />
-    <Compile Include="Gui\Components\Native\ComDlgResources.cs" />
-    <Compile Include="Gui\Components\Native\COMGuids.cs" />
-    <Compile Include="Gui\Components\Native\ErrorHelper.cs" />
-    <Compile Include="Gui\Components\Native\NativeMethods.cs" />
-    <Compile Include="Gui\Components\Native\SafeModuleHandle.cs" />
-    <Compile Include="Gui\Components\Native\ShellComInterfaces.cs" />
-    <Compile Include="Gui\Components\Native\ShellWrapperDefinitions.cs" />
-    <Compile Include="Gui\Components\Native\Win32Resources.cs" />
-    <Compile Include="Gui\Components\Native\WindowHandleWrapper.cs" />
-    <Compile Include="Gui\Components\ReorderableListView.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Gui\Components\FolderBrowserDialogVista.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Gui\Configuration.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Gui\Configuration.Designer.cs">
-      <DependentUpon>Configuration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Gui\Main.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Gui\Main.Designer.cs">
-      <DependentUpon>Main.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Logic\Configuration\ConfigurationPresenter.cs" />
-    <Compile Include="Logic\Main\MainPresenter.cs" />
-    <Compile Include="Logic\Main\ViewModels\ModViewModel.cs" />
-    <Compile Include="Logic\Model\ModlistData.cs" />
-    <Compile Include="Logic\Model\ModMetaData.cs" />
-    <Compile Include="Logic\Model\ModsConfigData.cs" />
-    <Compile Include="Logic\Model\SavegameData.cs" />
-    <Compile Include="Program.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Gui\Configuration.resx">
-      <DependentUpon>Configuration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Gui\Main.resx">
-      <DependentUpon>Main.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="..\CHANGELOG.md">
-      <Link>CHANGELOG.md</Link>
-    </None>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\DataSources\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
