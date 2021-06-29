@@ -221,6 +221,8 @@ namespace ModManager.Logic.Main
 
         public void SaveConfig()
         {
+            _config.Version = ActiveMods["ludeon.rimworld"].SupportedVersions;
+
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
             modConfig.IsReadOnly = false;
 
