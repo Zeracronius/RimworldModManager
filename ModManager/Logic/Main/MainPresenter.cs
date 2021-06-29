@@ -14,6 +14,8 @@ namespace ModManager.Logic.Main
 {
     public class MainPresenter
     {
+        public event EventHandler LoadComplete;
+
         public readonly Color IncompatibleColor = Color.Red;
         public readonly Color WarningColor = Color.Orange;
 
@@ -21,11 +23,10 @@ namespace ModManager.Logic.Main
         Dictionary<string, ViewModels.ModViewModel> _activeMods;
         Dictionary<string, ViewModels.ModViewModel> _availableMods;
         ViewModels.ModViewModel _selectedMod;
-
-        public event EventHandler LoadComplete;
-        public bool Loaded { get; private set; }
-
         private bool _loading;
+
+        public bool Loaded { get; private set; }
+        public System.Drawing.Image PreviewImage { get; private set; }
 
         public ViewModels.ModViewModel SelectedMod
         {
@@ -41,15 +42,10 @@ namespace ModManager.Logic.Main
                     PreviewImage = null;
             }
         }
-        public System.Drawing.Image PreviewImage { get; private set; }
-
 
         public Model.ModsConfigData Config => _config;
         public Dictionary<string, ViewModels.ModViewModel> AvailableMods => _availableMods;
         public Dictionary<string, ViewModels.ModViewModel> ActiveMods => _activeMods;
-
-
-
 
         public MainPresenter()
         {
@@ -119,8 +115,6 @@ namespace ModManager.Logic.Main
             }
         }
 
-
-
         public void ExportModlist(string filepath)
         {
             ModlistData modlist = new ModlistData();
@@ -128,7 +122,6 @@ namespace ModManager.Logic.Main
             modlist.Version = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
             SerializeFile(new FileInfo(filepath), modlist);
         }
-
 
         private T DeserializeFile<T>(FileInfo file) where T : class
         {
@@ -240,7 +233,6 @@ namespace ModManager.Logic.Main
             SerializeFile(modConfig, _config);
         }
 
-
         public void BrowseFolder()
         {
             if (SelectedMod == null)
@@ -259,15 +251,11 @@ namespace ModManager.Logic.Main
                 System.Diagnostics.Process.Start(workshopPath);
         }
 
-
-
-
         public Model.ModsConfigData LoadConfig()
         {
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
             return DeserializeFile<Model.ModsConfigData>(modConfig);
         }
-
 
         public Dictionary<string, ViewModels.ModViewModel> LoadMods()
         {
@@ -346,6 +334,5 @@ namespace ModManager.Logic.Main
 
             return mod;
         }
-
     }
 }
