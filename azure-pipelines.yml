@@ -36,12 +36,10 @@ stages:
     - task: CopyFiles@2
       displayName: 'Copy artifacts to staging'
       inputs:
-        SourceFolder: '$(build.sourcesdirectory)/Release'
+        SourceFolder: '$(build.sourcesdirectory)/Release/$(buildPlatform)'
         Contents: '*.exe'
         TargetFolder: '$(build.artifactstagingdirectory)'
-
-
-        
+    
     - task: PowerShell@2
       displayName: 'Read version no. from primary EXE/AssemblyInfo'
       inputs:
