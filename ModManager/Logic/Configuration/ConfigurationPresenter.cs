@@ -15,15 +15,17 @@ namespace ModManager.Logic.Configuration
 		public string LocalModPath { get; set; }
 		public string WorkshopPath { get; set; }
 		public int RollingBackups { get; set; }
+        public bool SilentLoading { get; set; }
 
 
-		public ConfigurationPresenter()
+        public ConfigurationPresenter()
 		{
 			ConfigPath = Settings.Default.ConfigPath;
 			ExpansionsPath = Settings.Default.ExpansionsPath;
 			LocalModPath = Settings.Default.LocalModsPath;
 			WorkshopPath = Settings.Default.WorkshopPath;
 			RollingBackups = Settings.Default.RollingBackups;
+			SilentLoading = Settings.Default.SilentLoading;
 		}
 
 		public void Save()
@@ -34,6 +36,7 @@ namespace ModManager.Logic.Configuration
 			settings.LocalModsPath = LocalModPath;
 			settings.WorkshopPath = WorkshopPath;
 			settings.RollingBackups = RollingBackups;
+			settings.SilentLoading = SilentLoading;
 			settings.Save();
 		}
 	}
