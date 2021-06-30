@@ -30,10 +30,8 @@
 		{
             this.components = new System.ComponentModel.Container();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.RollingBackupsLabel = new System.Windows.Forms.Label();
             this.RimworldConfigPathLabel = new System.Windows.Forms.Label();
             this.RimworldConfigPathTextBox = new System.Windows.Forms.TextBox();
-            this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.WorkshopPathPathLabel = new System.Windows.Forms.Label();
             this.WorkshopPathTextBox = new System.Windows.Forms.TextBox();
             this.LocalModPathLabel = new System.Windows.Forms.Label();
@@ -44,23 +42,26 @@
             this.ExpansionPathTextBox = new System.Windows.Forms.TextBox();
             this.ExpansionPathLabel = new System.Windows.Forms.Label();
             this.ExpansionsPathButton = new System.Windows.Forms.Button();
+            this.RollingBackupsLabel = new System.Windows.Forms.Label();
             this.RollingBackupsNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.FormCancelButton = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
             this.tooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.SilentLoadingCheckBox = new System.Windows.Forms.CheckBox();
+            this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RollingBackupsNumericUpDown)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -94,16 +95,6 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(616, 116);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
-            // RollingBackupsLabel
-            // 
-            this.RollingBackupsLabel.AutoSize = true;
-            this.RollingBackupsLabel.Location = new System.Drawing.Point(3, 5);
-            this.RollingBackupsLabel.Margin = new System.Windows.Forms.Padding(3, 5, 5, 5);
-            this.RollingBackupsLabel.Name = "RollingBackupsLabel";
-            this.RollingBackupsLabel.Size = new System.Drawing.Size(86, 13);
-            this.RollingBackupsLabel.TabIndex = 0;
-            this.RollingBackupsLabel.Text = "Rolling backups:";
-            // 
             // RimworldConfigPathLabel
             // 
             this.RimworldConfigPathLabel.AutoSize = true;
@@ -123,10 +114,8 @@
             this.RimworldConfigPathTextBox.ReadOnly = true;
             this.RimworldConfigPathTextBox.Size = new System.Drawing.Size(407, 20);
             this.RimworldConfigPathTextBox.TabIndex = 1;
-            // 
-            // PresenterBindingSource
-            // 
-            this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Configuration.ConfigurationPresenter);
+            this.tooltip.SetToolTip(this.RimworldConfigPathTextBox, "Location of rimworld config files. (Typically in %USERPROFILE%\\AppData\\LocalLow\\L" +
+        "udeon Studios\\RimWorld by Ludeon Studios\\Config)");
             // 
             // WorkshopPathPathLabel
             // 
@@ -147,6 +136,7 @@
             this.WorkshopPathTextBox.ReadOnly = true;
             this.WorkshopPathTextBox.Size = new System.Drawing.Size(407, 20);
             this.WorkshopPathTextBox.TabIndex = 1;
+            this.tooltip.SetToolTip(this.WorkshopPathTextBox, "Location of Rimworld\'s workshop mods.");
             // 
             // LocalModPathLabel
             // 
@@ -167,6 +157,7 @@
             this.LocalModPathTextBox.ReadOnly = true;
             this.LocalModPathTextBox.Size = new System.Drawing.Size(407, 20);
             this.LocalModPathTextBox.TabIndex = 1;
+            this.tooltip.SetToolTip(this.LocalModPathTextBox, "Location of Rimworld mods.");
             // 
             // ConfigPathButton
             // 
@@ -207,6 +198,7 @@
             this.ExpansionPathTextBox.ReadOnly = true;
             this.ExpansionPathTextBox.Size = new System.Drawing.Size(407, 20);
             this.ExpansionPathTextBox.TabIndex = 1;
+            this.tooltip.SetToolTip(this.ExpansionPathTextBox, "Location of Rimworld expansions.");
             // 
             // ExpansionPathLabel
             // 
@@ -228,19 +220,30 @@
             this.ExpansionsPathButton.UseVisualStyleBackColor = true;
             this.ExpansionsPathButton.Click += new System.EventHandler(this.ExpansionsPathButton_Click);
             // 
+            // RollingBackupsLabel
+            // 
+            this.RollingBackupsLabel.AutoSize = true;
+            this.RollingBackupsLabel.Location = new System.Drawing.Point(3, 5);
+            this.RollingBackupsLabel.Margin = new System.Windows.Forms.Padding(3, 5, 5, 5);
+            this.RollingBackupsLabel.Name = "RollingBackupsLabel";
+            this.RollingBackupsLabel.Size = new System.Drawing.Size(86, 13);
+            this.RollingBackupsLabel.TabIndex = 0;
+            this.RollingBackupsLabel.Text = "Rolling backups:";
+            // 
             // RollingBackupsNumericUpDown
             // 
             this.RollingBackupsNumericUpDown.DataBindings.Add(new System.Windows.Forms.Binding("Value", this.PresenterBindingSource, "RollingBackups", true));
             this.RollingBackupsNumericUpDown.Dock = System.Windows.Forms.DockStyle.Top;
-            this.RollingBackupsNumericUpDown.Location = new System.Drawing.Point(97, 3);
+            this.RollingBackupsNumericUpDown.Location = new System.Drawing.Point(130, 3);
             this.RollingBackupsNumericUpDown.Maximum = new decimal(new int[] {
             10,
             0,
             0,
             0});
             this.RollingBackupsNumericUpDown.Name = "RollingBackupsNumericUpDown";
-            this.RollingBackupsNumericUpDown.Size = new System.Drawing.Size(167, 20);
+            this.RollingBackupsNumericUpDown.Size = new System.Drawing.Size(156, 20);
             this.RollingBackupsNumericUpDown.TabIndex = 3;
+            this.tooltip.SetToolTip(this.RollingBackupsNumericUpDown, "Every time the load order is saved, a new backup is made up to this number.");
             // 
             // FormCancelButton
             // 
@@ -275,6 +278,26 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
             // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 4;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.Controls.Add(this.RollingBackupsLabel, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.RollingBackupsNumericUpDown, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.SilentLoadingCheckBox, 0, 1);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(616, 116);
+            this.tableLayoutPanel2.TabIndex = 0;
+            this.tooltip.SetToolTip(this.tableLayoutPanel2, "Prevents loading issues from popping up.");
+            // 
             // groupBox2
             // 
             this.groupBox2.AutoSize = true;
@@ -286,24 +309,6 @@
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Directories";
-            // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.ColumnCount = 4;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel2.Controls.Add(this.RollingBackupsLabel, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.RollingBackupsNumericUpDown, 1, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(616, 116);
-            this.tableLayoutPanel2.TabIndex = 0;
             // 
             // tableLayoutPanel3
             // 
@@ -334,6 +339,21 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(622, 29);
             this.flowLayoutPanel1.TabIndex = 6;
             // 
+            // SilentLoadingCheckBox
+            // 
+            this.SilentLoadingCheckBox.AutoSize = true;
+            this.SilentLoadingCheckBox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.PresenterBindingSource, "SilentLoading", true));
+            this.SilentLoadingCheckBox.Location = new System.Drawing.Point(3, 29);
+            this.SilentLoadingCheckBox.Name = "SilentLoadingCheckBox";
+            this.SilentLoadingCheckBox.Size = new System.Drawing.Size(121, 17);
+            this.SilentLoadingCheckBox.TabIndex = 4;
+            this.SilentLoadingCheckBox.Text = "Silent loading errors.";
+            this.SilentLoadingCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // PresenterBindingSource
+            // 
+            this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Configuration.ConfigurationPresenter);
+            // 
             // Configuration
             // 
             this.AcceptButton = this.SaveButton;
@@ -348,16 +368,16 @@
             this.Text = "Mod manager configuration";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RollingBackupsNumericUpDown)).EndInit();
             this.groupBox1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
             this.ResumeLayout(false);
 
 		}
@@ -388,5 +408,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.CheckBox SilentLoadingCheckBox;
     }
 }

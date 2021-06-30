@@ -197,7 +197,7 @@ namespace ModManager.Logic.Main
                         mods.Remove(mod);
                     }
 
-                    if (stringBuilder.Length > 0)
+                    if (stringBuilder.Length > 0 && Settings.Default.SilentLoading == false)
                         MessageBox.Show(stringBuilder.ToString(), "Missing mods");
 
                     _availableMods = mods;
@@ -327,8 +327,18 @@ namespace ModManager.Logic.Main
             if (File.Exists(aboutPath) == false)
                 return null;
 
-            Model.ModMetaData modMeta = DeserializeFile<Model.ModMetaData>(new FileInfo(aboutPath));
+            Model.ModMetaData modMeta = null;
+            try
+            {
+                modMeta = DeserializeFile<Model.ModMetaData>(new FileInfo(aboutPath));
+            }
+            catch (Exception e)
+            {
+                if (Settings.Default.SilentLoading == false)
+                    MessageBox.Show($"Failed to read metadata from directory '{modDirectory.FullName}': {e.Message}");
 
+                return null;
+            }
 
             ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);
 

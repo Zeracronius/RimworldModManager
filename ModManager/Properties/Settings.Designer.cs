@@ -118,5 +118,17 @@ namespace ModManager.Properties {
                 this["UpgradeRequired"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SilentLoading {
+            get {
+                return ((bool)(this["SilentLoading"]));
+            }
+            set {
+                this["SilentLoading"] = value;
+            }
+        }
     }
 }
