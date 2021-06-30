@@ -1,1 +1,2 @@
-Updated title and readme.
+- Added handling of incompatible mod metadata.
+- Added option to disable errors from being displayed during loading.
