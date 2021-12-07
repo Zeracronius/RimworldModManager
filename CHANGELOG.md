@@ -1,2 +1,1 @@
-- Added handling of incompatible mod metadata.
-- Added option to disable errors from being displayed during loading.
+- Drag and drop polishing: Added indicator line for drop target.
