@@ -1,1 +1,1 @@
-- Drag and drop polishing: Added indicator line for drop target.
+- Enabled assembly signing.

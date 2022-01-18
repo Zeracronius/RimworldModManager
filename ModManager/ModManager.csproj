@@ -6,13 +6,15 @@
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateManifests>true</GenerateManifests>
     <Copyright>Copyright © Zeracronius 2021</Copyright>
-    <Version>1.4.2</Version>
+    <Version>1.4.3</Version>
     <Authors>Zeracronius</Authors>
     <Company />
     <PackageId>ModManager</PackageId>
     <Product>ModManager</Product>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/Zeracronius/RimworldModManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Zeracronius/RimworldModManager</RepositoryUrl>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>..\Release\</OutputPath>
