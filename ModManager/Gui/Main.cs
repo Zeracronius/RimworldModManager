@@ -237,7 +237,7 @@ namespace ModManager.Gui
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            ModViewModel[] issues = _activeModItems.OfType<ModViewModel>().Where(x => x.Background != Color.Transparent).ToArray();
+            ModViewModel[] issues = ExpandList(_activeModItems).Where(x => x.Background != Color.Transparent).ToArray();
             if (issues.Length > 0)
             {
                 int warnings = issues.Count(x => x.Background == _presenter.WarningColor);
@@ -248,9 +248,27 @@ namespace ModManager.Gui
                     return;
             }
 
-            _presenter.Config.ActiveMods = _activeModItems.OfType<ModViewModel>().Select(x => x.PackageId).ToArray();
+
+
+
+
+            _presenter.Config.ActiveMods = ExpandList(_activeModItems).Select(x => x.PackageId).ToArray();
             _presenter.SaveConfig();
             _presenter.LoadData();
+        }
+
+        private IEnumerable<ModViewModel> ExpandList(IEnumerable<ITreeListViewItem> list)
+        {
+            foreach (ITreeListViewItem item in list)
+            {
+                if (item is ModViewModel mod)
+                    yield return mod;
+
+                foreach (ModViewModel subMod in ExpandList(item.Children))
+                {
+                    yield return subMod;
+                }
+            }
         }
 
         private void BrowseFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -273,6 +291,8 @@ namespace ModManager.Gui
             ActiveModsListView.BuildList(true);
             ModsListView.BuildList(true);
 
+            List<ModViewModel> activeMods = ExpandList(_activeModItems).ToList();
+
             int availableMods = _passiveModItems.Count;
             int outdatedMods = _passiveModItems.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
 
@@ -281,14 +301,14 @@ namespace ModManager.Gui
                 AvailableModsFooterLabel.Text += $" ({outdatedMods} incompatible)";
 
             availableMods = _activeModItems.Count;
-            outdatedMods = _activeModItems.OfType<ModViewModel>().Cast<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
+            outdatedMods = activeMods.Count(x => x.Background == _presenter.IncompatibleColor);
 
             ActiveModsFooterLabel.Text = $"{availableMods} active.";
             if (outdatedMods > 0)
                 ActiveModsFooterLabel.Text += $" ({outdatedMods} incompatible)";
 
 
-            foreach (var item in _activeModItems.OfType<ModViewModel>())
+            foreach (var item in activeMods)
             {
                 if (item.Background == _presenter.IncompatibleColor)
                     continue; 
@@ -306,21 +326,26 @@ namespace ModManager.Gui
                 {
                     foreach (KeyValuePair<string, string> dependancy in mod.Dependencies)
                     {
-                        ModViewModel referencedMod = _activeModItems.OfType<ModViewModel>().FirstOrDefault(x => x.PackageId == dependancy.Key);
+                        ModViewModel referencedMod = activeMods.FirstOrDefault(x => x.PackageId == dependancy.Key);
                         if (referencedMod == null)
                             tooltip.AppendLine("Missing dependancy: " + dependancy.Value);
                     }
                 }
 
-                int currentIndex = _activeModItems.IndexOf(item);
+                int currentIndex = _activeModItems.IndexOf(item.Parent == null ? item : item.Parent);
+
                 if (mod.LoadAfter != null)
                 {
                     foreach (string loadAfter in mod.LoadAfter)
                     {
-                        ModViewModel referencedMod = _activeModItems.OfType<ModViewModel>().FirstOrDefault(x => x.PackageId == loadAfter);
-                        if (referencedMod != null && _activeModItems.IndexOf(referencedMod) > currentIndex)
+                        ModViewModel referencedMod = activeMods.FirstOrDefault(x => x.PackageId == loadAfter);
+                        if (referencedMod != null)
                         {
-                            tooltip.AppendLine("This should be loaded after " + referencedMod.Caption);
+                            int dependentIndex = _activeModItems.IndexOf(referencedMod.Parent == null ? referencedMod : referencedMod.Parent);
+                            if (dependentIndex > currentIndex)
+                            {
+                                tooltip.AppendLine("This should be loaded after " + referencedMod.Caption);
+                            }
                         }
                     }
                 }
@@ -329,10 +354,14 @@ namespace ModManager.Gui
                 {
                     foreach (string loadBefore in mod.LoadBefore)
                     {
-                        ModViewModel referencedMod = _activeModItems.OfType<ModViewModel>().FirstOrDefault(x => x.PackageId == loadBefore);
-                        if (referencedMod != null && _activeModItems.IndexOf(referencedMod) < currentIndex)
+                        ModViewModel referencedMod = activeMods.FirstOrDefault(x => x.PackageId == loadBefore);
+                        if (referencedMod != null)
                         {
-                            tooltip.AppendLine("This should be loaded before " + referencedMod.Caption);
+                            int dependentIndex = _activeModItems.IndexOf(referencedMod.Parent == null ? referencedMod : referencedMod.Parent);
+                            if (dependentIndex < currentIndex)
+                            {
+                                tooltip.AppendLine("This should be loaded before " + referencedMod.Caption);
+                            }
                         }
                     }
                 }
