@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,8 +24,8 @@ namespace ModManager.Gui
     {
         private readonly MainPresenter _presenter;
 
-        List<ModViewModel> _activeModItems = new List<ModViewModel>();
-        List<ModViewModel> _passiveModItems = new List<ModViewModel>();
+        List<ITreeListViewItem> _activeModItems = new List<ITreeListViewItem>();
+        List<ITreeListViewItem> _passiveModItems = new List<ITreeListViewItem>();
 
         public Main(MainPresenter presenter)
         {
@@ -45,13 +46,13 @@ namespace ModManager.Gui
             sink1.AcceptExternal = true;
             sink1.CanDropBetween = true;
             sink1.CanDropOnBackground = true;
-            sink1.CanDropOnItem = false;
+            sink1.CanDropOnItem = true;
 
             sink1 = (SimpleDropSink)ModsListView.DropSink;
             sink1.AcceptExternal = true;
             sink1.CanDropBetween = true;
             sink1.CanDropOnBackground = true;
-            sink1.CanDropOnItem = false;
+            sink1.CanDropOnItem = true;
 
 
 
@@ -236,7 +237,7 @@ namespace ModManager.Gui
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            ModViewModel[] issues = _activeModItems.Where(x => x.Background != Color.Transparent).ToArray();
+            ModViewModel[] issues = _activeModItems.OfType<ModViewModel>().Where(x => x.Background != Color.Transparent).ToArray();
             if (issues.Length > 0)
             {
                 int warnings = issues.Count(x => x.Background == _presenter.WarningColor);
@@ -247,7 +248,7 @@ namespace ModManager.Gui
                     return;
             }
 
-            _presenter.Config.ActiveMods = _activeModItems.Select(x => x.PackageId).ToArray();
+            _presenter.Config.ActiveMods = _activeModItems.OfType<ModViewModel>().Select(x => x.PackageId).ToArray();
             _presenter.SaveConfig();
             _presenter.LoadData();
         }
@@ -273,21 +274,21 @@ namespace ModManager.Gui
             ModsListView.BuildList(true);
 
             int availableMods = _passiveModItems.Count;
-            int outdatedMods = _passiveModItems.Count(x => x.Background == _presenter.IncompatibleColor);
+            int outdatedMods = _passiveModItems.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
 
             AvailableModsFooterLabel.Text = $"{availableMods} inactive.";
             if (outdatedMods > 0)
                 AvailableModsFooterLabel.Text += $" ({outdatedMods} incompatible)";
 
             availableMods = _activeModItems.Count;
-            outdatedMods = _activeModItems.Cast<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
+            outdatedMods = _activeModItems.OfType<ModViewModel>().Cast<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
 
             ActiveModsFooterLabel.Text = $"{availableMods} active.";
             if (outdatedMods > 0)
                 ActiveModsFooterLabel.Text += $" ({outdatedMods} incompatible)";
 
 
-            foreach (var item in _activeModItems)
+            foreach (var item in _activeModItems.OfType<ModViewModel>())
             {
                 if (item.Background == _presenter.IncompatibleColor)
                     continue; 
@@ -305,8 +306,8 @@ namespace ModManager.Gui
                 {
                     foreach (KeyValuePair<string, string> dependancy in mod.Dependencies)
                     {
-                        ModViewModel referencedMod = _activeModItems.FirstOrDefault(x => x.PackageId == dependancy.Key);
-                        if (referencedMod != null)
+                        ModViewModel referencedMod = _activeModItems.OfType<ModViewModel>().FirstOrDefault(x => x.PackageId == dependancy.Key);
+                        if (referencedMod == null)
                             tooltip.AppendLine("Missing dependancy: " + dependancy.Value);
                     }
                 }
@@ -316,7 +317,7 @@ namespace ModManager.Gui
                 {
                     foreach (string loadAfter in mod.LoadAfter)
                     {
-                        ModViewModel referencedMod = _activeModItems.FirstOrDefault(x => x.PackageId == loadAfter);
+                        ModViewModel referencedMod = _activeModItems.OfType<ModViewModel>().FirstOrDefault(x => x.PackageId == loadAfter);
                         if (referencedMod != null && _activeModItems.IndexOf(referencedMod) > currentIndex)
                         {
                             tooltip.AppendLine("This should be loaded after " + referencedMod.Caption);
@@ -328,7 +329,7 @@ namespace ModManager.Gui
                 {
                     foreach (string loadBefore in mod.LoadBefore)
                     {
-                        ModViewModel referencedMod = _activeModItems.FirstOrDefault(x => x.PackageId == loadBefore);
+                        ModViewModel referencedMod = _activeModItems.OfType<ModViewModel>().FirstOrDefault(x => x.PackageId == loadBefore);
                         if (referencedMod != null && _activeModItems.IndexOf(referencedMod) < currentIndex)
                         {
                             tooltip.AppendLine("This should be loaded before " + referencedMod.Caption);
@@ -344,34 +345,7 @@ namespace ModManager.Gui
             }
         }
 
-        //private void ModsListView_ColumnClick(object sender, ColumnClickEventArgs e)
-        //{
-        //    Components.ReorderableListView listView = sender as Components.ReorderableListView;
-
-        //    if (listView.ModViewModelSorter == null)
-        //        listView.ModViewModelSorter = new Components.ListViewColumnSorter();
-
-        //    Components.ListViewColumnSorter columnSorter = listView.ModViewModelSorter as Components.ListViewColumnSorter;
-
-        //    if (e.Column == columnSorter.SortColumn)
-        //    {
-        //        // If column is already sorted, reverse.
-        //        if (columnSorter.Order == SortOrder.Ascending)
-        //            columnSorter.Order = SortOrder.Descending;
-        //        else
-        //            columnSorter.Order = SortOrder.Ascending;
-        //    }
-        //    else
-        //    {
-        //        // Otherwise reset sorting
-        //        columnSorter.SortColumn = e.Column;
-        //        columnSorter.Order = SortOrder.Ascending;
-        //    }
-
-        //    listView.Sort();
-        //}
-
-        private void ActiveModsListView_DoubleClick(object sender, EventArgs e)
+        private void ActiveModsListView_DoubleClick(object sender, MouseEventArgs e)
         {
             if (ActiveModsListView.SelectedObjects.Count > 1)
                 return;
@@ -383,7 +357,7 @@ namespace ModManager.Gui
             RefreshInterface();
         }
 
-        private void ModsListView_DoubleClick(object sender, EventArgs e)
+        private void ModsListView_DoubleClick(object sender, MouseEventArgs e)
         {
             if (ModsListView.SelectedObjects.Count > 1)
                 return;
@@ -468,7 +442,7 @@ namespace ModManager.Gui
             if (e.Canceled)
                 return;
 
-            _activeModItems.InsertRange(e.Index, e.ObjectsToAdd.OfType<ModViewModel>());
+            _activeModItems.InsertRange(e.Index, e.ObjectsToAdd.OfType<ITreeListViewItem>());
         }
 
         private void ActiveModsListView_ItemsRemoving(object sender, ItemsRemovingEventArgs e)
@@ -476,7 +450,7 @@ namespace ModManager.Gui
             if (e.Canceled)
                 return;
 
-            foreach (var item in e.ObjectsToRemove.OfType<ModViewModel>())
+            foreach (var item in e.ObjectsToRemove.OfType<ITreeListViewItem>())
                 _activeModItems.Remove(item);
         }
 
@@ -485,7 +459,7 @@ namespace ModManager.Gui
             if (e.Canceled)
                 return;
 
-            foreach (var item in e.ObjectsToRemove.OfType<ModViewModel>())
+            foreach (var item in e.ObjectsToRemove.OfType<ITreeListViewItem>())
                 _passiveModItems.Remove(item);
         }
 
@@ -494,20 +468,22 @@ namespace ModManager.Gui
             if (e.Canceled)
                 return;
 
-            _passiveModItems.InsertRange(e.Index, e.ObjectsToAdd.OfType<ModViewModel>());
+            _passiveModItems.InsertRange(e.Index, e.ObjectsToAdd.OfType<ITreeListViewItem>());
         }
 
         private void ListView_ModelDropped(object sender, ModelDropEventArgs e)
         {
-            List<ModViewModel> targetCollection = e.ListView == ActiveModsListView ? _activeModItems : _passiveModItems;
-            List<ModViewModel> sourceCollection = e.SourceListView == ActiveModsListView ? _activeModItems : _passiveModItems;
-            IEnumerable<ModViewModel> selectedItems = e.SourceModels.OfType<ModViewModel>();
-            ModViewModel targetItem = (ModViewModel)e.TargetModel;
+            List<ITreeListViewItem> targetCollection = e.ListView == ActiveModsListView ? _activeModItems : _passiveModItems;
+            List<ITreeListViewItem> sourceCollection = e.SourceListView == ActiveModsListView ? _activeModItems : _passiveModItems;
+            IEnumerable<ITreeListViewItem> selectedItems = e.SourceModels.OfType<ITreeListViewItem>();
+            ITreeListViewItem targetItem = (ITreeListViewItem)e.TargetModel;
 
+            if (targetItem?.Parent != null)
+                targetCollection = targetItem.Parent.Children;
 
 
             // Detach
-            foreach (ModViewModel x in selectedItems)
+            foreach (ITreeListViewItem x in selectedItems)
             {
                 if (x.Parent != null)
                 {
@@ -535,6 +511,11 @@ namespace ModManager.Gui
                 case DropTargetLocation.AboveItem:
                     MoveObjectsAboveItem(targetCollection, targetItem, selectedItems);
                     break;
+
+                // Move items to index
+                case DropTargetLocation.BelowItem:
+                    MoveObjectsBelowItem(targetCollection, targetItem, selectedItems);
+                    break;
             }
 
             e.SourceListView.DeselectAll();
@@ -546,29 +527,48 @@ namespace ModManager.Gui
         }
 
 
-        private void MoveItemsToGroup(List<ModViewModel> targetCollection, ModViewModel target, IEnumerable<ModViewModel> selectedItems)
+        private void MoveItemsToGroup(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
         {
             // Grouping logic here.
             target.Children.AddRange(selectedItems);
+            foreach (var item in selectedItems)
+                item.Parent = target;
         }
 
-        private void MoveObjectsToRoots(List<ModViewModel> targetCollection, IEnumerable<ModViewModel> selectedItems)
+        private void MoveObjectsToRoots(List<ITreeListViewItem> targetCollection, IEnumerable<ITreeListViewItem> selectedItems)
         {
             targetCollection.AddRange(selectedItems);
         }
 
-        private void MoveObjectsAboveItem(List<ModViewModel> targetCollection, ModViewModel target, IEnumerable<ModViewModel> selectedItems)
+        private void MoveObjectsAboveItem(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
         {
             if (target.Parent != null)
             {
                 int index = target.Parent.Children.IndexOf(target);
                 target.Parent.Children.InsertRange(index, selectedItems);
-
+                foreach (var item in selectedItems)
+                    item.Parent = target.Parent;
             }
             else
             {
                 int index = targetCollection.IndexOf(target);
                 targetCollection.InsertRange(index, selectedItems);
+            }
+        }
+
+        private void MoveObjectsBelowItem(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
+        {
+            if (target.Parent != null)
+            {
+                int index = target.Parent.Children.IndexOf(target);
+                target.Parent.Children.InsertRange(index+1, selectedItems);
+                foreach (var item in selectedItems)
+                    item.Parent = target.Parent;
+            }
+            else
+            {
+                int index = targetCollection.IndexOf(target);
+                targetCollection.InsertRange(index+1, selectedItems);
             }
         }
 
@@ -606,6 +606,18 @@ namespace ModManager.Gui
             listView.UseFiltering = false;
             listView.UseFiltering = true;
         }
-        
+
+        private void ModsListView_FormatRow(object sender, FormatRowEventArgs e)
+        {
+            if (e.Model is ModViewModel mod && mod.Background != Color.Transparent)
+                e.Item.BackColor = mod.Background;
+        }
+
+        private void ModsListView_CellToolTipShowing(object sender, ToolTipShowingEventArgs e)
+        {
+            if (e.Item.RowObject is ModViewModel mod)
+                e.Text = mod.Tooltip;
+            
+        }
     }
 }

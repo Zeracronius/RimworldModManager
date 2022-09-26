@@ -48,9 +48,9 @@
             this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.InactiveModListFilterTextBox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.AvailableModsFooterLabel = new System.Windows.Forms.Label();
-            this.InactiveModListFilterTextBox = new System.Windows.Forms.TextBox();
             this.ActiveModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
             this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -301,6 +301,8 @@
             this.ModsListView.UseFiltering = true;
             this.ModsListView.View = System.Windows.Forms.View.Details;
             this.ModsListView.VirtualMode = true;
+            this.ModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
+            this.ModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
             this.ModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ModsListView_ItemsAdding);
             this.ModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ModsListView_ItemsRemoving);
             this.ModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
@@ -325,6 +327,15 @@
             this.olvColumn6.AspectName = "SupportedVersions";
             this.olvColumn6.Text = "Supports";
             // 
+            // InactiveModListFilterTextBox
+            // 
+            this.InactiveModListFilterTextBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.InactiveModListFilterTextBox.Location = new System.Drawing.Point(0, 0);
+            this.InactiveModListFilterTextBox.Name = "InactiveModListFilterTextBox";
+            this.InactiveModListFilterTextBox.Size = new System.Drawing.Size(378, 20);
+            this.InactiveModListFilterTextBox.TabIndex = 4;
+            this.InactiveModListFilterTextBox.TextChanged += new System.EventHandler(this.InactiveModListFilterTextBox_TextChanged);
+            // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.AutoSize = true;
@@ -345,15 +356,6 @@
             this.AvailableModsFooterLabel.Size = new System.Drawing.Size(45, 13);
             this.AvailableModsFooterLabel.TabIndex = 0;
             this.AvailableModsFooterLabel.Text = "Loading";
-            // 
-            // InactiveModListFilterTextBox
-            // 
-            this.InactiveModListFilterTextBox.Dock = System.Windows.Forms.DockStyle.Top;
-            this.InactiveModListFilterTextBox.Location = new System.Drawing.Point(0, 0);
-            this.InactiveModListFilterTextBox.Name = "InactiveModListFilterTextBox";
-            this.InactiveModListFilterTextBox.Size = new System.Drawing.Size(378, 20);
-            this.InactiveModListFilterTextBox.TabIndex = 4;
-            this.InactiveModListFilterTextBox.TextChanged += new System.EventHandler(this.InactiveModListFilterTextBox_TextChanged);
             // 
             // ActiveModsListView
             // 
@@ -383,6 +385,8 @@
             this.ActiveModsListView.UseFiltering = true;
             this.ActiveModsListView.View = System.Windows.Forms.View.Details;
             this.ActiveModsListView.VirtualMode = true;
+            this.ActiveModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
+            this.ActiveModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
             this.ActiveModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ActiveModsListView_ItemsAdding);
             this.ActiveModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ActiveModsListView_ItemsRemoving);
             this.ActiveModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
