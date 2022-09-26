@@ -1,16 +1,19 @@
-﻿using ModManager.Logic.Model;
+﻿using ModManager.Gui;
+using ModManager.Logic.Model;
 using ModManager.Properties;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ModManager.Gui.Components.ReorderableTreeListView;
 
 namespace ModManager.Logic.Main.ViewModels
 {
-	public class ModViewModel
+	public class ModViewModel : Gui.ITreeListViewItem
 	{
 		public enum ModType
 		{
@@ -116,7 +119,9 @@ namespace ModManager.Logic.Main.ViewModels
 					break;
 			}
 
-		}
+			Children = new List<ITreeListViewItem>();
+
+        }
 
 		public string Caption { get; private set; }
 		public string PackageId { get; private set; }
@@ -140,5 +145,25 @@ namespace ModManager.Logic.Main.ViewModels
         public string WorkshopPath { get; private set; }
 
         public string Downloaded { get; private set; }
+
+		public Color Background { get; set; }
+		public string Tooltip { get; set; }
+		public List<ITreeListViewItem> Children { get; }
+		public ITreeListViewItem Parent { get; set; }
+
+
+
+        public bool IsAncestorOf(ITreeListViewItem item)
+        {
+			ITreeListViewItem parent = item.Parent;
+            while (parent != null)
+			{
+				if (parent == this)
+					return true;
+
+				parent = parent.Parent;
+			}
+			return false;
+        }
     }
 }

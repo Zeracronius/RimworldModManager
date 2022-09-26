@@ -32,6 +32,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.ModNameLabel = new System.Windows.Forms.Label();
             this.ModBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.DescriptionWebBrowser = new System.Windows.Forms.WebBrowser();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.browseFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,8 +44,18 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.ModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
+            this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.AvailableModsFooterLabel = new System.Windows.Forms.Label();
+            this.InactiveModListFilterTextBox = new System.Windows.Forms.TextBox();
+            this.ActiveModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
+            this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn3 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.ActiveModListFilterTextBox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.ActiveModsFooterLabel = new System.Windows.Forms.Label();
             this.menuStrip3 = new System.Windows.Forms.MenuStrip();
@@ -57,18 +68,9 @@
             this.expansionsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.workshopFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ModsListView = new ModManager.Gui.Components.ReorderableListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ActiveModsListView = new ModManager.Gui.Components.ReorderableListView();
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.treeListView1 = new BrightIdeasSoftware.TreeListView();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModPictureBox)).BeginInit();
@@ -81,11 +83,11 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ModsListView)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).BeginInit();
             this.flowLayoutPanel3.SuspendLayout();
             this.menuStrip3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.treeListView1)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -106,7 +108,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 66.89814F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(451, 450);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(459, 450);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // ModNameLabel
@@ -119,7 +121,7 @@
             this.ModNameLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ModNameLabel.Name = "ModNameLabel";
             this.ModNameLabel.Padding = new System.Windows.Forms.Padding(5);
-            this.ModNameLabel.Size = new System.Drawing.Size(451, 23);
+            this.ModNameLabel.Size = new System.Drawing.Size(459, 23);
             this.ModNameLabel.TabIndex = 0;
             this.ModNameLabel.Text = "Mod Name";
             this.ModNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -130,13 +132,17 @@
             this.ModBindingSource.DataMember = "SelectedMod";
             this.ModBindingSource.DataSource = this.PresenterBindingSource;
             // 
+            // PresenterBindingSource
+            // 
+            this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Main.MainPresenter);
+            // 
             // DescriptionWebBrowser
             // 
             this.DescriptionWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DescriptionWebBrowser.Location = new System.Drawing.Point(3, 171);
             this.DescriptionWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
             this.DescriptionWebBrowser.Name = "DescriptionWebBrowser";
-            this.DescriptionWebBrowser.Size = new System.Drawing.Size(445, 240);
+            this.DescriptionWebBrowser.Size = new System.Drawing.Size(453, 240);
             this.DescriptionWebBrowser.TabIndex = 1;
             // 
             // menuStrip1
@@ -147,7 +153,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 144);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.ShowItemToolTips = true;
-            this.menuStrip1.Size = new System.Drawing.Size(451, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(459, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -173,7 +179,7 @@
             this.flowLayoutPanel2.Controls.Add(this.SaveButton);
             this.flowLayoutPanel2.Controls.Add(this.ReloadButton);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(323, 417);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(331, 417);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(125, 30);
             this.flowLayoutPanel2.TabIndex = 3;
@@ -208,7 +214,7 @@
             this.ModPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ModPictureBox.Location = new System.Drawing.Point(3, 26);
             this.ModPictureBox.Name = "ModPictureBox";
-            this.ModPictureBox.Size = new System.Drawing.Size(445, 115);
+            this.ModPictureBox.Size = new System.Drawing.Size(453, 115);
             this.ModPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.ModPictureBox.TabIndex = 4;
             this.ModPictureBox.TabStop = false;
@@ -227,8 +233,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel1);
-            this.splitContainer1.Size = new System.Drawing.Size(1217, 450);
-            this.splitContainer1.SplitterDistance = 762;
+            this.splitContainer1.Size = new System.Drawing.Size(1238, 450);
+            this.splitContainer1.SplitterDistance = 775;
             this.splitContainer1.TabIndex = 2;
             // 
             // tableLayoutPanel3
@@ -243,7 +249,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(762, 426);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(775, 426);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // splitContainer2
@@ -255,16 +261,69 @@
             // splitContainer2.Panel1
             // 
             this.splitContainer2.Panel1.Controls.Add(this.ModsListView);
+            this.splitContainer2.Panel1.Controls.Add(this.InactiveModListFilterTextBox);
             this.splitContainer2.Panel1.Controls.Add(this.flowLayoutPanel1);
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.treeListView1);
             this.splitContainer2.Panel2.Controls.Add(this.ActiveModsListView);
+            this.splitContainer2.Panel2.Controls.Add(this.ActiveModListFilterTextBox);
             this.splitContainer2.Panel2.Controls.Add(this.flowLayoutPanel3);
-            this.splitContainer2.Size = new System.Drawing.Size(756, 420);
-            this.splitContainer2.SplitterDistance = 372;
+            this.splitContainer2.Size = new System.Drawing.Size(769, 420);
+            this.splitContainer2.SplitterDistance = 378;
             this.splitContainer2.TabIndex = 1;
+            // 
+            // ModsListView
+            // 
+            this.ModsListView.AllColumns.Add(this.olvColumn4);
+            this.ModsListView.AllColumns.Add(this.olvColumn5);
+            this.ModsListView.AllColumns.Add(this.olvColumn6);
+            this.ModsListView.AllowDrop = true;
+            this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.olvColumn4,
+            this.olvColumn5,
+            this.olvColumn6});
+            this.ModsListView.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ModsListView.DataSource = null;
+            this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModsListView.FullRowSelect = true;
+            this.ModsListView.HideSelection = false;
+            this.ModsListView.IsSimpleDragSource = true;
+            this.ModsListView.IsSimpleDropSink = true;
+            this.ModsListView.KeyAspectName = "";
+            this.ModsListView.Location = new System.Drawing.Point(0, 20);
+            this.ModsListView.Name = "ModsListView";
+            this.ModsListView.RootKeyValueString = "";
+            this.ModsListView.ShowGroups = false;
+            this.ModsListView.Size = new System.Drawing.Size(378, 381);
+            this.ModsListView.TabIndex = 4;
+            this.ModsListView.UseCompatibleStateImageBehavior = false;
+            this.ModsListView.UseFiltering = true;
+            this.ModsListView.View = System.Windows.Forms.View.Details;
+            this.ModsListView.VirtualMode = true;
+            this.ModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ModsListView_ItemsAdding);
+            this.ModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ModsListView_ItemsRemoving);
+            this.ModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
+            this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
+            this.ModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
+            this.ModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ModsListView_DoubleClick);
+            // 
+            // olvColumn4
+            // 
+            this.olvColumn4.AspectName = "Caption";
+            this.olvColumn4.Text = "Name";
+            this.olvColumn4.Width = 226;
+            // 
+            // olvColumn5
+            // 
+            this.olvColumn5.AspectName = "Downloaded";
+            this.olvColumn5.Text = "Downloaded";
+            this.olvColumn5.Width = 73;
+            // 
+            // olvColumn6
+            // 
+            this.olvColumn6.AspectName = "SupportedVersions";
+            this.olvColumn6.Text = "Supports";
             // 
             // flowLayoutPanel1
             // 
@@ -274,7 +333,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 401);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(372, 19);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(378, 19);
             this.flowLayoutPanel1.TabIndex = 1;
             // 
             // AvailableModsFooterLabel
@@ -287,6 +346,76 @@
             this.AvailableModsFooterLabel.TabIndex = 0;
             this.AvailableModsFooterLabel.Text = "Loading";
             // 
+            // InactiveModListFilterTextBox
+            // 
+            this.InactiveModListFilterTextBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.InactiveModListFilterTextBox.Location = new System.Drawing.Point(0, 0);
+            this.InactiveModListFilterTextBox.Name = "InactiveModListFilterTextBox";
+            this.InactiveModListFilterTextBox.Size = new System.Drawing.Size(378, 20);
+            this.InactiveModListFilterTextBox.TabIndex = 4;
+            this.InactiveModListFilterTextBox.TextChanged += new System.EventHandler(this.InactiveModListFilterTextBox_TextChanged);
+            // 
+            // ActiveModsListView
+            // 
+            this.ActiveModsListView.AllColumns.Add(this.olvColumn1);
+            this.ActiveModsListView.AllColumns.Add(this.olvColumn2);
+            this.ActiveModsListView.AllColumns.Add(this.olvColumn3);
+            this.ActiveModsListView.AllowDrop = true;
+            this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.olvColumn1,
+            this.olvColumn2,
+            this.olvColumn3});
+            this.ActiveModsListView.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ActiveModsListView.DataSource = null;
+            this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ActiveModsListView.FullRowSelect = true;
+            this.ActiveModsListView.HideSelection = false;
+            this.ActiveModsListView.IsSimpleDragSource = true;
+            this.ActiveModsListView.IsSimpleDropSink = true;
+            this.ActiveModsListView.KeyAspectName = "";
+            this.ActiveModsListView.Location = new System.Drawing.Point(0, 20);
+            this.ActiveModsListView.Name = "ActiveModsListView";
+            this.ActiveModsListView.RootKeyValueString = "";
+            this.ActiveModsListView.ShowGroups = false;
+            this.ActiveModsListView.Size = new System.Drawing.Size(387, 381);
+            this.ActiveModsListView.TabIndex = 3;
+            this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
+            this.ActiveModsListView.UseFiltering = true;
+            this.ActiveModsListView.View = System.Windows.Forms.View.Details;
+            this.ActiveModsListView.VirtualMode = true;
+            this.ActiveModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ActiveModsListView_ItemsAdding);
+            this.ActiveModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ActiveModsListView_ItemsRemoving);
+            this.ActiveModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
+            this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
+            this.ActiveModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
+            this.ActiveModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ActiveModsListView_DoubleClick);
+            // 
+            // olvColumn1
+            // 
+            this.olvColumn1.AspectName = "Caption";
+            this.olvColumn1.Text = "Name";
+            this.olvColumn1.Width = 240;
+            // 
+            // olvColumn2
+            // 
+            this.olvColumn2.AspectName = "Downloaded";
+            this.olvColumn2.Text = "Downloaded";
+            this.olvColumn2.Width = 73;
+            // 
+            // olvColumn3
+            // 
+            this.olvColumn3.AspectName = "SupportedVersions";
+            this.olvColumn3.Text = "Supports";
+            // 
+            // ActiveModListFilterTextBox
+            // 
+            this.ActiveModListFilterTextBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ActiveModListFilterTextBox.Location = new System.Drawing.Point(0, 0);
+            this.ActiveModListFilterTextBox.Name = "ActiveModListFilterTextBox";
+            this.ActiveModListFilterTextBox.Size = new System.Drawing.Size(387, 20);
+            this.ActiveModListFilterTextBox.TabIndex = 3;
+            this.ActiveModListFilterTextBox.TextChanged += new System.EventHandler(this.ActiveModListFilterTextBox_TextChanged);
+            // 
             // flowLayoutPanel3
             // 
             this.flowLayoutPanel3.AutoSize = true;
@@ -295,7 +424,7 @@
             this.flowLayoutPanel3.Location = new System.Drawing.Point(0, 401);
             this.flowLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
-            this.flowLayoutPanel3.Size = new System.Drawing.Size(380, 19);
+            this.flowLayoutPanel3.Size = new System.Drawing.Size(387, 19);
             this.flowLayoutPanel3.TabIndex = 2;
             // 
             // ActiveModsFooterLabel
@@ -315,7 +444,7 @@
             this.browseToolStripMenuItem});
             this.menuStrip3.Location = new System.Drawing.Point(0, 0);
             this.menuStrip3.Name = "menuStrip3";
-            this.menuStrip3.Size = new System.Drawing.Size(762, 24);
+            this.menuStrip3.Size = new System.Drawing.Size(775, 24);
             this.menuStrip3.TabIndex = 2;
             this.menuStrip3.Text = "menuStrip3";
             // 
@@ -391,102 +520,11 @@
             this.modsFolderToolStripMenuItem.Text = "Mods folder";
             this.modsFolderToolStripMenuItem.Click += new System.EventHandler(this.ModsFolderToolStripMenuItem_Click);
             // 
-            // ModsListView
-            // 
-            this.ModsListView.AllowDrop = true;
-            this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3});
-            this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ModsListView.FullRowSelect = true;
-            this.ModsListView.HideSelection = false;
-            this.ModsListView.Location = new System.Drawing.Point(0, 0);
-            this.ModsListView.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.ModsListView.Name = "ModsListView";
-            this.ModsListView.Size = new System.Drawing.Size(372, 401);
-            this.ModsListView.TabIndex = 0;
-            this.ModsListView.UseCompatibleStateImageBehavior = false;
-            this.ModsListView.View = System.Windows.Forms.View.Details;
-            this.ModsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ModsListView_ColumnClick);
-            this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-            this.ModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
-            this.ModsListView.DoubleClick += new System.EventHandler(this.ModsListView_DoubleClick);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 240;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Downloaded";
-            this.columnHeader2.Width = 73;
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Supports";
-            this.columnHeader3.Width = 54;
-            // 
-            // ActiveModsListView
-            // 
-            this.ActiveModsListView.AllowDrop = true;
-            this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader6});
-            this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ActiveModsListView.FullRowSelect = true;
-            this.ActiveModsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.ActiveModsListView.HideSelection = false;
-            this.ActiveModsListView.Location = new System.Drawing.Point(0, 0);
-            this.ActiveModsListView.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.ActiveModsListView.Name = "ActiveModsListView";
-            this.ActiveModsListView.ShowItemToolTips = true;
-            this.ActiveModsListView.Size = new System.Drawing.Size(380, 401);
-            this.ActiveModsListView.TabIndex = 1;
-            this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
-            this.ActiveModsListView.View = System.Windows.Forms.View.Details;
-            this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-            this.ActiveModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
-            this.ActiveModsListView.DoubleClick += new System.EventHandler(this.ActiveModsListView_DoubleClick);
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Name";
-            this.columnHeader4.Width = 243;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Text = "Downloaded";
-            this.columnHeader5.Width = 79;
-            // 
-            // columnHeader6
-            // 
-            this.columnHeader6.Text = "Supports";
-            this.columnHeader6.Width = 54;
-            // 
-            // PresenterBindingSource
-            // 
-            this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Main.MainPresenter);
-            // 
-            // treeListView1
-            // 
-            this.treeListView1.HideSelection = false;
-            this.treeListView1.Location = new System.Drawing.Point(118, 97);
-            this.treeListView1.Name = "treeListView1";
-            this.treeListView1.ShowGroups = false;
-            this.treeListView1.Size = new System.Drawing.Size(121, 97);
-            this.treeListView1.TabIndex = 3;
-            this.treeListView1.UseCompatibleStateImageBehavior = false;
-            this.treeListView1.View = System.Windows.Forms.View.Details;
-            this.treeListView1.VirtualMode = true;
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1217, 450);
+            this.ClientSize = new System.Drawing.Size(1238, 450);
             this.Controls.Add(this.splitContainer1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Main";
@@ -496,6 +534,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
@@ -512,14 +551,14 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ModsListView)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).EndInit();
             this.flowLayoutPanel3.ResumeLayout(false);
             this.flowLayoutPanel3.PerformLayout();
             this.menuStrip3.ResumeLayout(false);
             this.menuStrip3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.treeListView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -528,8 +567,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label ModNameLabel;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private Gui.Components.ReorderableListView ModsListView;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Label AvailableModsFooterLabel;
@@ -542,13 +579,7 @@
         private System.Windows.Forms.ToolStripMenuItem openWorkshopPageToolStripMenuItem;
         private System.Windows.Forms.BindingSource PresenterBindingSource;
         private System.Windows.Forms.BindingSource ModBindingSource;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private Components.ReorderableListView ActiveModsListView;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
-        private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel3;
         private System.Windows.Forms.Label ActiveModsFooterLabel;
         private System.Windows.Forms.WebBrowser DescriptionWebBrowser;
@@ -562,6 +593,15 @@
 		private System.Windows.Forms.ToolStripMenuItem modsFolderToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
-        private BrightIdeasSoftware.TreeListView treeListView1;
+        private BrightIdeasSoftware.OLVColumn olvColumn1;
+        private BrightIdeasSoftware.OLVColumn olvColumn2;
+        private BrightIdeasSoftware.OLVColumn olvColumn3;
+        private BrightIdeasSoftware.OLVColumn olvColumn4;
+        private BrightIdeasSoftware.OLVColumn olvColumn5;
+        private BrightIdeasSoftware.OLVColumn olvColumn6;
+        private Components.ReorderableTreeListView ActiveModsListView;
+        private Components.ReorderableTreeListView ModsListView;
+        private System.Windows.Forms.TextBox ActiveModListFilterTextBox;
+        private System.Windows.Forms.TextBox InactiveModListFilterTextBox;
     }
 }
