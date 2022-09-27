@@ -150,9 +150,6 @@ namespace ModManager.Logic.Main.ViewModels
 		public string Tooltip { get; set; }
 		public List<ITreeListViewItem> Children { get; }
 		public ITreeListViewItem Parent { get; set; }
-
-		string ITreeListViewItem.Name => Caption;
-
 		string ITreeListViewItem.Key => PackageId;
 
 		public bool IsAncestorOf(ITreeListViewItem item)

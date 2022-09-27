@@ -17,6 +17,7 @@ using ModManager.Logic.Configuration;
 using ModManager.Logic.Main;
 using ModManager.Logic.Main.ViewModels;
 using ModManager.Logic.Model;
+using ModManager.Logic.TextDialog;
 using ModManager.Properties;
 
 namespace ModManager.Gui
@@ -27,6 +28,7 @@ namespace ModManager.Gui
 
         List<ITreeListViewItem> _activeModItems = new List<ITreeListViewItem>();
         List<ITreeListViewItem> _passiveModItems = new List<ITreeListViewItem>();
+        Dictionary<string, GroupViewModel> _groups = new System.Collections.Generic.Dictionary<string, GroupViewModel>();
 
         public Main(MainPresenter presenter)
         {
@@ -141,9 +143,8 @@ namespace ModManager.Gui
             int activeMods = _presenter.Config.ActiveMods.Length;
             int availableMods = _presenter.AvailableMods.Count + activeMods;
 
+            GroupViewModel.ResetSeed();
 
-            ModsListView.BeginUpdate();
-            ActiveModsListView.BeginUpdate();
             _activeModItems.Clear();
             _passiveModItems.Clear();
 
@@ -153,15 +154,20 @@ namespace ModManager.Gui
             Dictionary<string, string> parents = new Dictionary<string, string>(Settings.Default.Parenting.Count);
             foreach (string parentPair in Settings.Default.Parenting)
             {
-                string[] parentParts = parentPair.Split('\\');
+                string[] parentParts = parentPair.Split(new char[]{ '\\' }, 2);
                 parents[parentParts[0]] = parentParts[1];
             }
-            
+
+
+            Dictionary<string, string> groupMapping = new Dictionary<string, string>();
+
+            _groups.Clear();
+            groupMapping.Clear();
             foreach (var mod in _presenter.ActiveMods)
             {
                 if (parents.ContainsKey(mod.Key))
                 {
-                    ITreeListViewItem parent = ExpandList(_activeModItems).FirstOrDefault(x => x.Key == parents[mod.Key]);
+                    ITreeListViewItem parent = GetParent(_activeModItems, groupMapping, parents, mod.Key);
                     
                     if (parent != null)
                     {
@@ -173,11 +179,12 @@ namespace ModManager.Gui
                 _activeModItems.Add(mod.Value);
             }
 
+            groupMapping.Clear();
             foreach (var mod in _presenter.AvailableMods.OrderByDescending(x => _presenter.AvailableMods[x.Key].Downloaded))
             {
                 if (parents.ContainsKey(mod.Key))
                 {
-                    ITreeListViewItem parent = ExpandList(_passiveModItems).FirstOrDefault(x => x.Key == parents[mod.Key]);
+                    ITreeListViewItem parent = GetParent(_passiveModItems, groupMapping, parents, mod.Key);
 
                     if (parent != null)
                     {
@@ -189,20 +196,47 @@ namespace ModManager.Gui
                 _passiveModItems.Add(mod.Value);
             }
 
-            ActiveModsListView.Roots = _activeModItems;
-            ModsListView.Roots = _passiveModItems;
-
-            ActiveModsListView.ExpandAll();
-            ActiveModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            ActiveModsListView.EndUpdate();
-
-            ModsListView.ExpandAll();
-            ModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            ModsListView.EndUpdate();
-            PresenterBindingSource.ResetBindings(false);
-            
             RefreshInterface();
             SaveButton.Enabled = true;
+        }
+
+        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key)
+        {
+            key = parents[key];
+
+            // Is it a group?
+            if (key.Contains('\\'))
+            {
+                string[] keyParts = key.Split('\\');
+                string groupKey = keyParts[0];
+
+
+                if (groupTranslationMap.ContainsKey(groupKey))
+                    groupKey = groupTranslationMap[groupKey];
+
+                GroupViewModel group = null;
+                if (_groups.TryGetValue(groupKey, out group) == false)
+                {
+                    group = new GroupViewModel(keyParts[1]);
+                    groupTranslationMap.Add(keyParts[0], groupKey);
+
+                    if (parents.ContainsKey(keyParts[0]))
+                        group.Parent = GetParent(targetCollection, groupTranslationMap, parents, keyParts[0]);
+
+                    if (group.Parent != null)
+                        group.Parent.Children.Add(group);
+                    else
+                        targetCollection.Add(group);
+
+                    _groups.Add(groupKey, group);
+                }
+
+                return group;
+            }
+            else
+            {
+                return FlattenList(targetCollection).FirstOrDefault(x => x.Key == key);
+            }
         }
 
         private void ModsListView_SelectedIndexChanged(object sender, EventArgs e)
@@ -211,16 +245,7 @@ namespace ModManager.Gui
             Components.ReorderableTreeListView view = sender as Components.ReorderableTreeListView;
             if (view.SelectedIndices.Count == 1)
             {
-                string modKey = ((ModViewModel)view.SelectedObject).PackageId;
-
-                ModViewModel selectedMod;
-                _presenter.ActiveMods.TryGetValue(modKey, out selectedMod);
-
-                if (selectedMod == null)
-                    _presenter.AvailableMods.TryGetValue(modKey, out selectedMod);
-
-
-                if (selectedMod != null)
+                if (view.SelectedObject is ModViewModel selectedMod)
                 {
                     menuStrip1.Enabled = true;
                     _presenter.SelectedMod = selectedMod;
@@ -271,7 +296,7 @@ namespace ModManager.Gui
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            ModViewModel[] issues = ExpandList(_activeModItems).OfType<ModViewModel>().Where(x => x.Background != Color.Transparent).ToArray();
+            ModViewModel[] issues = FlattenList(_activeModItems).OfType<ModViewModel>().Where(x => x.Background != Color.Transparent).ToArray();
             if (issues.Length > 0)
             {
                 int warnings = issues.Count(x => x.Background == _presenter.WarningColor);
@@ -286,22 +311,28 @@ namespace ModManager.Gui
             StringCollection parents = Settings.Default.Parenting;
             parents.Clear();
 
-            parents.AddRange(ExpandList(_passiveModItems).Where(x => x.Parent != null).Select(x => x.Key + "\\" + x.Parent.Key).ToArray());
-            parents.AddRange(ExpandList(_activeModItems).Where(x => x.Parent != null).Select(x => x.Key + "\\" + x.Parent.Key).ToArray());
+            parents.AddRange(SaveMods(_passiveModItems));
+            parents.AddRange(SaveMods(_activeModItems));
             Settings.Default.Parenting = parents;
 
-            _presenter.Config.ActiveMods = ExpandList(_activeModItems).OfType<ModViewModel>().Select(x => x.PackageId).ToArray();
+            _presenter.Config.ActiveMods = FlattenList(_activeModItems).OfType<ModViewModel>().Select(x => x.PackageId).ToArray();
             _presenter.SaveConfig();
             _presenter.LoadData();
         }
 
-        private IEnumerable<ITreeListViewItem> ExpandList(IEnumerable<ITreeListViewItem> list)
+
+        private string[] SaveMods(List<ITreeListViewItem> collection)
+        {
+            return FlattenList(collection).Where(x => x.Parent != null).Select(x => x.Key + "\\" + x.Parent.Key + (x.Parent is GroupViewModel ? "\\" + x.Parent.Caption : "")).ToArray();
+        }
+
+        private IEnumerable<ITreeListViewItem> FlattenList(IEnumerable<ITreeListViewItem> list)
         {
             foreach (ITreeListViewItem item in list)
             {
                 yield return item;
 
-                foreach (ITreeListViewItem subMod in ExpandList(item.Children))
+                foreach (ITreeListViewItem subMod in FlattenList(item.Children))
                 {
                     yield return subMod;
                 }
@@ -325,10 +356,26 @@ namespace ModManager.Gui
 
         private void RefreshInterface()
         {
+
+            ModsListView.BeginUpdate();
+            ActiveModsListView.BeginUpdate();
+
+            ActiveModsListView.Roots = _activeModItems;
+            ModsListView.Roots = _passiveModItems;
             ActiveModsListView.BuildList(true);
             ModsListView.BuildList(true);
 
-            List<ModViewModel> activeMods = ExpandList(_activeModItems).OfType<ModViewModel>().ToList();
+            ActiveModsListView.ExpandAll();
+            ActiveModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            ActiveModsListView.EndUpdate();
+
+            ModsListView.ExpandAll();
+            ModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            ModsListView.EndUpdate();
+            PresenterBindingSource.ResetBindings(false);
+
+
+            List<ModViewModel> activeMods = FlattenList(_activeModItems).OfType<ModViewModel>().ToList();
 
             int availableMods = _passiveModItems.Count;
             int outdatedMods = _passiveModItems.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
@@ -689,6 +736,97 @@ namespace ModManager.Gui
             if (e.Item.RowObject is ModViewModel mod)
                 e.Text = mod.Tooltip;
             
+        }
+
+        private void ActiveModsListView_CellRightClick(object sender, CellRightClickEventArgs e)
+        {
+            // Rightclicked background
+            if (e.Model == null)
+            {
+                e.MenuStrip = BackgroundContextMenuStrip;
+            }
+            else
+            {
+                switch (e.Model)
+                {
+                    case GroupViewModel group:
+                        e.MenuStrip = GroupContextMenuStrip;
+                        break;
+
+                    default:
+                        e.Handled = true;
+                        return;
+                }
+            }
+
+            e.MenuStrip.Tag = e.ListView;
+        }
+
+        private void Group_Context_Delete_Click(object sender, EventArgs e)
+        {
+            ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
+
+            List<ITreeListViewItem> collection;
+            GroupViewModel group;
+            if (contextMenu.Tag == ActiveModsListView)
+            {
+                collection = _activeModItems;
+                group = ActiveModsListView.SelectedObject as GroupViewModel;
+            }
+            else
+            {
+                collection = _activeModItems;
+                group = ModsListView.SelectedObject as GroupViewModel;
+            }
+
+            if (group.Parent != null)
+            {
+                MoveObjectsBelowItem(group.Parent.Children, group.Parent, group.Children);
+                group.Parent.Children.Remove(group);
+            }
+            else
+            {
+                MoveObjectsToRoots(collection, group.Children);
+                collection.Remove(group);
+            }
+
+            _groups.Remove(group.Key);
+            RefreshInterface();
+        }
+
+        private void Group_Context_Rename_Click(object sender, EventArgs e)
+        {
+            ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
+            GroupViewModel selectedGroup = ((ObjectListView)contextMenu.Tag).SelectedObject as GroupViewModel;
+            TextDialogPresenter presenter = new TextDialogPresenter("Rename group", selectedGroup.Caption, "New name:");
+            using (TextDialog dialog = new TextDialog(presenter))
+            {
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    selectedGroup.Caption = presenter.Value;
+                    RefreshInterface();
+                }
+            }
+        }
+
+        private void TreeView_Context_CreateGroup_Click(object sender, EventArgs e)
+        {
+            ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
+            TextDialogPresenter presenter = new TextDialogPresenter("New group", String.Empty, "Group name:");
+            using (TextDialog dialog = new TextDialog(presenter))
+            {
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    GroupViewModel group = new GroupViewModel(presenter.Value);
+
+                    if (contextMenu.Tag == ActiveModsListView)
+                        _activeModItems.Add(group);
+                    else
+                        _passiveModItems.Add(group);
+
+                    RefreshInterface();
+                }
+            }
         }
     }
 }

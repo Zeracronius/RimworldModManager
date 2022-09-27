@@ -68,6 +68,11 @@
             this.expansionsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.workshopFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modsFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BackgroundContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.newGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.GroupContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
@@ -88,6 +93,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).BeginInit();
             this.flowLayoutPanel3.SuspendLayout();
             this.menuStrip3.SuspendLayout();
+            this.BackgroundContextMenuStrip.SuspendLayout();
+            this.GroupContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -388,6 +395,7 @@
             this.ActiveModsListView.UseFiltering = true;
             this.ActiveModsListView.View = System.Windows.Forms.View.Details;
             this.ActiveModsListView.VirtualMode = true;
+            this.ActiveModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ActiveModsListView_CellRightClick);
             this.ActiveModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
             this.ActiveModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
             this.ActiveModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ActiveModsListView_ItemsAdding);
@@ -469,14 +477,14 @@
             // configurationsToolStripMenuItem
             // 
             this.configurationsToolStripMenuItem.Name = "configurationsToolStripMenuItem";
-            this.configurationsToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.configurationsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.configurationsToolStripMenuItem.Text = "Configurations";
             this.configurationsToolStripMenuItem.Click += new System.EventHandler(this.ConfigurationsToolStripMenuItem_Click);
             // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.importToolStripMenuItem.Text = "Import mod list";
             this.importToolStripMenuItem.ToolTipText = "Import active mods from either an exported list or a rimworld save";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
@@ -484,7 +492,7 @@
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportToolStripMenuItem.Text = "Export mod list";
             this.exportToolStripMenuItem.ToolTipText = "Export active mods as an importable mod list";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
@@ -528,6 +536,42 @@
             this.modsFolderToolStripMenuItem.Text = "Mods folder";
             this.modsFolderToolStripMenuItem.Click += new System.EventHandler(this.ModsFolderToolStripMenuItem_Click);
             // 
+            // BackgroundContextMenuStrip
+            // 
+            this.BackgroundContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newGroupToolStripMenuItem});
+            this.BackgroundContextMenuStrip.Name = "BackgroundContextMenuStrip";
+            this.BackgroundContextMenuStrip.Size = new System.Drawing.Size(181, 48);
+            // 
+            // newGroupToolStripMenuItem
+            // 
+            this.newGroupToolStripMenuItem.Name = "newGroupToolStripMenuItem";
+            this.newGroupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newGroupToolStripMenuItem.Text = "New group";
+            this.newGroupToolStripMenuItem.Click += new System.EventHandler(this.TreeView_Context_CreateGroup_Click);
+            // 
+            // GroupContextMenuStrip
+            // 
+            this.GroupContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem1});
+            this.GroupContextMenuStrip.Name = "BackgroundContextMenuStrip";
+            this.GroupContextMenuStrip.Size = new System.Drawing.Size(118, 48);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(117, 22);
+            this.toolStripMenuItem2.Text = "Rename";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.Group_Context_Rename_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(117, 22);
+            this.toolStripMenuItem1.Text = "Delete";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.Group_Context_Delete_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -567,6 +611,8 @@
             this.flowLayoutPanel3.PerformLayout();
             this.menuStrip3.ResumeLayout(false);
             this.menuStrip3.PerformLayout();
+            this.BackgroundContextMenuStrip.ResumeLayout(false);
+            this.GroupContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -611,5 +657,10 @@
         private Components.ReorderableTreeListView ModsListView;
         private System.Windows.Forms.TextBox ActiveModListFilterTextBox;
         private System.Windows.Forms.TextBox InactiveModListFilterTextBox;
+        private System.Windows.Forms.ContextMenuStrip BackgroundContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem newGroupToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip GroupContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
     }
 }
