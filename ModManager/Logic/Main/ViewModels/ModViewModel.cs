@@ -151,9 +151,11 @@ namespace ModManager.Logic.Main.ViewModels
 		public List<ITreeListViewItem> Children { get; }
 		public ITreeListViewItem Parent { get; set; }
 
+		string ITreeListViewItem.Name => Caption;
 
+		string ITreeListViewItem.Key => PackageId;
 
-        public bool IsAncestorOf(ITreeListViewItem item)
+		public bool IsAncestorOf(ITreeListViewItem item)
         {
 			ITreeListViewItem parent = item.Parent;
             while (parent != null)

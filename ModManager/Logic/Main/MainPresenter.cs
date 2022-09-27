@@ -226,9 +226,9 @@ namespace ModManager.Logic.Main
                 modConfig.CopyTo(Path.Combine(modConfig.Directory.FullName, modConfig.Name + $"_Backup{currentBackup + 1}.xml"), true);
 
                 Settings.Default.CurrentBackup += 1;
-                Settings.Default.Save();
             }
 
+            Settings.Default.Save();
             SerializeFile(modConfig, _config);
         }
 

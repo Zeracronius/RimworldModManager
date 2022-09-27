@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -146,23 +147,56 @@ namespace ModManager.Gui
             _activeModItems.Clear();
             _passiveModItems.Clear();
 
+            if (Settings.Default.Parenting == null)
+                Settings.Default.Parenting = new StringCollection();
+
+            Dictionary<string, string> parents = new Dictionary<string, string>(Settings.Default.Parenting.Count);
+            foreach (string parentPair in Settings.Default.Parenting)
+            {
+                string[] parentParts = parentPair.Split('\\');
+                parents[parentParts[0]] = parentParts[1];
+            }
             
             foreach (var mod in _presenter.ActiveMods)
             {
+                if (parents.ContainsKey(mod.Key))
+                {
+                    ITreeListViewItem parent = ExpandList(_activeModItems).FirstOrDefault(x => x.Key == parents[mod.Key]);
+                    
+                    if (parent != null)
+                    {
+                        parent.Children.Add(mod.Value);
+                        mod.Value.Parent = parent;
+                        continue;
+                    }
+                }
                 _activeModItems.Add(mod.Value);
             }
 
             foreach (var mod in _presenter.AvailableMods.OrderByDescending(x => _presenter.AvailableMods[x.Key].Downloaded))
             {
+                if (parents.ContainsKey(mod.Key))
+                {
+                    ITreeListViewItem parent = ExpandList(_passiveModItems).FirstOrDefault(x => x.Key == parents[mod.Key]);
+
+                    if (parent != null)
+                    {
+                        parent.Children.Add(mod.Value);
+                        mod.Value.Parent = parent;
+                        continue;
+                    }
+                }
                 _passiveModItems.Add(mod.Value);
             }
 
             ActiveModsListView.Roots = _activeModItems;
             ModsListView.Roots = _passiveModItems;
 
+            ActiveModsListView.ExpandAll();
             ActiveModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             ActiveModsListView.EndUpdate();
 
+            ModsListView.ExpandAll();
             ModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             ModsListView.EndUpdate();
             PresenterBindingSource.ResetBindings(false);
@@ -237,7 +271,7 @@ namespace ModManager.Gui
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            ModViewModel[] issues = ExpandList(_activeModItems).Where(x => x.Background != Color.Transparent).ToArray();
+            ModViewModel[] issues = ExpandList(_activeModItems).OfType<ModViewModel>().Where(x => x.Background != Color.Transparent).ToArray();
             if (issues.Length > 0)
             {
                 int warnings = issues.Count(x => x.Background == _presenter.WarningColor);
@@ -249,22 +283,25 @@ namespace ModManager.Gui
             }
 
 
+            StringCollection parents = Settings.Default.Parenting;
+            parents.Clear();
 
+            parents.AddRange(ExpandList(_passiveModItems).Where(x => x.Parent != null).Select(x => x.Key + "\\" + x.Parent.Key).ToArray());
+            parents.AddRange(ExpandList(_activeModItems).Where(x => x.Parent != null).Select(x => x.Key + "\\" + x.Parent.Key).ToArray());
+            Settings.Default.Parenting = parents;
 
-
-            _presenter.Config.ActiveMods = ExpandList(_activeModItems).Select(x => x.PackageId).ToArray();
+            _presenter.Config.ActiveMods = ExpandList(_activeModItems).OfType<ModViewModel>().Select(x => x.PackageId).ToArray();
             _presenter.SaveConfig();
             _presenter.LoadData();
         }
 
-        private IEnumerable<ModViewModel> ExpandList(IEnumerable<ITreeListViewItem> list)
+        private IEnumerable<ITreeListViewItem> ExpandList(IEnumerable<ITreeListViewItem> list)
         {
             foreach (ITreeListViewItem item in list)
             {
-                if (item is ModViewModel mod)
-                    yield return mod;
+                yield return item;
 
-                foreach (ModViewModel subMod in ExpandList(item.Children))
+                foreach (ITreeListViewItem subMod in ExpandList(item.Children))
                 {
                     yield return subMod;
                 }
@@ -291,7 +328,7 @@ namespace ModManager.Gui
             ActiveModsListView.BuildList(true);
             ModsListView.BuildList(true);
 
-            List<ModViewModel> activeMods = ExpandList(_activeModItems).ToList();
+            List<ModViewModel> activeMods = ExpandList(_activeModItems).OfType<ModViewModel>().ToList();
 
             int availableMods = _passiveModItems.Count;
             int outdatedMods = _passiveModItems.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
@@ -534,6 +571,7 @@ namespace ModManager.Gui
                 // Create group
                 case DropTargetLocation.Item:
                     MoveItemsToGroup(targetCollection, targetItem, selectedItems);
+                    (e.ListView as TreeListView).Expand(targetItem);
                     break;
 
                 // Move items to index
@@ -552,6 +590,10 @@ namespace ModManager.Gui
             ActiveModsListView.Roots = _activeModItems;
             ModsListView.Roots = _passiveModItems;
 
+
+
+            foreach (var item in selectedItems)
+                (e.ListView as TreeListView).Expand(item);
             RefreshInterface();
         }
 

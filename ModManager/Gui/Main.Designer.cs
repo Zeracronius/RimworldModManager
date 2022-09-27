@@ -279,6 +279,7 @@
             this.ModsListView.AllColumns.Add(this.olvColumn5);
             this.ModsListView.AllColumns.Add(this.olvColumn6);
             this.ModsListView.AllowDrop = true;
+            this.ModsListView.AutoGenerateColumns = false;
             this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn4,
             this.olvColumn5,
@@ -313,6 +314,7 @@
             // olvColumn4
             // 
             this.olvColumn4.AspectName = "Caption";
+            this.olvColumn4.FillsFreeSpace = true;
             this.olvColumn4.Text = "Name";
             this.olvColumn4.Width = 226;
             // 
@@ -363,6 +365,7 @@
             this.ActiveModsListView.AllColumns.Add(this.olvColumn2);
             this.ActiveModsListView.AllColumns.Add(this.olvColumn3);
             this.ActiveModsListView.AllowDrop = true;
+            this.ActiveModsListView.AutoGenerateColumns = false;
             this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn1,
             this.olvColumn2,
@@ -397,6 +400,7 @@
             // olvColumn1
             // 
             this.olvColumn1.AspectName = "Caption";
+            this.olvColumn1.FillsFreeSpace = true;
             this.olvColumn1.Text = "Name";
             this.olvColumn1.Width = 240;
             // 

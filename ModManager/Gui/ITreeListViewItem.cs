@@ -11,5 +11,7 @@ namespace ModManager.Gui
         bool IsAncestorOf(ITreeListViewItem item);
         List<ITreeListViewItem> Children { get; }
         ITreeListViewItem Parent { get; set; }
+        string Name { get; }
+        string Key { get; }
     }
 }
