@@ -7,7 +7,7 @@ Can be downloaded from [releases](https://github.com/Zeracronius/RimworldModMana
 Originally inspired by ModSorter by Mehni  
 https://github.com/Mehni/ModSorter
  
-This tool is designed to be very light weight; A single executable file with no dependencies or resources.  
+This tool is designed to be very light weight; A single executable file that requires no installation.  
 **Currently only supports Windows.**
 
 
@@ -47,3 +47,7 @@ This tool is designed to be very light weight; A single executable file with no 
 Note that there is no functionality to auto-sort load order.
 RimPy is a much more powerful alternative that does support auto-sorting the load order.  
 https://steamcommunity.com/sharedfiles/filedetails/?id=1847679158
+
+Credits:
+Uses TreeListView as a base.
+https://objectlistview.sourceforge.net
