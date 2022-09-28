@@ -14,6 +14,23 @@ namespace ModManager.Gui.Components
 {
     public class ReorderableTreeListView : DataTreeListView
     {
+        public bool SuspendSorting { get; set; }
+        public IList RowData { get; set; }
+
+
+        public void Reload()
+        {
+            try
+            {
+                SuspendSorting = true;
+                Roots = RowData;
+                BuildList(true);
+            }
+            finally
+            {
+                SuspendSorting = false;
+            }
+        }
 
         protected override void OnModelCanDrop(BrightIdeasSoftware.ModelDropEventArgs e)
         {
@@ -32,6 +49,84 @@ namespace ModManager.Gui.Components
                     e.Effect = DragDropEffects.Move;
             }
             base.OnModelCanDrop(e);
+        }
+
+        protected override void OnBeforeSorting(BeforeSortingEventArgs e)
+        {
+            if (SuspendSorting == true)
+            {
+                e.Canceled = true;
+                return;
+            }
+
+            // Detect third column sort toggle and trigger unsort
+            if (e.ColumnToSort != null && LastSortColumn == e.ColumnToSort && Sorting == SortOrder.Descending)
+            {
+                e.SortOrder = SortOrder.None;
+                e.ColumnToSort = null;
+                e.Handled = true;
+            }
+            Sorting = e.SortOrder;
+            base.OnBeforeSorting(e);
+        }
+
+        protected override void OnAfterSorting(AfterSortingEventArgs e)
+        {
+            if (SuspendSorting == true)
+                return;
+
+
+            if (e.ColumnToSort == null)
+            {
+                // Unsort
+                try
+                {
+                    SuspendSorting = true;
+                    Roots = RowData;
+                    RebuildColumns();
+                    UpdateFiltering();
+                }
+                finally
+                {
+                    SuspendSorting = false;
+                }
+            }
+            else
+                base.OnAfterSorting(e);
+        }
+
+
+        public void ApplyFilter(string filterText)
+        {
+            try
+            {
+                SuspendSorting = true;
+
+                if (String.IsNullOrWhiteSpace(filterText))
+                {
+                    ResetColumnFiltering();
+                    RebuildColumns();
+                    return;
+                }
+
+                filterText = filterText.ToLower();
+                if (ModelFilter == null)
+                {
+                    TextMatchFilter filter = TextMatchFilter.Contains(this, filterText);
+                    ModelFilter = filter;
+                    DefaultRenderer = new HighlightTextRenderer(filter);
+                }
+                else
+                {
+                    (ModelFilter as TextMatchFilter).ContainsStrings = new string[] { filterText };
+                }
+
+                UpdateFiltering();
+            }
+            finally
+            {
+                SuspendSorting = false;
+            }
         }
     }
 }

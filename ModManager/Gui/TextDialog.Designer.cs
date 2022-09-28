@@ -59,6 +59,7 @@
             // 
             this.ValueTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ValueTextBox.Location = new System.Drawing.Point(3, 23);
+            this.ValueTextBox.Multiline = true;
             this.ValueTextBox.Name = "ValueTextBox";
             this.ValueTextBox.Size = new System.Drawing.Size(376, 20);
             this.ValueTextBox.TabIndex = 1;

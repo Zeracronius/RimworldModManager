@@ -35,7 +35,7 @@ namespace ModManager.Gui
 
         private void Accept()
         {
-            _presenter.Value = ValueTextBox.Text;
+            _presenter.Value = ValueTextBox.Text.Replace(Environment.NewLine, "");
             DialogResult = DialogResult.OK;
         }
 
@@ -45,12 +45,17 @@ namespace ModManager.Gui
             {
                 case Keys.Escape:
                     DialogResult = DialogResult.Cancel;
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
                     break;
 
                 case Keys.Enter:
                     Accept();
+                    e.SuppressKeyPress = true;
+                    e.Handled = true;
                     break;
             }
         }
+
     }
 }

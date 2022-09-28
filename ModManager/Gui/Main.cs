@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -26,10 +27,9 @@ namespace ModManager.Gui
     public partial class Main : Form
     {
         private readonly MainPresenter _presenter;
-
-        List<ITreeListViewItem> _activeModItems = new List<ITreeListViewItem>();
-        List<ITreeListViewItem> _passiveModItems = new List<ITreeListViewItem>();
-        Dictionary<string, GroupViewModel> _groups = new System.Collections.Generic.Dictionary<string, GroupViewModel>();
+        private readonly List<ITreeListViewItem> _activeModItems = new List<ITreeListViewItem>();
+        private readonly List<ITreeListViewItem> _passiveModItems = new List<ITreeListViewItem>();
+        private readonly Dictionary<string, GroupViewModel> _groups = new Dictionary<string, GroupViewModel>();
 
         public Main(MainPresenter presenter)
         {
@@ -197,6 +197,10 @@ namespace ModManager.Gui
                 _passiveModItems.Add(mod.Value);
             }
 
+            ActiveModsListView.RowData = _activeModItems;
+            ModsListView.RowData = _passiveModItems;
+            ActiveModsListView.Reload();
+            ModsListView.Reload();
             RefreshInterface();
             SaveButton.Enabled = true;
         }
@@ -215,8 +219,7 @@ namespace ModManager.Gui
                 if (groupTranslationMap.ContainsKey(groupKey))
                     groupKey = groupTranslationMap[groupKey];
 
-                GroupViewModel group = null;
-                if (_groups.TryGetValue(groupKey, out group) == false)
+                if (_groups.TryGetValue(groupKey, out GroupViewModel group) == false)
                 {
                     group = new GroupViewModel(keyParts[1]);
                     groupTranslationMap.Add(keyParts[0], groupKey);
@@ -352,36 +355,18 @@ namespace ModManager.Gui
 
         private void RefreshInterface()
         {
-            ModsListView.BeginUpdate();
-            ActiveModsListView.BeginUpdate();
-
-            ActiveModsListView.Roots = _activeModItems;
-            ModsListView.Roots = _passiveModItems;
-            ActiveModsListView.BuildList(true);
-            ModsListView.BuildList(true);
-
-            ActiveModsListView.Unsort();
-            ActiveModsListView.ExpandAll();
-            ActiveModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            ActiveModsListView.EndUpdate();
-
-            ModsListView.Unsort();
-            ModsListView.ExpandAll();
-            ModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            ModsListView.EndUpdate();
             PresenterBindingSource.ResetBindings(false);
 
-
-            List<ModViewModel> activeMods = FlattenList(_activeModItems).OfType<ModViewModel>().ToList();
-
-            int availableMods = _passiveModItems.Count;
-            int outdatedMods = _passiveModItems.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
+            List<ModViewModel> disabledMods = FlattenList(_passiveModItems).OfType<ModViewModel>().ToList();
+            int availableMods = disabledMods.Count;
+            int outdatedMods = disabledMods.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
 
             AvailableModsFooterLabel.Text = $"{availableMods} inactive.";
             if (outdatedMods > 0)
                 AvailableModsFooterLabel.Text += $" ({outdatedMods} incompatible)";
 
-            availableMods = _activeModItems.Count;
+            List<ModViewModel> activeMods = FlattenList(_activeModItems).OfType<ModViewModel>().ToList();
+            availableMods = activeMods.Count;
             outdatedMods = activeMods.Count(x => x.Background == _presenter.IncompatibleColor);
 
             ActiveModsFooterLabel.Text = $"{availableMods} active.";
@@ -389,17 +374,10 @@ namespace ModManager.Gui
                 ActiveModsFooterLabel.Text += $" ({outdatedMods} incompatible)";
 
 
-            foreach (var item in activeMods)
+            foreach (ModViewModel mod in activeMods)
             {
-                if (item.Background == _presenter.IncompatibleColor)
+                if (mod.Background == _presenter.IncompatibleColor)
                     continue; 
-
-
-                ModViewModel mod;
-                _presenter.ActiveMods.TryGetValue(item.PackageId, out mod);
-
-                if (mod == null)
-                    _presenter.AvailableMods.TryGetValue(item.PackageId, out mod);
 
                 StringBuilder tooltip = new StringBuilder();
 
@@ -413,7 +391,7 @@ namespace ModManager.Gui
                     }
                 }
 
-                int currentIndex = activeMods.IndexOf(item);
+                int currentIndex = activeMods.IndexOf(mod);
 
                 if (mod.LoadAfter != null)
                 {
@@ -447,11 +425,11 @@ namespace ModManager.Gui
                     }
                 }
 
-                item.Tooltip = tooltip.ToString();
-                if (item.Tooltip.Length > 0)
-                    item.Background = _presenter.WarningColor;
+                mod.Tooltip = tooltip.ToString();
+                if (mod.Tooltip.Length > 0)
+                    mod.Background = _presenter.WarningColor;
                 else
-                    item.Background = Color.Transparent;
+                    mod.Background = Color.Transparent;
             }
         }
 
@@ -462,8 +440,11 @@ namespace ModManager.Gui
 
             // Move mod to disabled list
             ModViewModel selectedItem = (ModViewModel)ActiveModsListView.SelectedObject;
-            ActiveModsListView.RemoveObject(selectedItem);
-            ModsListView.AddObject(selectedItem);
+            _activeModItems.Remove(selectedItem);
+            _passiveModItems.Add(selectedItem);
+
+            ActiveModsListView.Reload();
+            ModsListView.Reload();
             RefreshInterface();
         }
 
@@ -474,8 +455,11 @@ namespace ModManager.Gui
 
             // Move mod to activated list
             ModViewModel selectedItem = (ModViewModel)ModsListView.SelectedObject;
-            ModsListView.RemoveObject(selectedItem);
-            ActiveModsListView.AddObject(selectedItem);
+            _passiveModItems.Remove(selectedItem);
+            _activeModItems.Add(selectedItem);
+
+            ActiveModsListView.Reload();
+            ModsListView.Reload();
             RefreshInterface();
         }
 
@@ -516,7 +500,7 @@ namespace ModManager.Gui
                 MessageBox.Show("Browse folder", "Folder does not exist.", MessageBoxButtons.OK);
         }
 
-        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
@@ -528,7 +512,7 @@ namespace ModManager.Gui
             }
         }
 
-        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "Ludeon Studios", "RimWorld by Ludeon Studios", "Saves");
             using (OpenFileDialog dialog = new OpenFileDialog())
@@ -583,8 +567,11 @@ namespace ModManager.Gui
 
         private void ListView_ModelDropped(object sender, ModelDropEventArgs e)
         {
-            List<ITreeListViewItem> targetCollection = e.ListView == ActiveModsListView ? _activeModItems : _passiveModItems;
-            List<ITreeListViewItem> sourceCollection = e.SourceListView == ActiveModsListView ? _activeModItems : _passiveModItems;
+            ReorderableTreeListView targetListView = e.ListView as ReorderableTreeListView;
+            ReorderableTreeListView sourceListView = e.SourceListView as ReorderableTreeListView;
+
+            List<ITreeListViewItem> targetCollection = targetListView.RowData as List<ITreeListViewItem>;
+            List<ITreeListViewItem> sourceCollection = sourceListView.RowData as List<ITreeListViewItem>;
             IEnumerable<ITreeListViewItem> selectedItems = e.SourceModels.OfType<ITreeListViewItem>();
             ITreeListViewItem targetItem = (ITreeListViewItem)e.TargetModel;
 
@@ -614,37 +601,31 @@ namespace ModManager.Gui
 
                 // Create group
                 case DropTargetLocation.Item:
-                    MoveItemsToGroup(targetCollection, targetItem, selectedItems);
-                    (e.ListView as TreeListView).Expand(targetItem);
+                    MoveItemsToGroup(targetItem, selectedItems);
+                    targetListView.Expand(targetItem);
                     break;
 
                 // Move items to index
                 case DropTargetLocation.AboveItem:
-                    MoveObjectsAboveItem(targetCollection, targetItem, selectedItems);
+                    MoveObjectsToItem(targetCollection, targetItem, selectedItems);
                     break;
 
                 // Move items to index
                 case DropTargetLocation.BelowItem:
-                    MoveObjectsBelowItem(targetCollection, targetItem, selectedItems);
+                    MoveObjectsToItem(targetCollection, targetItem, selectedItems, false);
                     break;
             }
 
             e.SourceListView.DeselectAll();
-
-            ActiveModsListView.Roots = _activeModItems;
-            ModsListView.Roots = _passiveModItems;
-
-
-
-            foreach (var item in selectedItems)
-                (e.ListView as TreeListView).Expand(item);
+            targetListView.Reload();
+            if (sourceListView != targetListView)
+                sourceListView.Reload();
             RefreshInterface();
         }
 
 
-        private void MoveItemsToGroup(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
+        private void MoveItemsToGroup(ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
         {
-            // Grouping logic here.
             target.Children.AddRange(selectedItems);
             foreach (var item in selectedItems)
                 item.Parent = target;
@@ -655,72 +636,33 @@ namespace ModManager.Gui
             targetCollection.AddRange(selectedItems);
         }
 
-        private void MoveObjectsAboveItem(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
+        private void MoveObjectsToItem(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems, bool above = true)
         {
+            int offset = above ? 0 : 1;
             if (target.Parent != null)
             {
                 int index = target.Parent.Children.IndexOf(target);
-                target.Parent.Children.InsertRange(index, selectedItems);
+                target.Parent.Children.InsertRange(index + offset, selectedItems);
                 foreach (var item in selectedItems)
                     item.Parent = target.Parent;
             }
             else
             {
                 int index = targetCollection.IndexOf(target);
-                targetCollection.InsertRange(index, selectedItems);
-            }
-        }
-
-        private void MoveObjectsBelowItem(List<ITreeListViewItem> targetCollection, ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
-        {
-            if (target.Parent != null)
-            {
-                int index = target.Parent.Children.IndexOf(target);
-                target.Parent.Children.InsertRange(index+1, selectedItems);
-                foreach (var item in selectedItems)
-                    item.Parent = target.Parent;
-            }
-            else
-            {
-                int index = targetCollection.IndexOf(target);
-                targetCollection.InsertRange(index+1, selectedItems);
+                targetCollection.InsertRange(index + offset, selectedItems);
             }
         }
 
         private void ActiveModListFilterTextBox_TextChanged(object sender, EventArgs e)
         {
-            ApplyFilter(ActiveModsListView, ActiveModListFilterTextBox.Text);
+            ActiveModsListView.ApplyFilter(ActiveModListFilterTextBox.Text);
         }
 
         private void InactiveModListFilterTextBox_TextChanged(object sender, EventArgs e)
         {
-            ApplyFilter(ModsListView, InactiveModListFilterTextBox.Text);
+            ModsListView.ApplyFilter(InactiveModListFilterTextBox.Text);
         }
 
-        private void ApplyFilter(ReorderableTreeListView listView, string filterText)
-        {
-            if (String.IsNullOrWhiteSpace(filterText))
-            {
-                listView.ResetColumnFiltering();
-                listView.RebuildColumns();
-                return;
-            }
-
-            filterText = filterText.ToLower();
-            if (listView.ModelFilter == null)
-            {
-                TextMatchFilter filter = TextMatchFilter.Contains(listView, filterText);
-                listView.ModelFilter = filter;
-                listView.DefaultRenderer = new HighlightTextRenderer(filter);
-            }
-            else
-            {
-                (listView.ModelFilter as TextMatchFilter).ContainsStrings = new string[] { filterText };
-            }
-
-            listView.UseFiltering = false;
-            listView.UseFiltering = true;
-        }
 
         private void ModsListView_FormatRow(object sender, FormatRowEventArgs e)
         {
@@ -746,7 +688,7 @@ namespace ModManager.Gui
             {
                 switch (e.Model)
                 {
-                    case GroupViewModel group:
+                    case GroupViewModel _:
                         e.MenuStrip = GroupContextMenuStrip;
                         break;
 
@@ -762,23 +704,14 @@ namespace ModManager.Gui
         private void Group_Context_Delete_Click(object sender, EventArgs e)
         {
             ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
+            ReorderableTreeListView listView = contextMenu.Tag as ReorderableTreeListView;
 
-            List<ITreeListViewItem> collection;
-            GroupViewModel group;
-            if (contextMenu.Tag == ActiveModsListView)
-            {
-                collection = _activeModItems;
-                group = ActiveModsListView.SelectedObject as GroupViewModel;
-            }
-            else
-            {
-                collection = _activeModItems;
-                group = ModsListView.SelectedObject as GroupViewModel;
-            }
+            List<ITreeListViewItem> collection = listView.RowData as List<ITreeListViewItem>;
+            GroupViewModel group = listView.SelectedObject as GroupViewModel;
 
             if (group.Parent != null)
             {
-                MoveObjectsBelowItem(group.Parent.Children, group.Parent, group.Children);
+                MoveObjectsToItem(group.Parent.Children, group.Parent, group.Children, false);
                 group.Parent.Children.Remove(group);
             }
             else
@@ -788,20 +721,22 @@ namespace ModManager.Gui
             }
 
             _groups.Remove(group.Key);
-            RefreshInterface();
+            listView.Reload();
         }
 
         private void Group_Context_Rename_Click(object sender, EventArgs e)
         {
             ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
-            GroupViewModel selectedGroup = ((ObjectListView)contextMenu.Tag).SelectedObject as GroupViewModel;
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.Tag;
+            GroupViewModel selectedGroup = listView.SelectedObject as GroupViewModel;
+
             TextDialogPresenter presenter = new TextDialogPresenter("Rename group", selectedGroup.Caption, "New name:");
             using (TextDialog dialog = new TextDialog(presenter))
             {
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
                     selectedGroup.Caption = presenter.Value;
-                    RefreshInterface();
+                    listView.Reload();
                 }
             }
         }
@@ -809,45 +744,17 @@ namespace ModManager.Gui
         private void TreeView_Context_CreateGroup_Click(object sender, EventArgs e)
         {
             ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.Tag;
+
             TextDialogPresenter presenter = new TextDialogPresenter("New group", String.Empty, "Group name:");
             using (TextDialog dialog = new TextDialog(presenter))
             {
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
                     GroupViewModel group = new GroupViewModel(presenter.Value);
-
-                    if (contextMenu.Tag == ActiveModsListView)
-                        _activeModItems.Add(group);
-                    else
-                        _passiveModItems.Add(group);
-
-                    RefreshInterface();
+                    listView.RowData.Add(group);
+                    listView.Reload();
                 }
-            }
-        }
-
-        private void ListView_BeforeSorting(object sender, BeforeSortingEventArgs e)
-        {
-            ReorderableTreeListView list = sender as ReorderableTreeListView;
-
-            if (e.ColumnToSort != null && list.LastSortColumn == e.ColumnToSort && list.Sorting == SortOrder.Descending)
-            {
-                e.SortOrder = SortOrder.None;
-                e.ColumnToSort = null;
-                ((TreeListView)sender).Roots = ((TreeListView)sender) == ActiveModsListView ? _activeModItems : _passiveModItems;
-                e.Handled = true;
-            }
-            list.Sorting = e.SortOrder;
-        }
-
-        private void ListView_AfterSorting(object sender, AfterSortingEventArgs e)
-        {
-            TreeListView listView = ((TreeListView)sender);
-            if (e.SortOrder == SortOrder.None)
-            {
-                listView.UseFiltering = false;
-                listView.RebuildColumns();
-                listView.UseFiltering = true;
             }
         }
     }

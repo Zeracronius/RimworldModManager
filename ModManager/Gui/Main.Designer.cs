@@ -309,8 +309,6 @@
             this.ModsListView.UseFiltering = true;
             this.ModsListView.View = System.Windows.Forms.View.Details;
             this.ModsListView.VirtualMode = true;
-            this.ModsListView.AfterSorting += new System.EventHandler<BrightIdeasSoftware.AfterSortingEventArgs>(this.ListView_AfterSorting);
-            this.ModsListView.BeforeSorting += new System.EventHandler<BrightIdeasSoftware.BeforeSortingEventArgs>(this.ListView_BeforeSorting);
             this.ModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
             this.ModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
             this.ModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
@@ -400,8 +398,6 @@
             this.ActiveModsListView.UseFiltering = true;
             this.ActiveModsListView.View = System.Windows.Forms.View.Details;
             this.ActiveModsListView.VirtualMode = true;
-            this.ActiveModsListView.AfterSorting += new System.EventHandler<BrightIdeasSoftware.AfterSortingEventArgs>(this.ListView_AfterSorting);
-            this.ActiveModsListView.BeforeSorting += new System.EventHandler<BrightIdeasSoftware.BeforeSortingEventArgs>(this.ListView_BeforeSorting);
             this.ActiveModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
             this.ActiveModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
             this.ActiveModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
@@ -493,7 +489,7 @@
             this.importToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.importToolStripMenuItem.Text = "Import mod list";
             this.importToolStripMenuItem.ToolTipText = "Import active mods from either an exported list or a rimworld save";
-            this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            this.importToolStripMenuItem.Click += new System.EventHandler(this.ImportToolStripMenuItem_Click);
             // 
             // exportToolStripMenuItem
             // 
@@ -501,7 +497,7 @@
             this.exportToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.exportToolStripMenuItem.Text = "Export mod list";
             this.exportToolStripMenuItem.ToolTipText = "Export active mods as an importable mod list";
-            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
+            this.exportToolStripMenuItem.Click += new System.EventHandler(this.ExportToolStripMenuItem_Click);
             // 
             // browseToolStripMenuItem
             // 
