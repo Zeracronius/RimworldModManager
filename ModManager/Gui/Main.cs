@@ -201,6 +201,10 @@ namespace ModManager.Gui
             ModsListView.RowData = _passiveModItems;
             ActiveModsListView.Reload();
             ModsListView.Reload();
+
+            ActiveModsListView.ExpandAll();
+            ModsListView.ExpandAll();
+
             RefreshInterface();
             SaveButton.Enabled = true;
         }
