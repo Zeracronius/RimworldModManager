@@ -32,6 +32,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.ModNameLabel = new System.Windows.Forms.Label();
             this.ModBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.DescriptionWebBrowser = new System.Windows.Forms.WebBrowser();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.browseFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,9 +44,17 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.ModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
+            this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.InactiveModListFilterTextBox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.AvailableModsFooterLabel = new System.Windows.Forms.Label();
+            this.ActiveModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
+            this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn3 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.ActiveModListFilterTextBox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.ActiveModsFooterLabel = new System.Windows.Forms.Label();
@@ -64,17 +73,9 @@
             this.GroupContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.ModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
-            this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.ActiveModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
-            this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumn3 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.PresenterBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModPictureBox)).BeginInit();
@@ -87,14 +88,13 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ModsListView)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).BeginInit();
             this.flowLayoutPanel3.SuspendLayout();
             this.menuStrip3.SuspendLayout();
             this.BackgroundContextMenuStrip.SuspendLayout();
             this.GroupContextMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ModsListView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -138,6 +138,10 @@
             this.ModBindingSource.AllowNew = false;
             this.ModBindingSource.DataMember = "SelectedMod";
             this.ModBindingSource.DataSource = this.PresenterBindingSource;
+            // 
+            // PresenterBindingSource
+            // 
+            this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Main.MainPresenter);
             // 
             // DescriptionWebBrowser
             // 
@@ -276,6 +280,66 @@
             this.splitContainer2.SplitterDistance = 378;
             this.splitContainer2.TabIndex = 1;
             // 
+            // ModsListView
+            // 
+            this.ModsListView.AllColumns.Add(this.olvColumn4);
+            this.ModsListView.AllColumns.Add(this.olvColumn5);
+            this.ModsListView.AllColumns.Add(this.olvColumn6);
+            this.ModsListView.AllowDrop = true;
+            this.ModsListView.AutoGenerateColumns = false;
+            this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.olvColumn4,
+            this.olvColumn5,
+            this.olvColumn6});
+            this.ModsListView.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ModsListView.DataSource = null;
+            this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ModsListView.FullRowSelect = true;
+            this.ModsListView.HideSelection = false;
+            this.ModsListView.IsSimpleDragSource = true;
+            this.ModsListView.IsSimpleDropSink = true;
+            this.ModsListView.KeyAspectName = "";
+            this.ModsListView.Location = new System.Drawing.Point(0, 20);
+            this.ModsListView.Name = "ModsListView";
+            this.ModsListView.RootKeyValueString = "";
+            this.ModsListView.RowData = null;
+            this.ModsListView.ShowCommandMenuOnRightClick = true;
+            this.ModsListView.ShowFilterMenuOnRightClick = false;
+            this.ModsListView.ShowGroups = false;
+            this.ModsListView.Size = new System.Drawing.Size(378, 381);
+            this.ModsListView.SuspendSorting = false;
+            this.ModsListView.TabIndex = 4;
+            this.ModsListView.UseCompatibleStateImageBehavior = false;
+            this.ModsListView.UseFiltering = true;
+            this.ModsListView.View = System.Windows.Forms.View.Details;
+            this.ModsListView.VirtualMode = true;
+            this.ModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
+            this.ModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
+            this.ModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
+            this.ModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ModsListView_ItemsAdding);
+            this.ModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ModsListView_ItemsRemoving);
+            this.ModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
+            this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
+            this.ModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ModsListView_DoubleClick);
+            // 
+            // olvColumn4
+            // 
+            this.olvColumn4.AspectName = "Caption";
+            this.olvColumn4.FillsFreeSpace = true;
+            this.olvColumn4.Text = "Name";
+            this.olvColumn4.Width = 226;
+            // 
+            // olvColumn5
+            // 
+            this.olvColumn5.AspectName = "Downloaded";
+            this.olvColumn5.Text = "Downloaded";
+            this.olvColumn5.Width = 73;
+            // 
+            // olvColumn6
+            // 
+            this.olvColumn6.AspectName = "SupportedVersions";
+            this.olvColumn6.Text = "Supports";
+            // 
             // InactiveModListFilterTextBox
             // 
             this.InactiveModListFilterTextBox.Dock = System.Windows.Forms.DockStyle.Top;
@@ -305,6 +369,66 @@
             this.AvailableModsFooterLabel.Size = new System.Drawing.Size(45, 13);
             this.AvailableModsFooterLabel.TabIndex = 0;
             this.AvailableModsFooterLabel.Text = "Loading";
+            // 
+            // ActiveModsListView
+            // 
+            this.ActiveModsListView.AllColumns.Add(this.olvColumn1);
+            this.ActiveModsListView.AllColumns.Add(this.olvColumn2);
+            this.ActiveModsListView.AllColumns.Add(this.olvColumn3);
+            this.ActiveModsListView.AllowDrop = true;
+            this.ActiveModsListView.AutoGenerateColumns = false;
+            this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.olvColumn1,
+            this.olvColumn2,
+            this.olvColumn3});
+            this.ActiveModsListView.Cursor = System.Windows.Forms.Cursors.Default;
+            this.ActiveModsListView.DataSource = null;
+            this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ActiveModsListView.FullRowSelect = true;
+            this.ActiveModsListView.HideSelection = false;
+            this.ActiveModsListView.IsSimpleDragSource = true;
+            this.ActiveModsListView.IsSimpleDropSink = true;
+            this.ActiveModsListView.KeyAspectName = "";
+            this.ActiveModsListView.Location = new System.Drawing.Point(0, 20);
+            this.ActiveModsListView.Name = "ActiveModsListView";
+            this.ActiveModsListView.RootKeyValueString = "";
+            this.ActiveModsListView.RowData = null;
+            this.ActiveModsListView.ShowCommandMenuOnRightClick = true;
+            this.ActiveModsListView.ShowFilterMenuOnRightClick = false;
+            this.ActiveModsListView.ShowGroups = false;
+            this.ActiveModsListView.Size = new System.Drawing.Size(387, 381);
+            this.ActiveModsListView.SuspendSorting = false;
+            this.ActiveModsListView.TabIndex = 3;
+            this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
+            this.ActiveModsListView.UseFiltering = true;
+            this.ActiveModsListView.View = System.Windows.Forms.View.Details;
+            this.ActiveModsListView.VirtualMode = true;
+            this.ActiveModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
+            this.ActiveModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
+            this.ActiveModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
+            this.ActiveModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ActiveModsListView_ItemsAdding);
+            this.ActiveModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ActiveModsListView_ItemsRemoving);
+            this.ActiveModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
+            this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
+            this.ActiveModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ActiveModsListView_DoubleClick);
+            // 
+            // olvColumn1
+            // 
+            this.olvColumn1.AspectName = "Caption";
+            this.olvColumn1.FillsFreeSpace = true;
+            this.olvColumn1.Text = "Name";
+            this.olvColumn1.Width = 240;
+            // 
+            // olvColumn2
+            // 
+            this.olvColumn2.AspectName = "Downloaded";
+            this.olvColumn2.Text = "Downloaded";
+            this.olvColumn2.Width = 73;
+            // 
+            // olvColumn3
+            // 
+            this.olvColumn3.AspectName = "SupportedVersions";
+            this.olvColumn3.Text = "Supports";
             // 
             // ActiveModListFilterTextBox
             // 
@@ -455,130 +579,6 @@
             this.toolStripMenuItem1.Text = "Delete";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.Group_Context_Delete_Click);
             // 
-            // ModsListView
-            // 
-            this.ModsListView.AllColumns.Add(this.olvColumn4);
-            this.ModsListView.AllColumns.Add(this.olvColumn5);
-            this.ModsListView.AllColumns.Add(this.olvColumn6);
-            this.ModsListView.AllowDrop = true;
-            this.ModsListView.AutoGenerateColumns = false;
-            this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.olvColumn4,
-            this.olvColumn5,
-            this.olvColumn6});
-            this.ModsListView.Cursor = System.Windows.Forms.Cursors.Default;
-            this.ModsListView.DataSource = null;
-            this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ModsListView.FullRowSelect = true;
-            this.ModsListView.HideSelection = false;
-            this.ModsListView.IsSimpleDragSource = true;
-            this.ModsListView.IsSimpleDropSink = true;
-            this.ModsListView.KeyAspectName = "";
-            this.ModsListView.Location = new System.Drawing.Point(0, 20);
-            this.ModsListView.Name = "ModsListView";
-            this.ModsListView.RootKeyValueString = "";
-            this.ModsListView.RowData = null;
-            this.ModsListView.ShowCommandMenuOnRightClick = true;
-            this.ModsListView.ShowFilterMenuOnRightClick = false;
-            this.ModsListView.ShowGroups = false;
-            this.ModsListView.Size = new System.Drawing.Size(378, 381);
-            this.ModsListView.SuspendSorting = false;
-            this.ModsListView.TabIndex = 4;
-            this.ModsListView.UseCompatibleStateImageBehavior = false;
-            this.ModsListView.UseFiltering = true;
-            this.ModsListView.View = System.Windows.Forms.View.Details;
-            this.ModsListView.VirtualMode = true;
-            this.ModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
-            this.ModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
-            this.ModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
-            this.ModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ModsListView_ItemsAdding);
-            this.ModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ModsListView_ItemsRemoving);
-            this.ModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
-            this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-            this.ModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ModsListView_DoubleClick);
-            // 
-            // olvColumn4
-            // 
-            this.olvColumn4.AspectName = "Caption";
-            this.olvColumn4.Text = "Name";
-            this.olvColumn4.Width = 226;
-            // 
-            // olvColumn5
-            // 
-            this.olvColumn5.AspectName = "Downloaded";
-            this.olvColumn5.Text = "Downloaded";
-            this.olvColumn5.Width = 73;
-            // 
-            // olvColumn6
-            // 
-            this.olvColumn6.AspectName = "SupportedVersions";
-            this.olvColumn6.FillsFreeSpace = true;
-            this.olvColumn6.Text = "Supports";
-            // 
-            // ActiveModsListView
-            // 
-            this.ActiveModsListView.AllColumns.Add(this.olvColumn1);
-            this.ActiveModsListView.AllColumns.Add(this.olvColumn2);
-            this.ActiveModsListView.AllColumns.Add(this.olvColumn3);
-            this.ActiveModsListView.AllowDrop = true;
-            this.ActiveModsListView.AutoGenerateColumns = false;
-            this.ActiveModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.olvColumn1,
-            this.olvColumn2,
-            this.olvColumn3});
-            this.ActiveModsListView.Cursor = System.Windows.Forms.Cursors.Default;
-            this.ActiveModsListView.DataSource = null;
-            this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ActiveModsListView.FullRowSelect = true;
-            this.ActiveModsListView.HideSelection = false;
-            this.ActiveModsListView.IsSimpleDragSource = true;
-            this.ActiveModsListView.IsSimpleDropSink = true;
-            this.ActiveModsListView.KeyAspectName = "";
-            this.ActiveModsListView.Location = new System.Drawing.Point(0, 20);
-            this.ActiveModsListView.Name = "ActiveModsListView";
-            this.ActiveModsListView.RootKeyValueString = "";
-            this.ActiveModsListView.RowData = null;
-            this.ActiveModsListView.ShowCommandMenuOnRightClick = true;
-            this.ActiveModsListView.ShowFilterMenuOnRightClick = false;
-            this.ActiveModsListView.ShowGroups = false;
-            this.ActiveModsListView.Size = new System.Drawing.Size(387, 381);
-            this.ActiveModsListView.SuspendSorting = false;
-            this.ActiveModsListView.TabIndex = 3;
-            this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
-            this.ActiveModsListView.UseFiltering = true;
-            this.ActiveModsListView.View = System.Windows.Forms.View.Details;
-            this.ActiveModsListView.VirtualMode = true;
-            this.ActiveModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
-            this.ActiveModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
-            this.ActiveModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
-            this.ActiveModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ActiveModsListView_ItemsAdding);
-            this.ActiveModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ActiveModsListView_ItemsRemoving);
-            this.ActiveModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
-            this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-            this.ActiveModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ActiveModsListView_DoubleClick);
-            // 
-            // olvColumn1
-            // 
-            this.olvColumn1.AspectName = "Caption";
-            this.olvColumn1.Text = "Name";
-            this.olvColumn1.Width = 240;
-            // 
-            // olvColumn2
-            // 
-            this.olvColumn2.AspectName = "Downloaded";
-            this.olvColumn2.Text = "Downloaded";
-            this.olvColumn2.Width = 73;
-            // 
-            // olvColumn3
-            // 
-            this.olvColumn3.AspectName = "SupportedVersions";
-            this.olvColumn3.FillsFreeSpace = true;
-            this.olvColumn3.Text = "Supports";
-            // 
-            // PresenterBindingSource
-            // 
-            this.PresenterBindingSource.DataSource = typeof(ModManager.Logic.Main.MainPresenter);
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -593,6 +593,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
@@ -609,17 +610,16 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ModsListView)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).EndInit();
             this.flowLayoutPanel3.ResumeLayout(false);
             this.flowLayoutPanel3.PerformLayout();
             this.menuStrip3.ResumeLayout(false);
             this.menuStrip3.PerformLayout();
             this.BackgroundContextMenuStrip.ResumeLayout(false);
             this.GroupContextMenuStrip.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.ModsListView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ActiveModsListView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
