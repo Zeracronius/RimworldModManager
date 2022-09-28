@@ -30,9 +30,27 @@ namespace ModManager.Gui
 
         private void Accept_Click(object sender, EventArgs e)
         {
+            Accept();
+        }
+
+        private void Accept()
+        {
             _presenter.Value = ValueTextBox.Text;
             DialogResult = DialogResult.OK;
         }
 
+        private void ValueTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Escape:
+                    DialogResult = DialogResult.Cancel;
+                    break;
+
+                case Keys.Enter:
+                    Accept();
+                    break;
+            }
+        }
     }
 }

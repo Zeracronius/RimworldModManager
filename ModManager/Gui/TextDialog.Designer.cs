@@ -61,7 +61,8 @@
             this.ValueTextBox.Location = new System.Drawing.Point(3, 23);
             this.ValueTextBox.Name = "ValueTextBox";
             this.ValueTextBox.Size = new System.Drawing.Size(376, 20);
-            this.ValueTextBox.TabIndex = 0;
+            this.ValueTextBox.TabIndex = 1;
+            this.ValueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ValueTextBox_KeyUp);
             // 
             // DescriptionLabel
             // 
@@ -84,7 +85,7 @@
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(382, 29);
-            this.flowLayoutPanel1.TabIndex = 1;
+            this.flowLayoutPanel1.TabIndex = 2;
             // 
             // CancelButton
             // 
@@ -92,7 +93,7 @@
             this.CancelButton.Location = new System.Drawing.Point(304, 3);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 0;
+            this.CancelButton.TabIndex = 1;
             this.CancelButton.Text = "Cancel";
             this.CancelButton.UseVisualStyleBackColor = true;
             // 
@@ -109,10 +110,8 @@
             // 
             // TextDialog
             // 
-            this.AcceptButton = this.AcceptButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.CancelButton;
             this.ClientSize = new System.Drawing.Size(382, 75);
             this.ControlBox = false;
             this.Controls.Add(this.tableLayoutPanel1);
