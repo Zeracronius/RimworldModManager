@@ -735,7 +735,7 @@ namespace ModManager.Gui
             
         }
 
-        private void ActiveModsListView_CellRightClick(object sender, CellRightClickEventArgs e)
+        private void ListView_CellRightClick(object sender, CellRightClickEventArgs e)
         {
             // Rightclicked background
             if (e.Model == null)
