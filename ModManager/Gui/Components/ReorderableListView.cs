@@ -43,8 +43,8 @@ namespace ModManager.Gui.Components
                 var sourceModels = e.SourceModels.Cast<ITreeListViewItem>();
                 ITreeListViewItem target = e.TargetModel as ITreeListViewItem;
                 
-                if (e.DropTargetLocation == DropTargetLocation.Item && sourceModels.Any(x => target.IsAncestorOf(x)))
-                    e.InfoMessage = "Cannot drop on descendant (think of the temporal paradoxes!)";
+                if (target != null && sourceModels.Any(x => x.IsAncestorOf(target)))
+                    e.InfoMessage = "Cannot drop as it's own child.";
                 else
                     e.Effect = DragDropEffects.Move;
             }
