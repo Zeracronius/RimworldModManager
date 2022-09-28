@@ -48,6 +48,6 @@ Note that there is no functionality to auto-sort load order.
 RimPy is a much more powerful alternative that does support auto-sorting the load order.  
 https://steamcommunity.com/sharedfiles/filedetails/?id=1847679158
 
-Credits:
-Uses TreeListView as a base.
+## Credits:
+Uses TreeListView as a base.  
 https://objectlistview.sourceforge.net
