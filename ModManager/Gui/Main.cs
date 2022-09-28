@@ -164,8 +164,18 @@ namespace ModManager.Gui
 
             _groups.Clear();
             groupMapping.Clear();
+            StringBuilder missingMods = new StringBuilder();
             foreach (var mod in _presenter.ActiveMods)
             {
+                if (mod.Value == null)
+                    continue;
+
+                if (mod.Value.SupportedVersions.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
+                {
+                    mod.Value.Tooltip = "Incompatible with current version.";
+                    mod.Value.Background = _presenter.IncompatibleColor;
+                }
+
                 if (parents.ContainsKey(mod.Key))
                 {
                     ITreeListViewItem parent = GetParent(_activeModItems, groupMapping, parents, mod.Key);
@@ -183,6 +193,15 @@ namespace ModManager.Gui
             groupMapping.Clear();
             foreach (var mod in _presenter.AvailableMods.OrderByDescending(x => _presenter.AvailableMods[x.Key].Downloaded))
             {
+                if (mod.Value == null)
+                    continue;
+
+                if (mod.Value.SupportedVersions.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
+                {
+                    mod.Value.Tooltip = "Incompatible with current version.";
+                    mod.Value.Background = _presenter.IncompatibleColor;
+                }
+
                 if (parents.ContainsKey(mod.Key))
                 {
                     ITreeListViewItem parent = GetParent(_passiveModItems, groupMapping, parents, mod.Key);
@@ -363,7 +382,7 @@ namespace ModManager.Gui
 
             List<ModViewModel> disabledMods = FlattenList(_passiveModItems).OfType<ModViewModel>().ToList();
             int availableMods = disabledMods.Count;
-            int outdatedMods = disabledMods.OfType<ModViewModel>().Count(x => x.Background == _presenter.IncompatibleColor);
+            int outdatedMods = disabledMods.Count(x => x.Background == _presenter.IncompatibleColor);
 
             AvailableModsFooterLabel.Text = $"{availableMods} inactive.";
             if (outdatedMods > 0)
