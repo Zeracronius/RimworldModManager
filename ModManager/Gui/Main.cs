@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ModManager.Gui.Components;
 using ModManager.Logic.Configuration;
 using ModManager.Logic.Main;
 using ModManager.Logic.Main.ViewModels;
-using ModManager.Logic.Model;
 using ModManager.Logic.TextDialog;
 using ModManager.Properties;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ModManager.Gui
 {
@@ -74,16 +67,16 @@ namespace ModManager.Gui
 
         private void InitConfiguration()
         {
-#if DEBUG
-            Settings.Default.Reset();
-#else
+//#if DEBUG
+//            Settings.Default.Reset();
+//#else
             if (Settings.Default.UpgradeRequired)
             {
                 Settings.Default.Upgrade();
                 Settings.Default.UpgradeRequired = false;
                 Settings.Default.Save();
             }
-#endif
+//#endif
 
             if (String.IsNullOrWhiteSpace(Settings.Default.InstallationPath) || System.IO.File.Exists(System.IO.Path.Combine(Settings.Default.InstallationPath, "Version.txt")) == false)
             {
@@ -224,6 +217,25 @@ namespace ModManager.Gui
             ActiveModsListView.ExpandAll();
             ModsListView.ExpandAll();
 
+
+
+
+            if (Settings.Default.HiddenColumnsActive == null)
+                Settings.Default.HiddenColumnsActive = new StringCollection();
+
+            foreach (string column in Settings.Default.HiddenColumnsActive)
+                if (String.IsNullOrWhiteSpace(column) == false)
+                    ActiveModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
+
+            if (Settings.Default.HiddenColumnsInactive == null)
+                Settings.Default.HiddenColumnsInactive = new StringCollection();
+
+            foreach (string column in Settings.Default.HiddenColumnsInactive)
+                if (String.IsNullOrWhiteSpace(column) == false)
+                    ModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
+
+            ActiveModsListView.RebuildColumns();
+            ModsListView.RebuildColumns();
             RefreshInterface();
             SaveButton.Enabled = true;
         }
@@ -341,6 +353,14 @@ namespace ModManager.Gui
             parents.AddRange(SaveMods(_passiveModItems));
             parents.AddRange(SaveMods(_activeModItems));
             Settings.Default.Parenting = parents;
+
+            Settings.Default.HiddenColumnsActive.Clear();
+            Settings.Default.HiddenColumnsActive.AddRange(ActiveModsListView.AllColumns.Where(x => x.IsVisible == false).Select(x => x.Text).ToArray());
+
+            Settings.Default.HiddenColumnsInactive.Clear();
+            Settings.Default.HiddenColumnsInactive.AddRange(ModsListView.AllColumns.Where(x => x.IsVisible == false).Select(x => x.Text).ToArray());
+
+
 
             _presenter.Config.ActiveMods = FlattenList(_activeModItems).OfType<ModViewModel>().Select(x => x.PackageId).ToArray();
             _presenter.SaveConfig();

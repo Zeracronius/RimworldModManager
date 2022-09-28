@@ -141,5 +141,27 @@ namespace ModManager.Properties {
                 this["Parenting"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection HiddenColumnsActive {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["HiddenColumnsActive"]));
+            }
+            set {
+                this["HiddenColumnsActive"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection HiddenColumnsInactive {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["HiddenColumnsInactive"]));
+            }
+            set {
+                this["HiddenColumnsInactive"] = value;
+            }
+        }
     }
 }
