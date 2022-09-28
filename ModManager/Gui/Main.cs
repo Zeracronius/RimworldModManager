@@ -19,6 +19,7 @@ using ModManager.Logic.Main.ViewModels;
 using ModManager.Logic.Model;
 using ModManager.Logic.TextDialog;
 using ModManager.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ModManager.Gui
 {
@@ -349,14 +350,8 @@ namespace ModManager.Gui
             _presenter.OpenWorkshopPage();
         }
 
-        private void ModsListView_DragDrop(object sender, DragEventArgs e)
-        {
-            //RefreshInterface();
-        }
-
         private void RefreshInterface()
         {
-
             ModsListView.BeginUpdate();
             ActiveModsListView.BeginUpdate();
 
@@ -365,10 +360,12 @@ namespace ModManager.Gui
             ActiveModsListView.BuildList(true);
             ModsListView.BuildList(true);
 
+            ActiveModsListView.Unsort();
             ActiveModsListView.ExpandAll();
             ActiveModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             ActiveModsListView.EndUpdate();
 
+            ModsListView.Unsort();
             ModsListView.ExpandAll();
             ModsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             ModsListView.EndUpdate();
@@ -416,7 +413,7 @@ namespace ModManager.Gui
                     }
                 }
 
-                int currentIndex = _activeModItems.IndexOf(item.Parent == null ? item : item.Parent);
+                int currentIndex = activeMods.IndexOf(item);
 
                 if (mod.LoadAfter != null)
                 {
@@ -425,7 +422,7 @@ namespace ModManager.Gui
                         ModViewModel referencedMod = activeMods.FirstOrDefault(x => x.PackageId == loadAfter);
                         if (referencedMod != null)
                         {
-                            int dependentIndex = _activeModItems.IndexOf(referencedMod.Parent == null ? referencedMod : referencedMod.Parent);
+                            int dependentIndex = activeMods.IndexOf(referencedMod);
                             if (dependentIndex > currentIndex)
                             {
                                 tooltip.AppendLine("This should be loaded after " + referencedMod.Caption);
@@ -441,7 +438,7 @@ namespace ModManager.Gui
                         ModViewModel referencedMod = activeMods.FirstOrDefault(x => x.PackageId == loadBefore);
                         if (referencedMod != null)
                         {
-                            int dependentIndex = _activeModItems.IndexOf(referencedMod.Parent == null ? referencedMod : referencedMod.Parent);
+                            int dependentIndex = activeMods.IndexOf(referencedMod);
                             if (dependentIndex < currentIndex)
                             {
                                 tooltip.AppendLine("This should be loaded before " + referencedMod.Caption);
@@ -826,6 +823,31 @@ namespace ModManager.Gui
 
                     RefreshInterface();
                 }
+            }
+        }
+
+        private void ListView_BeforeSorting(object sender, BeforeSortingEventArgs e)
+        {
+            ReorderableTreeListView list = sender as ReorderableTreeListView;
+
+            if (e.ColumnToSort != null && list.LastSortColumn == e.ColumnToSort && list.Sorting == SortOrder.Descending)
+            {
+                e.SortOrder = SortOrder.None;
+                e.ColumnToSort = null;
+                ((TreeListView)sender).Roots = ((TreeListView)sender) == ActiveModsListView ? _activeModItems : _passiveModItems;
+                e.Handled = true;
+            }
+            list.Sorting = e.SortOrder;
+        }
+
+        private void ListView_AfterSorting(object sender, AfterSortingEventArgs e)
+        {
+            TreeListView listView = ((TreeListView)sender);
+            if (e.SortOrder == SortOrder.None)
+            {
+                listView.UseFiltering = false;
+                listView.RebuildColumns();
+                listView.UseFiltering = true;
             }
         }
     }

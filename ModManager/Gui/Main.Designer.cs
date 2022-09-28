@@ -309,13 +309,14 @@
             this.ModsListView.UseFiltering = true;
             this.ModsListView.View = System.Windows.Forms.View.Details;
             this.ModsListView.VirtualMode = true;
+            this.ModsListView.AfterSorting += new System.EventHandler<BrightIdeasSoftware.AfterSortingEventArgs>(this.ListView_AfterSorting);
+            this.ModsListView.BeforeSorting += new System.EventHandler<BrightIdeasSoftware.BeforeSortingEventArgs>(this.ListView_BeforeSorting);
             this.ModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
             this.ModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
             this.ModsListView.ItemsAdding += new System.EventHandler<BrightIdeasSoftware.ItemsAddingEventArgs>(this.ModsListView_ItemsAdding);
             this.ModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ModsListView_ItemsRemoving);
             this.ModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
             this.ModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-            this.ModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
             this.ModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ModsListView_DoubleClick);
             // 
             // olvColumn4
@@ -388,6 +389,9 @@
             this.ActiveModsListView.Location = new System.Drawing.Point(0, 20);
             this.ActiveModsListView.Name = "ActiveModsListView";
             this.ActiveModsListView.RootKeyValueString = "";
+            this.ActiveModsListView.SelectColumnsOnRightClick = false;
+            this.ActiveModsListView.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
+            this.ActiveModsListView.ShowCommandMenuOnRightClick = true;
             this.ActiveModsListView.ShowGroups = false;
             this.ActiveModsListView.Size = new System.Drawing.Size(387, 381);
             this.ActiveModsListView.TabIndex = 3;
@@ -395,6 +399,8 @@
             this.ActiveModsListView.UseFiltering = true;
             this.ActiveModsListView.View = System.Windows.Forms.View.Details;
             this.ActiveModsListView.VirtualMode = true;
+            this.ActiveModsListView.AfterSorting += new System.EventHandler<BrightIdeasSoftware.AfterSortingEventArgs>(this.ListView_AfterSorting);
+            this.ActiveModsListView.BeforeSorting += new System.EventHandler<BrightIdeasSoftware.BeforeSortingEventArgs>(this.ListView_BeforeSorting);
             this.ActiveModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ActiveModsListView_CellRightClick);
             this.ActiveModsListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModsListView_CellToolTipShowing);
             this.ActiveModsListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModsListView_FormatRow);
@@ -402,7 +408,6 @@
             this.ActiveModsListView.ItemsRemoving += new System.EventHandler<BrightIdeasSoftware.ItemsRemovingEventArgs>(this.ActiveModsListView_ItemsRemoving);
             this.ActiveModsListView.ModelDropped += new System.EventHandler<BrightIdeasSoftware.ModelDropEventArgs>(this.ListView_ModelDropped);
             this.ActiveModsListView.SelectedIndexChanged += new System.EventHandler(this.ModsListView_SelectedIndexChanged);
-            this.ActiveModsListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.ModsListView_DragDrop);
             this.ActiveModsListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ActiveModsListView_DoubleClick);
             // 
             // olvColumn1
@@ -477,14 +482,14 @@
             // configurationsToolStripMenuItem
             // 
             this.configurationsToolStripMenuItem.Name = "configurationsToolStripMenuItem";
-            this.configurationsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.configurationsToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.configurationsToolStripMenuItem.Text = "Configurations";
             this.configurationsToolStripMenuItem.Click += new System.EventHandler(this.ConfigurationsToolStripMenuItem_Click);
             // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.importToolStripMenuItem.Text = "Import mod list";
             this.importToolStripMenuItem.ToolTipText = "Import active mods from either an exported list or a rimworld save";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
@@ -492,7 +497,7 @@
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.exportToolStripMenuItem.Text = "Export mod list";
             this.exportToolStripMenuItem.ToolTipText = "Export active mods as an importable mod list";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
@@ -541,12 +546,12 @@
             this.BackgroundContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newGroupToolStripMenuItem});
             this.BackgroundContextMenuStrip.Name = "BackgroundContextMenuStrip";
-            this.BackgroundContextMenuStrip.Size = new System.Drawing.Size(181, 48);
+            this.BackgroundContextMenuStrip.Size = new System.Drawing.Size(134, 26);
             // 
             // newGroupToolStripMenuItem
             // 
             this.newGroupToolStripMenuItem.Name = "newGroupToolStripMenuItem";
-            this.newGroupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newGroupToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.newGroupToolStripMenuItem.Text = "New group";
             this.newGroupToolStripMenuItem.Click += new System.EventHandler(this.TreeView_Context_CreateGroup_Click);
             // 
@@ -616,6 +621,7 @@
             this.ResumeLayout(false);
 
         }
+
 
         #endregion
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
