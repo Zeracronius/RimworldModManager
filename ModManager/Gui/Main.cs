@@ -489,11 +489,7 @@ namespace ModManager.Gui
             // Move mod to disabled list
             ITreeListViewItem selectedItem = (ITreeListViewItem)ActiveModsListView.SelectedObject;
 
-            if (selectedItem.Parent != null)
-                selectedItem.Parent.Children.Remove(selectedItem);
-            else
-                _activeModItems.Remove(selectedItem);
-
+            ModsListView.DetachItem(selectedItem);
             _passiveModItems.Add(selectedItem);
 
             ActiveModsListView.Reload();
@@ -509,12 +505,7 @@ namespace ModManager.Gui
             // Move mod to activated list
             ITreeListViewItem selectedItem = (ITreeListViewItem)ModsListView.SelectedObject;
 
-
-            if (selectedItem.Parent != null)
-                selectedItem.Parent.Children.Remove(selectedItem);
-            else
-                _passiveModItems.Remove(selectedItem);
-
+            ModsListView.DetachItem(selectedItem);
             _activeModItems.Add(selectedItem);
 
             ActiveModsListView.Reload();

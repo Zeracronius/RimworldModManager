@@ -135,14 +135,19 @@ namespace ModManager.Gui.Components
         {
             foreach (ITreeListViewItem x in items)
             {
-                if (x.Parent != null)
-                {
-                    x.Parent.Children.Remove(x);
-                    x.Parent = null;
-                }
-                else
-                    RowData.Remove(x);
+                DetachItem(x);
             }
+        }
+
+        public void DetachItem(ITreeListViewItem item)
+        {
+            if (item.Parent != null)
+            {
+                item.Parent.Children.Remove(item);
+                item.Parent = null;
+            }
+            else
+                RowData.Remove(item);
         }
     }
 }
