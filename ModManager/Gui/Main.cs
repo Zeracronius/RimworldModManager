@@ -720,29 +720,28 @@ namespace ModManager.Gui
 
         private void ListView_CellRightClick(object sender, CellRightClickEventArgs e)
         {
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+
             // Rightclicked background
-            if (e.Model == null)
+            switch (e.Model)
             {
-                e.MenuStrip = BackgroundContextMenuStrip;
-            }
-            else
-            {
-                switch (e.Model)
-                {
-                    case GroupViewModel _:
-                        e.MenuStrip = GroupContextMenuStrip;
-                        break;
+                case GroupViewModel _:
+                    contextMenu.Items.Add(new ToolStripMenuItem("Rename group", null, Group_Context_Rename_Click));
+                    contextMenu.Items.Add(new ToolStripMenuItem("Delete group", null, Group_Context_Delete_Click));
+                    break;
 
-                    case ModViewModel _:
-                        e.MenuStrip = ModItemContextMenuStrip;
-                        break;
-
-                    default:
-                        e.Handled = true;
-                        return;
-                }
+                case ModViewModel _:
+                    break;
             }
 
+            if (contextMenu.Items.Count > 0)
+                contextMenu.Items.Add(new ToolStripSeparator());
+
+            contextMenu.Items.Add(new ToolStripMenuItem("New group", null, Context_CreateGroup_Click));
+            contextMenu.Items.Add(new ToolStripMenuItem("Expand all", null, Group_Context_ExpandAll_Click));
+            contextMenu.Items.Add(new ToolStripMenuItem("Collapse all", null, Group_Context_CollapseAll_Click));
+
+            e.MenuStrip = contextMenu;
             e.MenuStrip.Tag = e.Model;
         }
 
@@ -785,6 +784,22 @@ namespace ModManager.Gui
                 }
             }
         }
+
+
+        private void Group_Context_ExpandAll_Click(object sender, EventArgs e)
+        {
+            ContextMenuStrip contextMenu = (sender as ToolStripItem).GetCurrentParent() as ContextMenuStrip;
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.SourceControl;
+            listView.ExpandAll();
+        }
+
+        private void Group_Context_CollapseAll_Click(object sender, EventArgs e)
+        {
+            ContextMenuStrip contextMenu = (sender as ToolStripItem).GetCurrentParent() as ContextMenuStrip;
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.SourceControl;
+            listView.CollapseAll();
+        }
+
 
         private void Context_CreateGroup_Click(object sender, EventArgs e)
         {
