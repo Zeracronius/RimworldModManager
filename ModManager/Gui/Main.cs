@@ -214,11 +214,11 @@ namespace ModManager.Gui
             ActiveModsListView.Reload();
             ModsListView.Reload();
 
+            ActiveModsListView.ApplyFilter(ActiveModListFilterTextBox.Text);
+            ModsListView.ApplyFilter(InactiveModListFilterTextBox.Text);
+
             ActiveModsListView.ExpandAll();
             ModsListView.ExpandAll();
-
-
-
 
             if (Settings.Default.HiddenColumnsActive == null)
                 Settings.Default.HiddenColumnsActive = new StringCollection();
@@ -234,8 +234,6 @@ namespace ModManager.Gui
                 if (String.IsNullOrWhiteSpace(column) == false)
                     ModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
 
-            ActiveModsListView.RebuildColumns();
-            ModsListView.RebuildColumns();
             RefreshInterface();
             SaveButton.Enabled = true;
         }

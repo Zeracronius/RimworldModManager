@@ -1,13 +1,8 @@
 ﻿using BrightIdeasSoftware;
-using ModManager.Logic.Main.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModManager.Gui.Components
@@ -15,13 +10,17 @@ namespace ModManager.Gui.Components
     public class ReorderableTreeListView : DataTreeListView
     {
         public bool SuspendSorting { get; set; }
+        public bool Reloading { get; private set; }
         public IList RowData { get; set; }
 
 
         public void Reload()
         {
+            OLVColumn sortColumn = PrimarySortColumn;
+            SortOrder sortOrder = PrimarySortOrder;
             try
             {
+                Reloading = true;
                 SuspendSorting = true;
                 Roots = RowData;
                 BuildList(true);
@@ -29,6 +28,8 @@ namespace ModManager.Gui.Components
             finally
             {
                 SuspendSorting = false;
+                Sort(sortColumn, sortOrder);
+                Reloading = false;
             }
         }
 
@@ -60,7 +61,7 @@ namespace ModManager.Gui.Components
             }
 
             // Detect third column sort toggle and trigger unsort
-            if (e.ColumnToSort != null && LastSortColumn == e.ColumnToSort && Sorting == SortOrder.Descending)
+            if (Reloading == false && e.ColumnToSort != null && LastSortColumn == e.ColumnToSort && Sorting == SortOrder.Descending)
             {
                 e.SortOrder = SortOrder.None;
                 e.ColumnToSort = null;
