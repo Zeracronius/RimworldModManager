@@ -34,9 +34,16 @@ namespace ModManager.Logic.Main
             set
             {
                 _selectedMod = value;
+                if (PreviewImage != null)
+                    PreviewImage.Dispose();
 
                 if (String.IsNullOrWhiteSpace(value?.PreviewPath) == false)
-                    PreviewImage = System.Drawing.Image.FromFile(value.PreviewPath);
+                {
+                    using (var fileStream = new FileStream(value.PreviewPath, FileMode.Open, FileAccess.Read))
+                    {
+                        PreviewImage = Image.FromStream(fileStream);
+                    }
+                }
                 else
                     PreviewImage = null;
             }
