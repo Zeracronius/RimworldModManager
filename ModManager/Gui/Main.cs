@@ -23,9 +23,11 @@ namespace ModManager.Gui
         private readonly List<ITreeListViewItem> _activeModItems = new List<ITreeListViewItem>();
         private readonly List<ITreeListViewItem> _passiveModItems = new List<ITreeListViewItem>();
         private readonly Dictionary<string, GroupViewModel> _groups = new Dictionary<string, GroupViewModel>();
+        private bool _initializing;
 
         public Main(MainPresenter presenter)
         {
+            _initializing = true;
             InitializeComponent();
 
             _presenter = presenter;
@@ -214,28 +216,33 @@ namespace ModManager.Gui
             ActiveModsListView.Reload();
             ModsListView.Reload();
 
-            ActiveModsListView.ApplyFilter(ActiveModListFilterTextBox.Text);
-            ModsListView.ApplyFilter(InactiveModListFilterTextBox.Text);
-
             ActiveModsListView.ExpandAll();
             ModsListView.ExpandAll();
 
-            if (Settings.Default.HiddenColumnsActive == null)
-                Settings.Default.HiddenColumnsActive = new StringCollection();
+            if (_initializing)
+            {
 
-            foreach (string column in Settings.Default.HiddenColumnsActive)
-                if (String.IsNullOrWhiteSpace(column) == false)
-                    ActiveModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
+                if (Settings.Default.HiddenColumnsActive == null)
+                    Settings.Default.HiddenColumnsActive = new StringCollection();
 
-            if (Settings.Default.HiddenColumnsInactive == null)
-                Settings.Default.HiddenColumnsInactive = new StringCollection();
+                foreach (string column in Settings.Default.HiddenColumnsActive)
+                    if (String.IsNullOrWhiteSpace(column) == false)
+                        ActiveModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
 
-            foreach (string column in Settings.Default.HiddenColumnsInactive)
-                if (String.IsNullOrWhiteSpace(column) == false)
-                    ModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
+                if (Settings.Default.HiddenColumnsInactive == null)
+                    Settings.Default.HiddenColumnsInactive = new StringCollection();
+
+                foreach (string column in Settings.Default.HiddenColumnsInactive)
+                    if (String.IsNullOrWhiteSpace(column) == false)
+                        ModsListView.AllColumns.Single(x => x.Text == column).IsVisible = false;
+            }
+
+            ActiveModsListView.ApplyFilter(ActiveModListFilterTextBox.Text);
+            ModsListView.ApplyFilter(InactiveModListFilterTextBox.Text);
 
             RefreshInterface();
             SaveButton.Enabled = true;
+            _initializing = false;
         }
 
         private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key)
