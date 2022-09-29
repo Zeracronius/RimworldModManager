@@ -128,5 +128,20 @@ namespace ModManager.Gui.Components
                 SuspendSorting = false;
             }
         }
+
+
+        public void DetachItems(IEnumerable<ITreeListViewItem> items)
+        {
+            foreach (ITreeListViewItem x in items)
+            {
+                if (x.Parent != null)
+                {
+                    x.Parent.Children.Remove(x);
+                    x.Parent = null;
+                }
+                else
+                    RowData.Remove(x);
+            }
+        }
     }
 }

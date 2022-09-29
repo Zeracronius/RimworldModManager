@@ -73,6 +73,9 @@
             this.GroupContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.ModItemContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.newGroupToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PresenterBindingSource)).BeginInit();
@@ -95,6 +98,7 @@
             this.menuStrip3.SuspendLayout();
             this.BackgroundContextMenuStrip.SuspendLayout();
             this.GroupContextMenuStrip.SuspendLayout();
+            this.ModItemContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -555,29 +559,51 @@
             this.newGroupToolStripMenuItem.Name = "newGroupToolStripMenuItem";
             this.newGroupToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.newGroupToolStripMenuItem.Text = "New group";
-            this.newGroupToolStripMenuItem.Click += new System.EventHandler(this.TreeView_Context_CreateGroup_Click);
+            this.newGroupToolStripMenuItem.Click += new System.EventHandler(this.Context_CreateGroup_Click);
             // 
             // GroupContextMenuStrip
             // 
             this.GroupContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newGroupToolStripMenuItem1,
             this.toolStripMenuItem2,
             this.toolStripMenuItem1});
             this.GroupContextMenuStrip.Name = "BackgroundContextMenuStrip";
-            this.GroupContextMenuStrip.Size = new System.Drawing.Size(118, 48);
+            this.GroupContextMenuStrip.Size = new System.Drawing.Size(181, 92);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(117, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem2.Text = "Rename";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.Group_Context_Rename_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(117, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem1.Text = "Delete";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.Group_Context_Delete_Click);
+            // 
+            // ModItemContextMenuStrip
+            // 
+            this.ModItemContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem3});
+            this.ModItemContextMenuStrip.Name = "BackgroundContextMenuStrip";
+            this.ModItemContextMenuStrip.Size = new System.Drawing.Size(134, 26);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(133, 22);
+            this.toolStripMenuItem3.Text = "New group";
+            this.toolStripMenuItem3.Click += new System.EventHandler(this.Context_CreateGroup_Click);
+            // 
+            // newGroupToolStripMenuItem1
+            // 
+            this.newGroupToolStripMenuItem1.Name = "newGroupToolStripMenuItem1";
+            this.newGroupToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.newGroupToolStripMenuItem1.Text = "New group";
+            this.newGroupToolStripMenuItem1.Click += new System.EventHandler(this.Context_CreateGroup_Click);
             // 
             // Main
             // 
@@ -620,6 +646,7 @@
             this.menuStrip3.PerformLayout();
             this.BackgroundContextMenuStrip.ResumeLayout(false);
             this.GroupContextMenuStrip.ResumeLayout(false);
+            this.ModItemContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -670,5 +697,8 @@
         private System.Windows.Forms.ContextMenuStrip GroupContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ContextMenuStrip ModItemContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem newGroupToolStripMenuItem1;
     }
 }

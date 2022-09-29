@@ -625,27 +625,13 @@ namespace ModManager.Gui
             ReorderableTreeListView sourceListView = e.SourceListView as ReorderableTreeListView;
 
             List<ITreeListViewItem> targetCollection = targetListView.RowData as List<ITreeListViewItem>;
-            List<ITreeListViewItem> sourceCollection = sourceListView.RowData as List<ITreeListViewItem>;
             IEnumerable<ITreeListViewItem> selectedItems = e.SourceModels.OfType<ITreeListViewItem>();
             ITreeListViewItem targetItem = (ITreeListViewItem)e.TargetModel;
 
             if (targetItem?.Parent != null)
                 targetCollection = targetItem.Parent.Children;
 
-
-            // Detach
-            foreach (ITreeListViewItem x in selectedItems)
-            {
-                if (x.Parent != null)
-                {
-                    x.Parent.Children.Remove(x);
-                    x.Parent = null;
-                }
-                else
-                    sourceCollection.Remove(x);
-            }
-
-
+            sourceListView.DetachItems(selectedItems);
             switch (e.DropTargetLocation)
             {
                 // Add to bottom
@@ -676,6 +662,7 @@ namespace ModManager.Gui
                 sourceListView.Reload();
             RefreshInterface();
         }
+
 
 
         private void MoveItemsToGroup(ITreeListViewItem target, IEnumerable<ITreeListViewItem> selectedItems)
@@ -746,22 +733,26 @@ namespace ModManager.Gui
                         e.MenuStrip = GroupContextMenuStrip;
                         break;
 
+                    case ModViewModel _:
+                        e.MenuStrip = ModItemContextMenuStrip;
+                        break;
+
                     default:
                         e.Handled = true;
                         return;
                 }
             }
 
-            e.MenuStrip.Tag = e.ListView;
+            e.MenuStrip.Tag = e.Model;
         }
 
         private void Group_Context_Delete_Click(object sender, EventArgs e)
         {
-            ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
-            ReorderableTreeListView listView = contextMenu.Tag as ReorderableTreeListView;
+            ContextMenuStrip contextMenu = (sender as ToolStripItem).GetCurrentParent() as ContextMenuStrip;
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.SourceControl;
 
             List<ITreeListViewItem> collection = listView.RowData as List<ITreeListViewItem>;
-            GroupViewModel group = listView.SelectedObject as GroupViewModel;
+            GroupViewModel group = contextMenu.Tag as GroupViewModel;
 
             if (group.Parent != null)
             {
@@ -780,9 +771,9 @@ namespace ModManager.Gui
 
         private void Group_Context_Rename_Click(object sender, EventArgs e)
         {
-            ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
-            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.Tag;
-            GroupViewModel selectedGroup = listView.SelectedObject as GroupViewModel;
+            ContextMenuStrip contextMenu = (sender as ToolStripItem).GetCurrentParent() as ContextMenuStrip;
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.SourceControl;
+            GroupViewModel selectedGroup = contextMenu.Tag as GroupViewModel;
 
             TextDialogPresenter presenter = new TextDialogPresenter("Rename group", selectedGroup.Caption, "New name:");
             using (TextDialog dialog = new TextDialog(presenter))
@@ -795,10 +786,11 @@ namespace ModManager.Gui
             }
         }
 
-        private void TreeView_Context_CreateGroup_Click(object sender, EventArgs e)
+        private void Context_CreateGroup_Click(object sender, EventArgs e)
         {
-            ToolStrip contextMenu = (sender as ToolStripItem).GetCurrentParent();
-            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.Tag;
+            ContextMenuStrip contextMenu = (sender as ToolStripItem).GetCurrentParent() as ContextMenuStrip;
+            ReorderableTreeListView listView = (ReorderableTreeListView)contextMenu.SourceControl;
+            ITreeListViewItem selectedItem = contextMenu.Tag as ITreeListViewItem;
 
             TextDialogPresenter presenter = new TextDialogPresenter("New group", String.Empty, "Group name:");
             using (TextDialog dialog = new TextDialog(presenter))
@@ -806,10 +798,35 @@ namespace ModManager.Gui
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
                     GroupViewModel group = new GroupViewModel(presenter.Value);
-                    listView.RowData.Add(group);
+
+                    if (selectedItem != null)
+                    {
+                        System.Collections.IList targetCollection = listView.RowData;
+                        if (selectedItem.Parent != null)
+                            targetCollection = selectedItem.Parent.Children;
+
+                        targetCollection.Insert(targetCollection.IndexOf(selectedItem), group);
+                    }
+                    else
+                    {
+                        listView.RowData.Add(group);
+                    }
+
+                    IEnumerable<ITreeListViewItem> selectedItems = listView.SelectedObjects.OfType<ITreeListViewItem>();
+                    if (selectedItems.Any())
+                    {
+                        listView.DetachItems(selectedItems);
+                        MoveItemsToGroup(group, selectedItems);
+                        listView.DeselectAll();
+                    }
+
                     listView.Reload();
+                    listView.Expand(group);
                 }
             }
+
+
         }
+
     }
 }
