@@ -199,7 +199,9 @@ namespace ModManager.Logic.Main
                             stringBuilder.AppendLine("Missing mod: " + mod);
                         }
 
-                        _activeMods.Add(mod, modView);
+                        if (_activeMods.ContainsKey(mod) == false)
+                            _activeMods.Add(mod, modView);
+
                         mods.Remove(mod);
                     }
 
