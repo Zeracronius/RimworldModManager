@@ -22,7 +22,6 @@ namespace ModManager.Gui
         private readonly MainPresenter _presenter;
         private readonly List<ITreeListViewItem> _activeModItems = new List<ITreeListViewItem>();
         private readonly List<ITreeListViewItem> _passiveModItems = new List<ITreeListViewItem>();
-        private readonly Dictionary<string, GroupViewModel> _groups = new Dictionary<string, GroupViewModel>();
         private bool _initializing;
 
         public Main(MainPresenter presenter)
@@ -157,7 +156,7 @@ namespace ModManager.Gui
 
             Dictionary<string, string> groupMapping = new Dictionary<string, string>();
 
-            _groups.Clear();
+            Dictionary<string, GroupViewModel> groups = new Dictionary<string, GroupViewModel>();
             groupMapping.Clear();
             StringBuilder missingMods = new StringBuilder();
             foreach (var mod in _presenter.ActiveMods)
@@ -173,7 +172,7 @@ namespace ModManager.Gui
 
                 if (parents.ContainsKey(mod.Key))
                 {
-                    ITreeListViewItem parent = GetParent(_activeModItems, groupMapping, parents, mod.Key);
+                    ITreeListViewItem parent = GetParent(_activeModItems, groups, groupMapping, parents, mod.Key);
                     
                     if (parent != null)
                     {
@@ -186,6 +185,7 @@ namespace ModManager.Gui
             }
 
             groupMapping.Clear();
+            groups.Clear();
             foreach (var mod in _presenter.AvailableMods.OrderByDescending(x => _presenter.AvailableMods[x.Key].Downloaded))
             {
                 if (mod.Value == null)
@@ -199,7 +199,7 @@ namespace ModManager.Gui
 
                 if (parents.ContainsKey(mod.Key))
                 {
-                    ITreeListViewItem parent = GetParent(_passiveModItems, groupMapping, parents, mod.Key);
+                    ITreeListViewItem parent = GetParent(_passiveModItems, groups, groupMapping, parents, mod.Key);
 
                     if (parent != null)
                     {
@@ -245,7 +245,7 @@ namespace ModManager.Gui
             _initializing = false;
         }
 
-        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key)
+        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, GroupViewModel> groups, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key)
         {
             key = parents[key];
 
@@ -259,20 +259,20 @@ namespace ModManager.Gui
                 if (groupTranslationMap.ContainsKey(groupKey))
                     groupKey = groupTranslationMap[groupKey];
 
-                if (_groups.TryGetValue(groupKey, out GroupViewModel group) == false)
+                if (groups.TryGetValue(groupKey, out GroupViewModel group) == false)
                 {
                     group = new GroupViewModel(keyParts[1]);
                     groupTranslationMap.Add(keyParts[0], groupKey);
 
                     if (parents.ContainsKey(keyParts[0]))
-                        group.Parent = GetParent(targetCollection, groupTranslationMap, parents, keyParts[0]);
+                        group.Parent = GetParent(targetCollection, groups, groupTranslationMap, parents, keyParts[0]);
 
                     if (group.Parent != null)
                         group.Parent.Children.Add(group);
                     else
                         targetCollection.Add(group);
 
-                    _groups.Add(groupKey, group);
+                    groups.Add(groupKey, group);
                 }
 
                 return group;
@@ -760,7 +760,6 @@ namespace ModManager.Gui
                 collection.Remove(group);
             }
 
-            _groups.Remove(group.Key);
             listView.Reload();
         }
 
