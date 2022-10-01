@@ -39,6 +39,10 @@ namespace ModManager.Logic.Model
             [XmlArray("v1.2")]
             [XmlArrayItem("li")]
             public T[] V12 { get; set; }
+
+            [XmlArray("v1.3")]
+            [XmlArrayItem("li")]
+            public T[] V13 { get; set; }
         }
 
         [XmlElement("name")]

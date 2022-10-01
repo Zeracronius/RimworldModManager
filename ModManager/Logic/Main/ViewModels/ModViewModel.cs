@@ -35,7 +35,10 @@ namespace ModManager.Logic.Main.ViewModels
 
 				case "1.2":
 					return versioned.V12;
-			}
+
+                case "1.3":
+                    return versioned.V13;
+            }
 
 			return null;
 		}
