@@ -46,7 +46,7 @@
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.ModsListView = new ModManager.Gui.Components.ReorderableTreeListView();
             this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.InactiveDownloadedColumn = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.InactiveModListFilterTextBox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
@@ -276,13 +276,13 @@
             // ModsListView
             // 
             this.ModsListView.AllColumns.Add(this.olvColumn4);
-            this.ModsListView.AllColumns.Add(this.olvColumn5);
+            this.ModsListView.AllColumns.Add(this.InactiveDownloadedColumn);
             this.ModsListView.AllColumns.Add(this.olvColumn6);
             this.ModsListView.AllowDrop = true;
             this.ModsListView.AutoGenerateColumns = false;
             this.ModsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn4,
-            this.olvColumn5,
+            this.InactiveDownloadedColumn,
             this.olvColumn6});
             this.ModsListView.Cursor = System.Windows.Forms.Cursors.Default;
             this.ModsListView.DataSource = null;
@@ -322,11 +322,11 @@
             this.olvColumn4.Text = "Name";
             this.olvColumn4.Width = 226;
             // 
-            // olvColumn5
+            // InactiveDownloadedColumn
             // 
-            this.olvColumn5.AspectName = "Downloaded";
-            this.olvColumn5.Text = "Downloaded";
-            this.olvColumn5.Width = 73;
+            this.InactiveDownloadedColumn.AspectName = "Downloaded";
+            this.InactiveDownloadedColumn.Text = "Downloaded";
+            this.InactiveDownloadedColumn.Width = 73;
             // 
             // olvColumn6
             // 
@@ -614,7 +614,7 @@
         private BrightIdeasSoftware.OLVColumn olvColumn2;
         private BrightIdeasSoftware.OLVColumn olvColumn3;
         private BrightIdeasSoftware.OLVColumn olvColumn4;
-        private BrightIdeasSoftware.OLVColumn olvColumn5;
+        private BrightIdeasSoftware.OLVColumn InactiveDownloadedColumn;
         private BrightIdeasSoftware.OLVColumn olvColumn6;
         private Components.ReorderableTreeListView ActiveModsListView;
         private Components.ReorderableTreeListView ModsListView;

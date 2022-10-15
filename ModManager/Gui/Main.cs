@@ -14,6 +14,8 @@ using ModManager.Logic.Main;
 using ModManager.Logic.Main.ViewModels;
 using ModManager.Logic.TextDialog;
 using ModManager.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace ModManager.Gui
 {
@@ -61,6 +63,9 @@ namespace ModManager.Gui
             // Configure the second tree
             ModsListView.CanExpandGetter = x => ((ITreeListViewItem)x).Children.Count > 0;
             ModsListView.ChildrenGetter = x => ((ITreeListViewItem)x).Children;
+
+            ModsListView.PrimarySortColumn = InactiveDownloadedColumn;
+            ModsListView.PrimarySortOrder = SortOrder.Descending;
 
             this.Activate();
         }
@@ -132,16 +137,21 @@ namespace ModManager.Gui
             }
         }
 
+        private void ClearList(List<ITreeListViewItem> collection)
+        {
+            foreach (ITreeListViewItem item in FlattenList(collection).ToList())
+            {
+                item.Children.Clear();
+            }
+            collection.Clear();
+        }
 
         private void Presenter_LoadComplete(object sender, EventArgs e)
         {
-            int activeMods = _presenter.Config.ActiveMods.Length;
-            int availableMods = _presenter.AvailableMods.Count + activeMods;
-
             GroupViewModel.ResetSeed();
 
-            _activeModItems.Clear();
-            _passiveModItems.Clear();
+            ClearList(_activeModItems);
+            ClearList(_passiveModItems);
 
             if (Settings.Default.Parenting == null)
                 Settings.Default.Parenting = new StringCollection();
@@ -153,63 +163,8 @@ namespace ModManager.Gui
                 parents[parentParts[0]] = parentParts[1];
             }
 
-
-            Dictionary<string, string> groupMapping = new Dictionary<string, string>();
-
-            Dictionary<string, GroupViewModel> groups = new Dictionary<string, GroupViewModel>();
-            groupMapping.Clear();
-            StringBuilder missingMods = new StringBuilder();
-            foreach (var mod in _presenter.ActiveMods)
-            {
-                if (mod.Value == null)
-                    continue;
-
-                if (mod.Value.SupportedVersions.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
-                {
-                    mod.Value.Tooltip = "Incompatible with current version.";
-                    mod.Value.Background = _presenter.IncompatibleColor;
-                }
-
-                if (parents.ContainsKey(mod.Key))
-                {
-                    ITreeListViewItem parent = GetParent(_activeModItems, groups, groupMapping, parents, mod.Key);
-                    
-                    if (parent != null)
-                    {
-                        parent.Children.Add(mod.Value);
-                        mod.Value.Parent = parent;
-                        continue;
-                    }
-                }
-                _activeModItems.Add(mod.Value);
-            }
-
-            groupMapping.Clear();
-            groups.Clear();
-            foreach (var mod in _presenter.AvailableMods.OrderByDescending(x => _presenter.AvailableMods[x.Key].Downloaded))
-            {
-                if (mod.Value == null)
-                    continue;
-
-                if (mod.Value.SupportedVersions.Contains(_presenter.ActiveMods["ludeon.rimworld"].SupportedVersions) == false)
-                {
-                    mod.Value.Tooltip = "Incompatible with current version.";
-                    mod.Value.Background = _presenter.IncompatibleColor;
-                }
-
-                if (parents.ContainsKey(mod.Key))
-                {
-                    ITreeListViewItem parent = GetParent(_passiveModItems, groups, groupMapping, parents, mod.Key);
-
-                    if (parent != null)
-                    {
-                        parent.Children.Add(mod.Value);
-                        mod.Value.Parent = parent;
-                        continue;
-                    }
-                }
-                _passiveModItems.Add(mod.Value);
-            }
+            _activeModItems.AddRange(LoadMods(_presenter.ActiveMods, parents, true));
+            _passiveModItems.AddRange(LoadMods(_presenter.AvailableMods, parents));
 
             ActiveModsListView.RowData = _activeModItems;
             ModsListView.RowData = _passiveModItems;
@@ -245,7 +200,44 @@ namespace ModManager.Gui
             _initializing = false;
         }
 
-        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, GroupViewModel> groups, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key)
+        private List<ITreeListViewItem> LoadMods(IEnumerable<KeyValuePair<string, ModViewModel>> mods, Dictionary<string, string> parents, bool orderSensitive = false)
+        {
+            Dictionary<string, string> groupMapping = new Dictionary<string, string>();
+            Dictionary<string, GroupViewModel> groups = new Dictionary<string, GroupViewModel>();
+            List<ITreeListViewItem> result = new List<ITreeListViewItem>();
+
+            foreach (var mod in mods)
+            {
+                if (mod.Value == null)
+                    continue;
+
+                if (mod.Value.SupportedVersions.Contains(_presenter.CoreVersion) == false)
+                {
+                    mod.Value.Tooltip = "Incompatible with current version.";
+                    mod.Value.Background = _presenter.IncompatibleColor;
+                }
+
+                // Does current mod have a parent assigned.
+                if (parents.ContainsKey(mod.Key))
+                {
+                    // Find parent
+                    ITreeListViewItem parent = GetParent(result, groups, groupMapping, parents, mod.Key, orderSensitive);
+
+                    if (parent != null)
+                    {
+                        parent.Children.Add(mod.Value);
+                        mod.Value.Parent = parent;
+                        continue;
+                    }
+                }
+
+                result.Add(mod.Value);
+            }
+
+            return result;
+        }
+
+        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, GroupViewModel> groups, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key, bool orderSensitive)
         {
             key = parents[key];
 
@@ -255,6 +247,23 @@ namespace ModManager.Gui
                 string[] keyParts = key.Split('\\');
                 string groupKey = keyParts[0];
 
+                if (targetCollection.Count > 0)
+                {
+                    ITreeListViewItem result = null;
+                    if (orderSensitive)
+                    {
+                        result = targetCollection[targetCollection.Count - 1].Parent;
+                        if (result is GroupViewModel == false || result.Caption != keyParts[1])
+                            result = null;
+                    }
+                    else
+                    {
+                        result = targetCollection.FirstOrDefault(x => x is GroupViewModel && x.Caption == keyParts[1]);
+                    }
+
+                    if (result != null)
+                        return result;
+                }
 
                 if (groupTranslationMap.ContainsKey(groupKey))
                     groupKey = groupTranslationMap[groupKey];
@@ -265,7 +274,7 @@ namespace ModManager.Gui
                     groupTranslationMap.Add(keyParts[0], groupKey);
 
                     if (parents.ContainsKey(keyParts[0]))
-                        group.Parent = GetParent(targetCollection, groups, groupTranslationMap, parents, keyParts[0]);
+                        group.Parent = GetParent(targetCollection, groups, groupTranslationMap, parents, keyParts[0], orderSensitive);
 
                     if (group.Parent != null)
                         group.Parent.Children.Add(group);
@@ -483,34 +492,52 @@ namespace ModManager.Gui
 
         private void ActiveModsListView_DoubleClick(object sender, MouseEventArgs e)
         {
-            if (ActiveModsListView.SelectedObjects.Count > 1)
-                return;
-
-            // Move mod to disabled list
-            ITreeListViewItem selectedItem = (ITreeListViewItem)ActiveModsListView.SelectedObject;
-
-            ModsListView.DetachItem(selectedItem);
-            _passiveModItems.Add(selectedItem);
-
-            ActiveModsListView.Reload();
-            ModsListView.Reload();
-            RefreshInterface();
+            ToggleSelectedMod(ActiveModsListView, ModsListView);
         }
 
         private void ModsListView_DoubleClick(object sender, MouseEventArgs e)
         {
-            if (ModsListView.SelectedObjects.Count > 1)
+            ToggleSelectedMod(ModsListView, ActiveModsListView);
+        }
+
+        private void ToggleSelectedMod(ReorderableTreeListView source, ReorderableTreeListView target)
+        {
+            if (source.SelectedObjects.Count != 1)
                 return;
 
-            // Move mod to activated list
-            ITreeListViewItem selectedItem = (ITreeListViewItem)ModsListView.SelectedObject;
+            ITreeListViewItem selectedItem = (ITreeListViewItem)source.SelectedObject;
 
-            ModsListView.DetachItem(selectedItem);
-            _activeModItems.Add(selectedItem);
+            ITreeListViewItem parent = selectedItem.Parent;
+            if (parent != null)
+            {
+                ITreeListViewItem targetParent = FlattenList(target.RowData.Cast<ITreeListViewItem>()).FirstOrDefault(x => parent is GroupViewModel ? parent.Caption == x.Caption : x.Key == parent.Key);
 
-            ActiveModsListView.Reload();
-            ModsListView.Reload();
+                if (targetParent == null && parent is GroupViewModel)
+                {
+                    parent = new GroupViewModel(parent.Caption);
+                    target.RowData.Add(parent);
+                }
+                else
+                    parent = targetParent;
+            }
+
+            source.DetachItem(selectedItem);
+            if (parent != null)
+            {
+                selectedItem.Parent = parent;
+                parent.Children.Add(selectedItem);
+            }
+            else
+                target.RowData.Add(selectedItem);
+
+            source.Reload();
+            target.Reload();
             RefreshInterface();
+
+
+
+            if (parent != null)
+                target.Expand(parent);
         }
 
         private void ConfigurationsToolStripMenuItem_Click(object sender, EventArgs e)

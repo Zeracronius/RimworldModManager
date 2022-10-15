@@ -24,6 +24,8 @@ namespace ModManager.Logic.Main
         ViewModels.ModViewModel _selectedMod;
         private bool _loading;
 
+        public string CoreVersion { get; private set; }
+
         public bool Loaded { get; private set; }
         public System.Drawing.Image PreviewImage { get; private set; }
 
@@ -101,6 +103,9 @@ namespace ModManager.Logic.Main
                 StringBuilder stringBuilder = new StringBuilder();
                 foreach (string mod in mods)
                 {
+                    if (_activeMods.ContainsKey(mod))
+                        continue;
+
                     ViewModels.ModViewModel modView = null;
                     if (_availableMods.ContainsKey(mod))
                         modView = _availableMods[mod];
@@ -274,6 +279,7 @@ namespace ModManager.Logic.Main
 
             string coreVersion = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
             coreVersion = coreVersion.Substring(0, coreVersion.LastIndexOf("."));
+            CoreVersion = coreVersion;
 
             if (Directory.Exists(settings.WorkshopPath))
             {
