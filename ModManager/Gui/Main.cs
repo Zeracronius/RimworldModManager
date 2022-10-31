@@ -202,7 +202,6 @@ namespace ModManager.Gui
 
         private List<ITreeListViewItem> LoadMods(IEnumerable<KeyValuePair<string, ModViewModel>> mods, Dictionary<string, string> parents, bool orderSensitive = false)
         {
-            Dictionary<string, string> groupMapping = new Dictionary<string, string>();
             Dictionary<string, GroupViewModel> groups = new Dictionary<string, GroupViewModel>();
             List<ITreeListViewItem> result = new List<ITreeListViewItem>();
 
@@ -221,7 +220,7 @@ namespace ModManager.Gui
                 if (parents.ContainsKey(mod.Key))
                 {
                     // Find parent
-                    ITreeListViewItem parent = GetParent(result, groups, groupMapping, parents, mod.Key, orderSensitive);
+                    ITreeListViewItem parent = GetParent(result, groups, parents, mod.Key, orderSensitive);
 
                     if (parent != null)
                     {
@@ -237,7 +236,7 @@ namespace ModManager.Gui
             return result;
         }
 
-        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, GroupViewModel> groups, Dictionary<string, string> groupTranslationMap, Dictionary<string, string> parents, string key, bool orderSensitive)
+        private ITreeListViewItem GetParent(List<ITreeListViewItem> targetCollection, Dictionary<string, GroupViewModel> groups, Dictionary<string, string> parents, string key, bool orderSensitive)
         {
             key = parents[key];
 
@@ -245,46 +244,52 @@ namespace ModManager.Gui
             if (key.Contains('\\'))
             {
                 string[] keyParts = key.Split('\\');
+                string groupCaption = keyParts[1];
                 string groupKey = keyParts[0];
 
-                if (targetCollection.Count > 0)
+                ITreeListViewItem result = null;
+                if (orderSensitive)
                 {
-                    ITreeListViewItem result = null;
-                    if (orderSensitive)
+                    // If order sensitive then check if the immediate group above is matching caption.
+                    if (targetCollection.Count > 0)
                     {
-                        result = targetCollection[targetCollection.Count - 1].Parent;
-                        if (result is GroupViewModel == false || result.Caption != keyParts[1])
+                        result = targetCollection[targetCollection.Count - 1];
+                        if (result is GroupViewModel == false || result.Caption != groupCaption)
+                        {
+                            ITreeListViewItem found = result;
                             result = null;
-                    }
-                    else
-                    {
-                        result = targetCollection.FirstOrDefault(x => x is GroupViewModel && x.Caption == keyParts[1]);
-                    }
 
-                    if (result != null)
-                        return result;
+                            foreach (var item in FlattenList(found.Children))
+                            {
+                                if (item is GroupViewModel && item.Caption == groupCaption)
+                                    result = item;
+                            }
+                        }
+                    }
                 }
-
-                if (groupTranslationMap.ContainsKey(groupKey))
-                    groupKey = groupTranslationMap[groupKey];
-
-                if (groups.TryGetValue(groupKey, out GroupViewModel group) == false)
+                else
                 {
-                    group = new GroupViewModel(keyParts[1]);
-                    groupTranslationMap.Add(keyParts[0], groupKey);
-
-                    if (parents.ContainsKey(keyParts[0]))
-                        group.Parent = GetParent(targetCollection, groups, groupTranslationMap, parents, keyParts[0], orderSensitive);
-
-                    if (group.Parent != null)
-                        group.Parent.Children.Add(group);
-                    else
-                        targetCollection.Add(group);
-
-                    groups.Add(groupKey, group);
+                    // Else check if a group has already been added of matching caption.
+                    if (groups.ContainsKey(groupKey))
+                        result = groups[groupKey];
                 }
 
-                return group;
+                if (result == null)
+                {
+                    result = new GroupViewModel(groupCaption);
+
+                    if (parents.ContainsKey(groupKey))
+                        result.Parent = GetParent(targetCollection, groups, parents, groupKey, orderSensitive);
+
+                    if (result.Parent != null)
+                        result.Parent.Children.Add(result);
+                    else
+                        targetCollection.Add(result);
+
+                    groups.Add(result.Key, result as GroupViewModel);
+                }
+
+                return result;
             }
             else
             {
