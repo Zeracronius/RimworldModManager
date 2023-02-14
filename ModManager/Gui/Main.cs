@@ -270,8 +270,7 @@ namespace ModManager.Gui
                 else
                 {
                     // Else check if a group has already been added of matching caption.
-                    if (groups.ContainsKey(groupKey))
-                        result = groups[groupKey];
+                    result = groups.FirstOrDefault(x => x.Value.Caption == groupCaption).Value;
                 }
 
                 if (result == null)
