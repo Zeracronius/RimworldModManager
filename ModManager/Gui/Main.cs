@@ -536,11 +536,13 @@ namespace ModManager.Gui
 
             source.Reload();
             target.Reload();
-            RefreshInterface();
 
+			ActiveModsListView.ApplyFilter(ActiveModListFilterTextBox.Text);
+			ModsListView.ApplyFilter(InactiveModListFilterTextBox.Text);
 
+			RefreshInterface();
 
-            if (parent != null)
+			if (parent != null)
                 target.Expand(parent);
         }
 
@@ -869,5 +871,28 @@ namespace ModManager.Gui
 
         }
 
-    }
+		private void ListView_Filter(object sender, FilterEventArgs e)
+		{
+            ObjectListView list = sender as ObjectListView;
+
+            var filter = list.ListFilter;
+            var modelFilter = list.ModelFilter;
+
+            List<ITreeListViewItem> result = new List<ITreeListViewItem>();
+            foreach (ITreeListViewItem item in e.Objects)
+            {
+                if (modelFilter.Filter(item))
+                {
+                    result.Add(item);
+                    if (item.Children != null)
+                    {
+                        result.AddRange(item.Children);
+                    }
+				}
+            }
+
+            e.FilteredObjects = result.Distinct().ToList();
+            return;
+		}
+	}
 }
