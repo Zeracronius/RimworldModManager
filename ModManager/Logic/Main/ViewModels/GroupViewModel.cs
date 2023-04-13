@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModManager.Logic.Main.ViewModels
 {
-    internal class GroupViewModel : ITreeListViewItem
+    internal class GroupViewModel : FilterableTreeNodeBase
     {
         static HashSet<string> _groupKeys = new HashSet<string>();
         public static void ResetSeed()
@@ -27,29 +27,13 @@ namespace ModManager.Logic.Main.ViewModels
 
             Caption = caption;
             Key = key;
-            Children = new List<ITreeListViewItem>();
             _groupKeys.Add(key);
         }
 
-        public List<ITreeListViewItem> Children { get; }
-        public ITreeListViewItem Parent { get; set; }
-        public string Caption { get; set; }
-        public string Key { get; }
+        public override string Key { get; }
         public string Downloaded => "";
 
         public string SupportedVersions => "";
 
-        public bool IsAncestorOf(ITreeListViewItem item)
-        {
-            ITreeListViewItem parent = item.Parent;
-            while (parent != null)
-            {
-                if (parent == this)
-                    return true;
-
-                parent = parent.Parent;
-            }
-            return false;
-        }
     }
 }

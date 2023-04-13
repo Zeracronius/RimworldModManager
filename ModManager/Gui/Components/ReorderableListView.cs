@@ -1,4 +1,5 @@
 ﻿using BrightIdeasSoftware;
+using ModManager.Logic.Main.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,9 +13,9 @@ namespace ModManager.Gui.Components
         public bool SuspendSorting { get; set; }
         public bool Reloading { get; private set; }
         public IList RowData { get; set; }
+		public IList FilteredRowData { get; set; }
 
-
-        public void Reload()
+		public void Reload()
         {
             OLVColumn sortColumn = PrimarySortColumn;
             SortOrder sortOrder = PrimarySortOrder;
@@ -22,7 +23,7 @@ namespace ModManager.Gui.Components
             {
                 Reloading = true;
                 SuspendSorting = true;
-                Roots = RowData;
+                Roots = GetRoots();
                 BuildList(true);
             }
             finally
@@ -33,7 +34,21 @@ namespace ModManager.Gui.Components
             }
         }
 
-        protected override void OnModelCanDrop(BrightIdeasSoftware.ModelDropEventArgs e)
+		private IEnumerable GetRoots()
+		{
+            foreach (var item in RowData)
+            {
+                if (item is ITreeListViewItem treeItem)
+                {
+                    if (treeItem.Visible)
+                        yield return treeItem;
+                }
+                else
+                    yield return item;
+            }
+		}
+
+		protected override void OnModelCanDrop(BrightIdeasSoftware.ModelDropEventArgs e)
         {
             e.Handled = true;
             e.Effect = DragDropEffects.None;
@@ -83,8 +98,9 @@ namespace ModManager.Gui.Components
                 try
                 {
                     SuspendSorting = true;
-                    Roots = RowData;
-                    RebuildColumns();
+					Roots = GetRoots();
+					//Roots = RowData;
+					RebuildColumns();
                     UpdateFiltering();
                 }
                 finally
@@ -103,14 +119,22 @@ namespace ModManager.Gui.Components
             {
                 SuspendSorting = true;
 
-                if (String.IsNullOrWhiteSpace(filterText))
-                {
-                    ResetColumnFiltering();
+
+				filterText = filterText?.ToLower();
+
+				foreach (var item in RowData.OfType<ITreeListViewItem>())
+				{
+                    item.ApplyFilter(filterText);
+				}
+				Roots = GetRoots();
+
+				if (String.IsNullOrWhiteSpace(filterText))
+				{
+					ResetColumnFiltering();
                     RebuildColumns();
                     return;
                 }
 
-                filterText = filterText.ToLower();
                 if (ModelFilter == null)
                 {
                     TextMatchFilter filter = TextMatchFilter.Contains(this, filterText);

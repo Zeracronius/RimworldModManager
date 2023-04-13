@@ -303,7 +303,6 @@
 			this.ModsListView.SuspendSorting = false;
 			this.ModsListView.TabIndex = 4;
 			this.ModsListView.UseCompatibleStateImageBehavior = false;
-			this.ModsListView.UseFiltering = true;
 			this.ModsListView.View = System.Windows.Forms.View.Details;
 			this.ModsListView.VirtualMode = true;
 			this.ModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);

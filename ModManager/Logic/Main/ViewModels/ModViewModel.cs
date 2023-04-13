@@ -13,7 +13,7 @@ using static ModManager.Gui.Components.ReorderableTreeListView;
 
 namespace ModManager.Logic.Main.ViewModels
 {
-	public class ModViewModel : Gui.ITreeListViewItem
+	public class ModViewModel : FilterableTreeNodeBase
 	{
 		public enum ModType
 		{
@@ -121,12 +121,8 @@ namespace ModManager.Logic.Main.ViewModels
 					SupportedVersions = coreVersion;
 					break;
 			}
-
-			Children = new List<ITreeListViewItem>();
-
         }
 
-		public string Caption { get; private set; }
 		public string PackageId { get; private set; }
 
 		public ModType Type { get; private set; }
@@ -151,21 +147,7 @@ namespace ModManager.Logic.Main.ViewModels
 
 		public Color Background { get; set; }
 		public string Tooltip { get; set; }
-		public List<ITreeListViewItem> Children { get; }
-		public ITreeListViewItem Parent { get; set; }
-		string ITreeListViewItem.Key => PackageId;
+		public override string Key => PackageId;
 
-		public bool IsAncestorOf(ITreeListViewItem item)
-        {
-			ITreeListViewItem parent = item.Parent;
-            while (parent != null)
-			{
-				if (parent == this)
-					return true;
-
-				parent = parent.Parent;
-			}
-			return false;
-        }
     }
 }

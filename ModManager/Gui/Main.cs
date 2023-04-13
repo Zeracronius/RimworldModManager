@@ -57,12 +57,12 @@ namespace ModManager.Gui
 
 
             // Configure the first tree
-            ActiveModsListView.CanExpandGetter = x => ((ITreeListViewItem)x).Children.Count > 0;
-            ActiveModsListView.ChildrenGetter = x => ((ITreeListViewItem)x).Children;
+            ActiveModsListView.CanExpandGetter = x => ((ITreeListViewItem)x).FilteredChildren.Any();
+            ActiveModsListView.ChildrenGetter = x => ((ITreeListViewItem)x).FilteredChildren;
 
             // Configure the second tree
-            ModsListView.CanExpandGetter = x => ((ITreeListViewItem)x).Children.Count > 0;
-            ModsListView.ChildrenGetter = x => ((ITreeListViewItem)x).Children;
+            ModsListView.CanExpandGetter = x => ((ITreeListViewItem)x).FilteredChildren.Any();
+            ModsListView.ChildrenGetter = x => ((ITreeListViewItem)x).FilteredChildren;
 
             ModsListView.PrimarySortColumn = InactiveDownloadedColumn;
             ModsListView.PrimarySortOrder = SortOrder.Descending;

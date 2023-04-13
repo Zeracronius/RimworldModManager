@@ -13,5 +13,10 @@ namespace ModManager.Gui
         ITreeListViewItem Parent { get; set; }
         string Caption { get; }
         string Key { get; }
-    }
+        bool Visible { get; }
+		IEnumerable<ITreeListViewItem> FilteredChildren { get; }
+
+
+        void ApplyFilter(string filterText);
+	}
 }
