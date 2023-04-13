@@ -287,6 +287,7 @@
 			this.ModsListView.Cursor = System.Windows.Forms.Cursors.Default;
 			this.ModsListView.DataSource = null;
 			this.ModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ModsListView.FilteredRowData = null;
 			this.ModsListView.FullRowSelect = true;
 			this.ModsListView.HideSelection = false;
 			this.ModsListView.IsSimpleDragSource = true;
@@ -377,6 +378,7 @@
 			this.ActiveModsListView.Cursor = System.Windows.Forms.Cursors.Default;
 			this.ActiveModsListView.DataSource = null;
 			this.ActiveModsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ActiveModsListView.FilteredRowData = null;
 			this.ActiveModsListView.FullRowSelect = true;
 			this.ActiveModsListView.HideSelection = false;
 			this.ActiveModsListView.IsSimpleDragSource = true;
@@ -393,7 +395,6 @@
 			this.ActiveModsListView.SuspendSorting = false;
 			this.ActiveModsListView.TabIndex = 3;
 			this.ActiveModsListView.UseCompatibleStateImageBehavior = false;
-			this.ActiveModsListView.UseFiltering = true;
 			this.ActiveModsListView.View = System.Windows.Forms.View.Details;
 			this.ActiveModsListView.VirtualMode = true;
 			this.ActiveModsListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ListView_CellRightClick);
