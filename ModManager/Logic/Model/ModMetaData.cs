@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace ModManager.Logic.Model
@@ -25,25 +29,65 @@ namespace ModManager.Logic.Model
             public string WorkshopURL { get; set; }
         }
 
-        public class ByVersion<T>
-        {
-            [XmlArray("v1.0")]
-            [XmlArrayItem("li")]
-            public T[] V10 { get; set; }
+        public class ByVersion<T> : IXmlSerializable
+		{
+			public Dictionary<string, T[]> _versions = new Dictionary<string, T[]>();
 
+			public T[] this[string version]
+			{
+				get
+				{
+					if (_versions.TryGetValue(version, out var value))
+						return value;
+					return Array.Empty<T>();
+				}
+			}
 
-            [XmlArray("v1.1")]
-            [XmlArrayItem("li")]
-            public T[] V11 { get; set; }
+			public void ReadXml(XmlReader reader)
+			{
+				XmlSerializer deserializer = new XmlSerializer(typeof(T), new XmlRootAttribute("li"));
 
-            [XmlArray("v1.2")]
-            [XmlArrayItem("li")]
-            public T[] V12 { get; set; }
+				reader.MoveToContent();
+				reader.ReadStartElement();
 
-            [XmlArray("v1.3")]
-            [XmlArrayItem("li")]
-            public T[] V13 { get; set; }
-        }
+				while (reader.NodeType != XmlNodeType.EndElement)
+				{
+					if (reader.NodeType == XmlNodeType.Element)
+					{
+						string name = reader.Name.TrimStart('v');
+						reader.ReadStartElement();
+						List<T> result = new List<T>();
+
+						while (reader.NodeType != XmlNodeType.EndElement)
+						{
+							if (reader.NodeType == XmlNodeType.Element && reader.Name == "li")
+							{
+								// Deserialize each <li> element automatically
+								result.Add((T)deserializer.Deserialize(reader));
+							}
+							else
+							{
+								reader.Skip();
+							}
+						}
+						reader.ReadEndElement();
+
+						_versions[name] = result.ToArray();
+					}
+				}
+				reader.ReadEndElement();
+			}
+
+			public void WriteXml(XmlWriter writer)
+			{
+				throw new NotImplementedException();
+			}
+
+			public XmlSchema GetSchema()
+			{
+				return null;
+			}
+		}
 
         [XmlElement("name")]
         public string Name { get; set; }

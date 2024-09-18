@@ -25,22 +25,8 @@ namespace ModManager.Logic.Main.ViewModels
 
 		private T[] GetByVersion<T>(string coreVersion, ModMetaData.ByVersion<T> versioned)
 		{
-			switch (coreVersion)
-			{
-				case "1.0":
-					return versioned.V10;
-
-				case "1.1":
-					return versioned.V11;
-
-				case "1.2":
-					return versioned.V12;
-
-                case "1.3":
-                    return versioned.V13;
-            }
-
-			return null;
+			versioned._versions.TryGetValue(coreVersion, out var version);
+			return version;
 		}
 
 
