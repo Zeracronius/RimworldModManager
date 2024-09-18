@@ -22,14 +22,6 @@ namespace ModManager.Logic.Main.ViewModels
 			Expansion = 3,
 		}
 
-
-		private T[] GetByVersion<T>(string coreVersion, ModMetaData.ByVersion<T> versioned)
-		{
-			versioned._versions.TryGetValue(coreVersion, out var version);
-			return version;
-		}
-
-
 		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, string coreVersion, ModType type)
 		{
 			Type = type;
@@ -61,21 +53,21 @@ namespace ModManager.Logic.Main.ViewModels
 			// Couldn't figure out a better way to make xml deserialization dynamically create object members based on available version nodes.
 			if (modMeta.LoadBeforeByVersion != null)
 			{
-				var loadBefore = GetByVersion(coreVersion, modMeta.LoadBeforeByVersion);
+				var loadBefore = modMeta.LoadBeforeByVersion[coreVersion];
 				if (loadBefore != null)
 					LoadBefore.AddRange(loadBefore.Select(x => x.ToLower()));
 			}
 
 			if (modMeta.LoadAfterByVersion != null)
 			{
-				var loadAfter = GetByVersion(coreVersion, modMeta.LoadAfterByVersion);
+				var loadAfter = modMeta.LoadAfterByVersion[coreVersion];
 				if (loadAfter != null)
 					LoadAfter.AddRange(loadAfter.Select(x => x.ToLower()));
 			}
 
 			if (modMeta.DependenciesByVersion != null)
 			{
-				var versionDependancies = GetByVersion(coreVersion, modMeta.DependenciesByVersion);
+				var versionDependancies = modMeta.DependenciesByVersion[coreVersion];
 				if (versionDependancies != null)
 				{
 					foreach (ModMetaData.ModDependancy dependancy in versionDependancies)

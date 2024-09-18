@@ -36,8 +36,7 @@ namespace ModManager.Logic.Main
             set
             {
                 _selectedMod = value;
-                if (PreviewImage != null)
-                    PreviewImage.Dispose();
+                PreviewImage?.Dispose();
 
                 if (String.IsNullOrWhiteSpace(value?.PreviewPath) == false)
                 {
@@ -107,8 +106,8 @@ namespace ModManager.Logic.Main
                         continue;
 
                     ViewModels.ModViewModel modView = null;
-                    if (_availableMods.ContainsKey(mod))
-                        modView = _availableMods[mod];
+                    if (_availableMods.TryGetValue(mod, out ViewModels.ModViewModel value))
+                        modView = value;
                     else
                     {
                         // Unable to load active mod
@@ -196,8 +195,8 @@ namespace ModManager.Logic.Main
                     foreach (string mod in _config.ActiveMods)
                     {
                         ViewModels.ModViewModel modView = null;
-                        if (mods.ContainsKey(mod))
-                            modView = mods[mod];
+                        if (mods.TryGetValue(mod, out ViewModels.ModViewModel value))
+                            modView = value;
                         else
                         {
                             // Unable to load active mod
@@ -278,7 +277,7 @@ namespace ModManager.Logic.Main
 
 
             string coreVersion = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
-            coreVersion = coreVersion.Substring(0, coreVersion.LastIndexOf("."));
+            coreVersion = coreVersion[..coreVersion.LastIndexOf('.')];
             CoreVersion = coreVersion;
 
             if (Directory.Exists(settings.WorkshopPath))
@@ -341,11 +340,13 @@ namespace ModManager.Logic.Main
             if (File.Exists(aboutPath) == false)
                 return null;
 
-            Model.ModMetaData modMeta = null;
+            Model.ModMetaData modMeta;
             try
             {
                 modMeta = DeserializeFile<Model.ModMetaData>(new FileInfo(aboutPath));
-            }
+
+				return new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);
+			}
             catch (Exception e)
             {
                 if (Settings.Default.SilentLoading == false)
@@ -353,10 +354,6 @@ namespace ModManager.Logic.Main
 
                 return null;
             }
-
-            ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);
-
-            return mod;
         }
     }
 }
