@@ -2,8 +2,8 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 
-		<!--<TargetFramework>net48</TargetFramework>-->
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
+		<!--<TargetFramework>net8.0-windows</TargetFramework>-->
 		<PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<UseWindowsForms>true</UseWindowsForms>

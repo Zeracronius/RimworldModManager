@@ -1,6 +1,5 @@
 ﻿using ModManager.Gui;
 using ModManager.Logic.Model;
-using ModManager.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,13 +7,13 @@ using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using static ModManager.Gui.Components.ReorderableTreeListView;
 
 namespace ModManager.Logic.Main.ViewModels
 {
 	public class ModViewModel : FilterableTreeNodeBase
 	{
+		internal ModMetaData ModMeta { get; }
+
 		public enum ModType
 		{
 			Local = 1,
@@ -24,6 +23,7 @@ namespace ModManager.Logic.Main.ViewModels
 
 		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, string coreVersion, ModType type)
 		{
+			ModMeta = modMeta;
 			Type = type;
 			Directory = directory;
 			PackageId = modMeta.PackageId?.ToLower();

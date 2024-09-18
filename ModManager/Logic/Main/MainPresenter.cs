@@ -177,13 +177,11 @@ namespace ModManager.Logic.Main
                 Loaded = false;
                 _loading = true;
 
-                Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
-                Task<Dictionary<string, ViewModels.ModViewModel>> loadModsTask = Task.Run(() => LoadMods());
+				Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
+				Task<Dictionary<string, ViewModels.ModViewModel>> loadModsTask = Task.Run(() => LoadMods());
 
-                await Task.WhenAll(loadConfigTask, loadModsTask);
-
-
-                _config = loadConfigTask.Result;
+				await Task.WhenAll(loadConfigTask, loadModsTask);
+				_config = loadConfigTask.Result;
 
                 Dictionary<string, ViewModels.ModViewModel> mods = loadModsTask.Result;
 
@@ -277,7 +275,7 @@ namespace ModManager.Logic.Main
 
 
             string coreVersion = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
-            coreVersion = coreVersion[..coreVersion.LastIndexOf('.')];
+            coreVersion = coreVersion.Substring(0, coreVersion.LastIndexOf('.'));
             CoreVersion = coreVersion;
 
             if (Directory.Exists(settings.WorkshopPath))
@@ -355,5 +353,18 @@ namespace ModManager.Logic.Main
                 return null;
             }
         }
+
+		public void Sort()
+		{
+			var sorter = new Autosorting.ModSorter(_activeMods.Where(x => x.Value != null).Select(x => x.Value.ModMeta), CoreVersion);
+			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
+
+			var buffer = _activeMods.OrderBy(x => ordering.IndexOf(x.Key.ToLower())).ToList();
+			_activeMods.Clear();
+			foreach (var item in buffer)
+				_activeMods.Add(item.Key, item.Value);
+			
+			LoadComplete?.Invoke(this, new EventArgs());
+		}
     }
 }

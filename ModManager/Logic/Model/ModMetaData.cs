@@ -54,6 +54,7 @@ namespace ModManager.Logic.Model
 				{
 					if (reader.NodeType == XmlNodeType.Element)
 					{
+
 						string name = reader.Name.TrimStart('v');
 						reader.ReadStartElement();
 						List<T> result = new List<T>();
@@ -74,7 +75,10 @@ namespace ModManager.Logic.Model
 
 						_versions[name] = result.ToArray();
 					}
+					else
+						reader.Skip();
 				}
+
 				reader.ReadEndElement();
 			}
 
