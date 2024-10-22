@@ -32,6 +32,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="ilmerge" Version="3.0.41" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="ObjectListView.Official" Version="2.9.2-alpha2">
 			<NoWarn>NU1701</NoWarn>
 		</PackageReference>

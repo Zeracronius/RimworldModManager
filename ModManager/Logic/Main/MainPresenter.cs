@@ -95,27 +95,27 @@ namespace ModManager.Logic.Main
             {
                 // Deactivate all current mods
                 foreach (var item in _activeMods)
-                    _availableMods.Add(item.Key, item.Value);
+                    _availableMods.Add(item.Value.ModKey, item.Value);
                 _activeMods.Clear();
 
                 // Activate mods from loaded file
                 StringBuilder stringBuilder = new StringBuilder();
                 foreach (string mod in mods)
                 {
-                    if (_activeMods.ContainsKey(mod))
-                        continue;
+                    ViewModels.ModViewModel modView = _availableMods.FirstOrDefault(x => x.Value.PackageId == mod).Value;
 
-                    ViewModels.ModViewModel modView = null;
-                    if (_availableMods.TryGetValue(mod, out ViewModels.ModViewModel value))
-                        modView = value;
-                    else
+                    if (modView == null)
                     {
                         // Unable to load active mod
                         stringBuilder.AppendLine("Missing mod: " + mod);
-                    }
+						continue;
+					}
 
-                    _activeMods.Add(mod, modView);
-                    _availableMods.Remove(mod);
+					if (_activeMods.ContainsKey(modView.ModKey))
+						continue;
+
+					_activeMods.Add(modView.ModKey, modView);
+                    _availableMods.Remove(modView.ModKey);
                 }
 
                 if (stringBuilder.Length > 0)
@@ -128,7 +128,7 @@ namespace ModManager.Logic.Main
         public void ExportModlist(string filepath)
         {
             ModlistData modlist = new ModlistData();
-            modlist.ModPackageIds = _activeMods.Keys.ToArray();
+            modlist.ModPackageIds = _activeMods.Values.Select(x => x.PackageId).ToArray();
             modlist.Version = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
             SerializeFile(new FileInfo(filepath), modlist);
         }
@@ -192,19 +192,19 @@ namespace ModManager.Logic.Main
                     StringBuilder stringBuilder = new StringBuilder();
                     foreach (string mod in _config.ActiveMods)
                     {
-                        ViewModels.ModViewModel modView = null;
-                        if (mods.TryGetValue(mod, out ViewModels.ModViewModel value))
-                            modView = value;
-                        else
-                        {
-                            // Unable to load active mod
-                            stringBuilder.AppendLine("Missing mod: " + mod);
-                        }
+						ViewModels.ModViewModel modView = mods.FirstOrDefault(x => x.Value.PackageId == mod).Value;
+						if (modView == null)
+						{
+							// Unable to load active mod
+							stringBuilder.AppendLine("Missing mod: " + mod);
+							continue;
+						}
 
                         if (_activeMods.ContainsKey(mod) == false)
+						{
                             _activeMods.Add(mod, modView);
-
-                        mods.Remove(mod);
+	                        mods.Remove(modView.ModKey);
+						}
                     }
 
                     if (stringBuilder.Length > 0 && Settings.Default.SilentLoading == false)
@@ -224,7 +224,7 @@ namespace ModManager.Logic.Main
 
         public void SaveConfig()
         {
-            _config.Version = ActiveMods["ludeon.rimworld"].SupportedVersions;
+            _config.Version = ActiveMods.Single(x => x.Value.PackageId == "ludeon.rimworld").Value.SupportedVersions;
 
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
             modConfig.IsReadOnly = false;
@@ -288,7 +288,9 @@ namespace ModManager.Logic.Main
 
                     ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Workshop);
                     if (mod != null)
-                        availableMods.Add(mod.PackageId, mod);
+					{
+						availableMods.Add(mod.ModKey, mod);
+					}
                 }
             }
 
@@ -309,7 +311,7 @@ namespace ModManager.Logic.Main
                         //if (availableMods.ContainsKey(mod.PackageId))
                         //    MessageBox.Show("The local version of the mod " + mod.Caption + " was prioritised.");
 
-                        availableMods[mod.PackageId ?? modDirectory.Name] = mod;
+                        availableMods[mod.ModKey] = mod;
                     }
                 }
 
@@ -324,7 +326,7 @@ namespace ModManager.Logic.Main
 
                 ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Expansion);
                 if (mod != null)
-                    availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
+                    availableMods.Add(mod.ModKey, mod);
             }
 
 

@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using ModManager.Gui.Components;
+using ModManager.Logic.Autosorting.CommunityRules;
 using ModManager.Logic.Configuration;
 using ModManager.Logic.Main;
 using ModManager.Logic.Main.ViewModels;
@@ -215,10 +216,10 @@ namespace ModManager.Gui
 				}
 
 				// Does current mod have a parent assigned.
-				if (parents.ContainsKey(mod.Key))
+				if (parents.ContainsKey(mod.Value.Key))
 				{
 					// Find parent
-					ITreeListViewItem parent = GetParent(result, groups, parents, mod.Key, orderSensitive);
+					ITreeListViewItem parent = GetParent(result, groups, parents, mod.Value.Key, orderSensitive);
 
 					if (parent != null)
 					{
@@ -895,7 +896,9 @@ namespace ModManager.Gui
 
 		private void AutoSortButton_Click(object sender, EventArgs e)
 		{
-			_presenter.Sort();
+			Rimsort sort = new Rimsort();
+			sort.Load();
+			//_presenter.Sort();
 		}
 	}
 }

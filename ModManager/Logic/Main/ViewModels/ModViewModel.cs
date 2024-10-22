@@ -23,6 +23,8 @@ namespace ModManager.Logic.Main.ViewModels
 
 		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, string coreVersion, ModType type)
 		{
+			ModKey = directory.Name;
+
 			ModMeta = modMeta;
 			Type = type;
 			Directory = directory;
@@ -100,6 +102,8 @@ namespace ModManager.Logic.Main.ViewModels
 					break;
 			}
         }
+
+		public string ModKey { get; }
 
 		public string PackageId { get; private set; }
 
