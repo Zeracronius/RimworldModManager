@@ -10,31 +10,62 @@ using Newtonsoft.Json;
 
 namespace ModManager.Logic.Autosorting.CommunityRules
 {
-	internal class Rimsort
+	internal class Rimsort : ICommunityPatch
 	{
+		RuleSet _rules;
 
-
-        public Rimsort()
+		public Rimsort()
         {
             
         }
 
-		public RuleSet Load()
+		public IEnumerable<string> GetLoadAfter(string packageId)
+		{
+			if (_rules == null)
+				return null;
+
+			if (_rules.Rules.TryGetValue(packageId, out RuleEntry entry))
+			{
+				List<string> result = new List<string>();
+				foreach (var item in entry.LoadBefore)
+				{
+
+				}
+
+				foreach (var item in entry.LoadAfter)
+				{
+
+				}
+			}
+			return null;
+		}
+
+		public void Load()
+		{
+			_rules = Download();
+		}
+
+		private RuleSet Download()
 		{
 			JsonSerializer serializer = new JsonSerializer();
 
-			var request = HttpWebRequest.Create("https://github.com/RimSort/Community-Rules-Database/blob/main/communityRules.json");
+			var request = HttpWebRequest.Create("https://raw.githubusercontent.com/RimSort/Community-Rules-Database/refs/heads/main/communityRules.json");
 			request.Method = "GET";
 			request.ContentType = "application/json";
 			var response = request.GetResponse();
 
-			using (Stream stream = response.GetResponseStream())
+			try
 			{
-				var jsonReader = new JsonTextReader(new StreamReader(stream));
-				RuleSet result = serializer.Deserialize<RuleSet>(jsonReader);
+				using (Stream stream = response.GetResponseStream())
+				{
+					var jsonReader = new JsonTextReader(new StreamReader(stream));
+					return serializer.Deserialize<RuleSet>(jsonReader);
+				}
 			}
-
-			return null;
+			catch
+			{
+				return null;
+			}
 		}
 
 

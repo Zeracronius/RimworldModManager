@@ -896,9 +896,9 @@ namespace ModManager.Gui
 
 		private void AutoSortButton_Click(object sender, EventArgs e)
 		{
-			Rimsort sort = new Rimsort();
-			sort.Load();
-			//_presenter.Sort();
+			//Rimsort sort = new Rimsort();
+			//sort.Load();
+			_presenter.Sort();
 		}
 	}
 }

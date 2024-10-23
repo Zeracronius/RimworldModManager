@@ -361,7 +361,7 @@ namespace ModManager.Logic.Main
 			var sorter = new Autosorting.ModSorter(_activeMods.Where(x => x.Value != null).Select(x => x.Value.ModMeta), CoreVersion);
 			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
 
-			var buffer = _activeMods.OrderBy(x => ordering.IndexOf(x.Key.ToLower())).ToList();
+			var buffer = _activeMods.OrderBy(x => ordering.IndexOf(x.Value.PackageId.ToLower())).ToList();
 			_activeMods.Clear();
 			foreach (var item in buffer)
 				_activeMods.Add(item.Key, item.Value);

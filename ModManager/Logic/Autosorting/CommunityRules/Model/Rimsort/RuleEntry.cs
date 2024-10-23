@@ -10,9 +10,9 @@ namespace ModManager.Logic.Autosorting.CommunityRules.Model.Rimsort
 	internal class RuleEntry
 	{
 		[JsonProperty("loadBefore")]
-		public List<string> LoadBefore;
+		public Dictionary<string, object> LoadBefore;
 
 		[JsonProperty("loadAfter")]
-		public List<string> LoadAfter;
+		public Dictionary<string, object> LoadAfter;
 	}
 }
