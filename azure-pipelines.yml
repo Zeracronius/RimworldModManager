@@ -36,7 +36,7 @@ stages:
     - task: CopyFiles@2
       displayName: 'Copy artifacts to staging'
       inputs:
-        SourceFolder: '$(build.sourcesdirectory)/Release/net48/'
+        SourceFolder: '$(build.sourcesdirectory)/Release/net48/win-x64/'
         Contents: '*.exe'
         TargetFolder: '$(build.artifactstagingdirectory)'
     
