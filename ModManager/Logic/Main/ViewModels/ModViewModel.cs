@@ -1,17 +1,19 @@
-﻿using ModManager.Logic.Model;
-using ModManager.Properties;
+﻿using ModManager.Gui;
+using ModManager.Logic.Model;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ModManager.Logic.Main.ViewModels
 {
-	public class ModViewModel
+	public class ModViewModel : FilterableTreeNodeBase
 	{
+		internal ModMetaData ModMeta { get; }
+
 		public enum ModType
 		{
 			Local = 1,
@@ -19,27 +21,11 @@ namespace ModManager.Logic.Main.ViewModels
 			Expansion = 3,
 		}
 
-
-		private T[] GetByVersion<T>(string coreVersion, ModMetaData.ByVersion<T> versioned)
-		{
-			switch (coreVersion)
-			{
-				case "1.0":
-					return versioned.V10;
-
-				case "1.1":
-					return versioned.V11;
-
-				case "1.2":
-					return versioned.V12;
-			}
-
-			return null;
-		}
-
-
 		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, string coreVersion, ModType type)
 		{
+			ModKey = directory.Name;
+
+			ModMeta = modMeta;
 			Type = type;
 			Directory = directory;
 			PackageId = modMeta.PackageId?.ToLower();
@@ -69,21 +55,21 @@ namespace ModManager.Logic.Main.ViewModels
 			// Couldn't figure out a better way to make xml deserialization dynamically create object members based on available version nodes.
 			if (modMeta.LoadBeforeByVersion != null)
 			{
-				var loadBefore = GetByVersion(coreVersion, modMeta.LoadBeforeByVersion);
+				var loadBefore = modMeta.LoadBeforeByVersion[coreVersion];
 				if (loadBefore != null)
 					LoadBefore.AddRange(loadBefore.Select(x => x.ToLower()));
 			}
 
 			if (modMeta.LoadAfterByVersion != null)
 			{
-				var loadAfter = GetByVersion(coreVersion, modMeta.LoadAfterByVersion);
+				var loadAfter = modMeta.LoadAfterByVersion[coreVersion];
 				if (loadAfter != null)
 					LoadAfter.AddRange(loadAfter.Select(x => x.ToLower()));
 			}
 
 			if (modMeta.DependenciesByVersion != null)
 			{
-				var versionDependancies = GetByVersion(coreVersion, modMeta.DependenciesByVersion);
+				var versionDependancies = modMeta.DependenciesByVersion[coreVersion];
 				if (versionDependancies != null)
 				{
 					foreach (ModMetaData.ModDependancy dependancy in versionDependancies)
@@ -115,10 +101,10 @@ namespace ModManager.Logic.Main.ViewModels
 					SupportedVersions = coreVersion;
 					break;
 			}
+        }
 
-		}
+		public string ModKey { get; }
 
-		public string Caption { get; private set; }
 		public string PackageId { get; private set; }
 
 		public ModType Type { get; private set; }
@@ -140,5 +126,10 @@ namespace ModManager.Logic.Main.ViewModels
         public string WorkshopPath { get; private set; }
 
         public string Downloaded { get; private set; }
+
+		public Color Background { get; set; }
+		public string Tooltip { get; set; }
+		public override string Key => PackageId;
+
     }
 }

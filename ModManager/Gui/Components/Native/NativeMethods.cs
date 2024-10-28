@@ -259,8 +259,10 @@ namespace ModManager.Gui.Components.Native
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        public static extern bool FreeLibrary(IntPtr hModule);
+#pragma warning disable SYSLIB0004 // Type or member is obsolete
+		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+#pragma warning restore SYSLIB0004 // Type or member is obsolete
+		public static extern bool FreeLibrary(IntPtr hModule);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern int LoadString(SafeModuleHandle hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);

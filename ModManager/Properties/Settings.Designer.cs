@@ -12,7 +12,7 @@ namespace ModManager.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.11.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -128,6 +128,51 @@ namespace ModManager.Properties {
             }
             set {
                 this["SilentLoading"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Parenting {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Parenting"]));
+            }
+            set {
+                this["Parenting"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection HiddenColumnsActive {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["HiddenColumnsActive"]));
+            }
+            set {
+                this["HiddenColumnsActive"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection HiddenColumnsInactive {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["HiddenColumnsInactive"]));
+            }
+            set {
+                this["HiddenColumnsInactive"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseRimsortRules {
+            get {
+                return ((bool)(this["UseRimsortRules"]));
+            }
+            set {
+                this["UseRimsortRules"] = value;
             }
         }
     }

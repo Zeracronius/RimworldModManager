@@ -1,11 +1,11 @@
-﻿using ModManager.Logic.Model;
+﻿using ModManager.Logic.Autosorting.CommunityRules;
+using ModManager.Logic.Model;
 using ModManager.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -25,19 +25,34 @@ namespace ModManager.Logic.Main
         ViewModels.ModViewModel _selectedMod;
         private bool _loading;
 
+		public string CoreVersion { get; private set; }
+
         public bool Loaded { get; private set; }
         public System.Drawing.Image PreviewImage { get; private set; }
 
-        public ViewModels.ModViewModel SelectedMod
+
+		public bool RimsortCommunityRules 
+		{ 
+			get => Settings.Default.UseRimsortRules; 
+			set => Settings.Default.UseRimsortRules = value; 
+		}
+
+		public ViewModels.ModViewModel SelectedMod
         {
             get => _selectedMod;
 
             set
             {
                 _selectedMod = value;
+                PreviewImage?.Dispose();
 
                 if (String.IsNullOrWhiteSpace(value?.PreviewPath) == false)
-                    PreviewImage = System.Drawing.Image.FromFile(value.PreviewPath);
+                {
+                    using (var fileStream = new FileStream(value.PreviewPath, FileMode.Open, FileAccess.Read))
+                    {
+                        PreviewImage = Image.FromStream(fileStream);
+                    }
+                }
                 else
                     PreviewImage = null;
             }
@@ -88,24 +103,27 @@ namespace ModManager.Logic.Main
             {
                 // Deactivate all current mods
                 foreach (var item in _activeMods)
-                    _availableMods.Add(item.Key, item.Value);
+                    _availableMods.Add(item.Value.ModKey, item.Value);
                 _activeMods.Clear();
 
                 // Activate mods from loaded file
                 StringBuilder stringBuilder = new StringBuilder();
                 foreach (string mod in mods)
                 {
-                    ViewModels.ModViewModel modView = null;
-                    if (_availableMods.ContainsKey(mod))
-                        modView = _availableMods[mod];
-                    else
+                    ViewModels.ModViewModel modView = _availableMods.FirstOrDefault(x => x.Value.PackageId == mod).Value;
+
+                    if (modView == null)
                     {
                         // Unable to load active mod
                         stringBuilder.AppendLine("Missing mod: " + mod);
-                    }
+						continue;
+					}
 
-                    _activeMods.Add(mod, modView);
-                    _availableMods.Remove(mod);
+					if (_activeMods.ContainsKey(modView.ModKey))
+						continue;
+
+					_activeMods.Add(modView.ModKey, modView);
+                    _availableMods.Remove(modView.ModKey);
                 }
 
                 if (stringBuilder.Length > 0)
@@ -118,7 +136,7 @@ namespace ModManager.Logic.Main
         public void ExportModlist(string filepath)
         {
             ModlistData modlist = new ModlistData();
-            modlist.ModPackageIds = _activeMods.Keys.ToArray();
+            modlist.ModPackageIds = _activeMods.Values.Select(x => x.PackageId).ToArray();
             modlist.Version = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
             SerializeFile(new FileInfo(filepath), modlist);
         }
@@ -167,13 +185,11 @@ namespace ModManager.Logic.Main
                 Loaded = false;
                 _loading = true;
 
-                Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
-                Task<Dictionary<string, ViewModels.ModViewModel>> loadModsTask = Task.Run(() => LoadMods());
+				Task<Model.ModsConfigData> loadConfigTask = Task.Run(() => LoadConfig());
+				Task<Dictionary<string, ViewModels.ModViewModel>> loadModsTask = Task.Run(() => LoadMods());
 
-                await Task.WhenAll(loadConfigTask, loadModsTask);
-
-
-                _config = loadConfigTask.Result;
+				await Task.WhenAll(loadConfigTask, loadModsTask);
+				_config = loadConfigTask.Result;
 
                 Dictionary<string, ViewModels.ModViewModel> mods = loadModsTask.Result;
 
@@ -184,17 +200,19 @@ namespace ModManager.Logic.Main
                     StringBuilder stringBuilder = new StringBuilder();
                     foreach (string mod in _config.ActiveMods)
                     {
-                        ViewModels.ModViewModel modView = null;
-                        if (mods.ContainsKey(mod))
-                            modView = mods[mod];
-                        else
-                        {
-                            // Unable to load active mod
-                            stringBuilder.AppendLine("Missing mod: " + mod);
-                        }
+						ViewModels.ModViewModel modView = mods.FirstOrDefault(x => x.Value.PackageId == mod).Value;
+						if (modView == null)
+						{
+							// Unable to load active mod
+							stringBuilder.AppendLine("Missing mod: " + mod);
+							continue;
+						}
 
-                        _activeMods.Add(mod, modView);
-                        mods.Remove(mod);
+                        if (_activeMods.ContainsKey(mod) == false)
+						{
+                            _activeMods.Add(mod, modView);
+	                        mods.Remove(modView.ModKey);
+						}
                     }
 
                     if (stringBuilder.Length > 0 && Settings.Default.SilentLoading == false)
@@ -214,7 +232,7 @@ namespace ModManager.Logic.Main
 
         public void SaveConfig()
         {
-            _config.Version = ActiveMods["ludeon.rimworld"].SupportedVersions;
+            _config.Version = ActiveMods.Single(x => x.Value.PackageId == "ludeon.rimworld").Value.SupportedVersions;
 
             FileInfo modConfig = new FileInfo(Path.Combine(Settings.Default.ConfigPath, Resources.ConfigFilename));
             modConfig.IsReadOnly = false;
@@ -227,9 +245,9 @@ namespace ModManager.Logic.Main
                 modConfig.CopyTo(Path.Combine(modConfig.Directory.FullName, modConfig.Name + $"_Backup{currentBackup + 1}.xml"), true);
 
                 Settings.Default.CurrentBackup += 1;
-                Settings.Default.Save();
             }
 
+            Settings.Default.Save();
             SerializeFile(modConfig, _config);
         }
 
@@ -265,7 +283,8 @@ namespace ModManager.Logic.Main
 
 
             string coreVersion = File.ReadAllText(Path.Combine(Settings.Default.InstallationPath, "Version.txt"));
-            coreVersion = coreVersion.Substring(0, coreVersion.LastIndexOf("."));
+            coreVersion = coreVersion.Substring(0, coreVersion.LastIndexOf('.'));
+            CoreVersion = coreVersion;
 
             if (Directory.Exists(settings.WorkshopPath))
             {
@@ -277,7 +296,9 @@ namespace ModManager.Logic.Main
 
                     ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Workshop);
                     if (mod != null)
-                        availableMods.Add(mod.PackageId, mod);
+					{
+						availableMods.Add(mod.ModKey, mod);
+					}
                 }
             }
 
@@ -298,7 +319,7 @@ namespace ModManager.Logic.Main
                         //if (availableMods.ContainsKey(mod.PackageId))
                         //    MessageBox.Show("The local version of the mod " + mod.Caption + " was prioritised.");
 
-                        availableMods[mod.PackageId ?? modDirectory.Name] = mod;
+                        availableMods[mod.ModKey] = mod;
                     }
                 }
 
@@ -313,7 +334,7 @@ namespace ModManager.Logic.Main
 
                 ViewModels.ModViewModel mod = LoadModMeta(modDirectory, coreVersion, ViewModels.ModViewModel.ModType.Expansion);
                 if (mod != null)
-                    availableMods.Add(mod.PackageId ?? modDirectory.Name, mod);
+                    availableMods.Add(mod.ModKey, mod);
             }
 
 
@@ -327,11 +348,13 @@ namespace ModManager.Logic.Main
             if (File.Exists(aboutPath) == false)
                 return null;
 
-            Model.ModMetaData modMeta = null;
+            Model.ModMetaData modMeta;
             try
             {
                 modMeta = DeserializeFile<Model.ModMetaData>(new FileInfo(aboutPath));
-            }
+
+				return new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);
+			}
             catch (Exception e)
             {
                 if (Settings.Default.SilentLoading == false)
@@ -339,10 +362,21 @@ namespace ModManager.Logic.Main
 
                 return null;
             }
-
-            ViewModels.ModViewModel mod = new ViewModels.ModViewModel(modMeta, modDirectory, coreVersion, type);
-
-            return mod;
         }
+
+		public void Sort()
+		{
+			var sorter = new Autosorting.ModSorter(_activeMods.Where(x => x.Value != null).Select(x => x.Value.ModMeta), CoreVersion);
+			sorter.AddCommunityRules(new Rimsort());
+
+			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
+
+			var buffer = _activeMods.OrderBy(x => ordering.IndexOf(x.Value.PackageId.ToLower())).ToList();
+			_activeMods.Clear();
+			foreach (var item in buffer)
+				_activeMods.Add(item.Key, item.Value);
+			
+			LoadComplete?.Invoke(this, new EventArgs());
+		}
     }
 }

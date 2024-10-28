@@ -1,138 +1,177 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
+using ModManager.Logic.Main.ViewModels;
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModManager.Gui.Components
 {
-    public class ReorderableListView : ListView
+    public class ReorderableTreeListView : DataTreeListView
     {
-        Rectangle _lastRect;
+        public bool SuspendSorting { get; set; }
+        public bool Reloading { get; private set; }
+        public IList RowData { get; set; }
+		public IList FilteredRowData { get; set; }
 
-        protected override void OnItemDrag(ItemDragEventArgs e)
+		public void Reload()
         {
-            this.DoDragDrop(this.SelectedItems, DragDropEffects.Move);
-            base.OnItemDrag(e);
+            OLVColumn sortColumn = PrimarySortColumn;
+            SortOrder sortOrder = PrimarySortOrder;
+            try
+            {
+                Reloading = true;
+                SuspendSorting = true;
+                Roots = GetRoots();
+                BuildList(true);
+            }
+            finally
+            {
+                SuspendSorting = false;
+                Sort(sortColumn, sortOrder);
+                Reloading = false;
+            }
         }
 
-        protected override void OnDragEnter(DragEventArgs drgevent)
-        {
-            int len = drgevent.Data.GetFormats().Length - 1;
-            for (int i = 0; i <= len; i++)
+		private IEnumerable GetRoots()
+		{
+            foreach (var item in RowData)
             {
-                if (drgevent.Data.GetFormats()[i].Equals("System.Windows.Forms.ListView+SelectedListViewItemCollection"))
+                if (item is ITreeListViewItem treeItem)
                 {
-                    drgevent.Effect = DragDropEffects.Move;
-                    break;
-                }
-            }
-
-            base.OnDragEnter(drgevent);
-        }
-
-        protected override void OnDragLeave(EventArgs e)
-        {
-            ClearIndicatorLine();
-            base.OnDragLeave(e);
-        }
-
-        private void ClearIndicatorLine()
-        {
-            if (_lastRect.IsEmpty == false)
-            {
-                _lastRect.Offset(0, -1);
-                Invalidate(_lastRect);
-                _lastRect = default(Rectangle);
-            }
-        }
-
-        private void DrawIndicatorLine(DragEventArgs dragArgs)
-        {
-            Point cp = this.PointToClient(new Point(dragArgs.X, dragArgs.Y));
-            ListViewItem targetItem = this.GetItemAt(cp.X, cp.Y);
-
-            if (targetItem == null)
-                targetItem = this.Items[this.Items.Count - 1];
-
-            Rectangle targetItemRect = this.GetItemRect(targetItem.Index);
-
-            float itemCenter = targetItemRect.Top + (targetItemRect.Height / 2);
-            int targetPosition = targetItemRect.Bottom;
-            if (cp.Y < itemCenter && cp.X < targetItemRect.Right)
-                targetPosition = targetItemRect.Top;
-
-
-
-
-            if (_lastRect.Top == targetPosition)
-                return;
-
-            ClearIndicatorLine();
-            using (Graphics line = this.CreateGraphics())
-            {
-                line.DrawLine(new Pen(Color.Black, 2), new Point(0, targetPosition), new Point(this.Columns[0].Width, targetPosition));
-                _lastRect = new Rectangle(0, targetPosition, this.Columns[0].Width, 2);
-            }
-        }
-
-        protected override void OnDragOver(DragEventArgs drgevent)
-        {
-            DrawIndicatorLine(drgevent);
-            base.OnDragOver(drgevent);
-        }
-
-        protected override void OnDragDrop(DragEventArgs drgevent)
-        {
-            ClearIndicatorLine();
-
-            if (drgevent.Data == null)
-                return;
-
-            Point cp = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-            ListViewItem dragToItem = this.GetItemAt(cp.X, cp.Y);
-
-            int targetIndex = Items.Count - 1;
-            if (dragToItem != null)
-                targetIndex = dragToItem.Index;
-
-            Rectangle itemRec = this.GetItemRect(targetIndex);
-            float itemCenter = itemRec.Top + (itemRec.Height / 2);
-
-            // If inserting below
-            if (cp.Y > itemCenter)
-                targetIndex += 1;
-
-
-            SelectedListViewItemCollection draggedItems = drgevent.Data.GetData(typeof(SelectedListViewItemCollection)) as SelectedListViewItemCollection;
-            foreach (ListViewItem draggedItem in draggedItems)
-            {
-                int index = targetIndex;
-                if (draggedItem.ListView == this)
-                {
-                    if (targetIndex == draggedItem.Index)
-                    {
-                        // Trying to insert item in it's existing index.
-                        targetIndex++;
-                        continue;
-                    }
-
-                    if (draggedItem.Index > targetIndex && draggedItem.ListView == this)
-                        targetIndex++;
+                    if (treeItem.Visible)
+                        yield return treeItem;
                 }
                 else
-                    targetIndex++;
+                    yield return item;
+            }
+		}
 
-                ListViewItem insertItem = (ListViewItem)draggedItem.Clone();
-                insertItem.Name = draggedItem.Name;
-                this.Items.Insert(index, insertItem);
+		protected override void OnModelCanDrop(BrightIdeasSoftware.ModelDropEventArgs e)
+        {
+            e.Handled = true;
+            e.Effect = DragDropEffects.None;
+            if (e.SourceModels.Contains(e.TargetModel))
+                e.InfoMessage = "Cannot drop on self";
+            else
+            {
+                var sourceModels = e.SourceModels.Cast<ITreeListViewItem>();
+                ITreeListViewItem target = e.TargetModel as ITreeListViewItem;
+                
+                if (target != null && sourceModels.Any(x => x.IsAncestorOf(target)))
+                    e.InfoMessage = "Cannot drop as it's own child.";
+                else
+                    e.Effect = DragDropEffects.Move;
+            }
+            base.OnModelCanDrop(e);
+        }
 
-                draggedItem.ListView.Items.Remove(draggedItem);
+        protected override void OnBeforeSorting(BeforeSortingEventArgs e)
+        {
+            if (SuspendSorting == true)
+            {
+                e.Canceled = true;
+                return;
             }
 
-            base.OnDragDrop(drgevent);
+            // Detect third column sort toggle and trigger unsort
+            if (Reloading == false && e.ColumnToSort != null && LastSortColumn == e.ColumnToSort && Sorting == SortOrder.Descending)
+            {
+                e.SortOrder = SortOrder.None;
+                e.ColumnToSort = null;
+                e.Handled = true;
+            }
+            Sorting = e.SortOrder;
+            base.OnBeforeSorting(e);
+        }
+
+        protected override void OnAfterSorting(AfterSortingEventArgs e)
+        {
+            if (SuspendSorting == true)
+                return;
+
+
+            if (e.ColumnToSort == null)
+            {
+                // Unsort
+                try
+                {
+                    SuspendSorting = true;
+					Roots = GetRoots();
+					//Roots = RowData;
+					RebuildColumns();
+                    UpdateFiltering();
+                }
+                finally
+                {
+                    SuspendSorting = false;
+                }
+            }
+            else
+                base.OnAfterSorting(e);
+        }
+
+
+        public void ApplyFilter(string filterText)
+        {
+            try
+            {
+                SuspendSorting = true;
+
+
+				filterText = filterText?.ToLower();
+
+				foreach (var item in RowData.OfType<ITreeListViewItem>())
+				{
+                    item.ApplyFilter(filterText);
+				}
+				Roots = GetRoots();
+
+				if (String.IsNullOrWhiteSpace(filterText))
+				{
+					ResetColumnFiltering();
+                    RebuildColumns();
+                    return;
+                }
+
+                if (ModelFilter == null)
+                {
+                    TextMatchFilter filter = TextMatchFilter.Contains(this, filterText);
+                    ModelFilter = filter;
+                    DefaultRenderer = new HighlightTextRenderer(filter);
+                }
+                else
+                {
+                    (ModelFilter as TextMatchFilter).ContainsStrings = new string[] { filterText };
+                }
+
+                UpdateFiltering();
+            }
+            finally
+            {
+                SuspendSorting = false;
+            }
+        }
+
+
+        public void DetachItems(IEnumerable<ITreeListViewItem> items)
+        {
+            foreach (ITreeListViewItem x in items)
+            {
+                DetachItem(x);
+            }
+        }
+
+        public void DetachItem(ITreeListViewItem item)
+        {
+            if (item.Parent != null)
+            {
+                item.Parent.Children.Remove(item);
+                item.Parent = null;
+            }
+            else
+                RowData.Remove(item);
         }
     }
 }
