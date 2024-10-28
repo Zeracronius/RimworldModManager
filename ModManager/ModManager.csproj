@@ -52,6 +52,6 @@
 		</None>
 	</ItemGroup>
 	<Target Name="ILMerge" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<Exec Command="$(ILMergeConsolePath) $(TargetPath) /out:$(TargetPath) $(TargetDir)ObjectListView.dll" />
+		<Exec Command="$(ILMergeConsolePath) $(TargetPath) /out:$(TargetPath) $(TargetDir)ObjectListView.dll $(TargetDir)Newtonsoft.Json.dll" />
 	</Target>
 </Project>
