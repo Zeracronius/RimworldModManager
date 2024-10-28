@@ -66,6 +66,9 @@ namespace ModManager.Gui
 			ModsListView.PrimarySortColumn = InactiveDownloadedColumn;
 			ModsListView.PrimarySortOrder = SortOrder.Descending;
 
+
+			rimsortToolStripMenuItem.Checked = _presenter.RimsortCommunityRules;
+
 			this.Activate();
 		}
 
@@ -896,9 +899,12 @@ namespace ModManager.Gui
 
 		private void AutoSortButton_Click(object sender, EventArgs e)
 		{
-			//Rimsort sort = new Rimsort();
-			//sort.Load();
 			_presenter.Sort();
+		}
+
+		private void rimsortToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			_presenter.RimsortCommunityRules = rimsortToolStripMenuItem.Checked;
 		}
 	}
 }

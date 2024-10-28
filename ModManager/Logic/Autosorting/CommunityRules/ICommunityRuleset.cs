@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace ModManager.Logic.Autosorting.CommunityRules
 {
-	internal interface ICommunityPatch
+	internal interface ICommunityRuleset
 	{
-		IEnumerable<string> GetLoadAfter(string packageId);
+		Dictionary<string, List<string>> GetLoadAfters();
 	}
 }

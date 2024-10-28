@@ -1,4 +1,5 @@
-﻿using ModManager.Logic.Model;
+﻿using ModManager.Logic.Autosorting.CommunityRules;
+using ModManager.Logic.Model;
 using ModManager.Properties;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,19 @@ namespace ModManager.Logic.Main
         ViewModels.ModViewModel _selectedMod;
         private bool _loading;
 
-        public string CoreVersion { get; private set; }
+		public string CoreVersion { get; private set; }
 
         public bool Loaded { get; private set; }
         public System.Drawing.Image PreviewImage { get; private set; }
 
-        public ViewModels.ModViewModel SelectedMod
+
+		public bool RimsortCommunityRules 
+		{ 
+			get => Settings.Default.UseRimsortRules; 
+			set => Settings.Default.UseRimsortRules = value; 
+		}
+
+		public ViewModels.ModViewModel SelectedMod
         {
             get => _selectedMod;
 
@@ -359,6 +367,8 @@ namespace ModManager.Logic.Main
 		public void Sort()
 		{
 			var sorter = new Autosorting.ModSorter(_activeMods.Where(x => x.Value != null).Select(x => x.Value.ModMeta), CoreVersion);
+			sorter.AddCommunityRules(new Rimsort());
+
 			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
 
 			var buffer = _activeMods.OrderBy(x => ordering.IndexOf(x.Value.PackageId.ToLower())).ToList();

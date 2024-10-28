@@ -1,4 +1,5 @@
 ﻿using ModManager.Gui.Components.Native;
+using ModManager.Logic.Autosorting.CommunityRules;
 using ModManager.Logic.Model;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace ModManager.Logic.Autosorting
 		Dictionary<string, List<string>> _loadAfter = new Dictionary<string, List<string>>();
 		string _coreVersion;
 
-
+		List<ICommunityRuleset> _communityRulesets = new List<ICommunityRuleset>();
 
 		List<string> _loadEarly = new List<string>();
 		List<string> _loadLate = new List<string>() 
@@ -31,6 +32,12 @@ namespace ModManager.Logic.Autosorting
         {
 			_mods = mods.ToList();
 			_coreVersion = coreVersion;
+		}
+
+		public void AddCommunityRules(ICommunityRuleset communityRuleset)
+		{
+			if (communityRuleset != null)
+				_communityRulesets.Add(communityRuleset);
 		}
 
 		public List<string> Sort()
@@ -50,22 +57,22 @@ namespace ModManager.Logic.Autosorting
 				string packageId = mod.PackageId.ToLower();
 
 				if (mod.LoadBefore != null)
-					foreach (string loadBefore in mod.LoadBefore.Where(x => _loadAfter.ContainsKey(x.ToLower())))
-						_loadAfter[loadBefore.ToLower()].Add(packageId);
+					foreach (string loadBefore in mod.LoadBefore.Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
+						_loadAfter[loadBefore].Add(packageId);
 
 				if (mod.LoadAfter != null)
-					foreach (string loadAfter in mod.LoadAfter.Where(x => _loadAfter.ContainsKey(x.ToLower())))
-						_loadAfter[packageId].Add(loadAfter.ToLower());
+					foreach (string loadAfter in mod.LoadAfter.Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
+						_loadAfter[packageId].Add(loadAfter);
 
 				if (_coreVersion != null)
 				{
 					if (mod.LoadBeforeByVersion != null)
-						foreach (string loadBefore in mod.LoadBeforeByVersion[_coreVersion].Where(x => _loadAfter.ContainsKey(x.ToLower())))
-							_loadAfter[loadBefore.ToLower()].Add(packageId);
+						foreach (string loadBefore in mod.LoadBeforeByVersion[_coreVersion].Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
+							_loadAfter[loadBefore].Add(packageId);
 
 					if (mod.LoadAfterByVersion != null)
-						foreach (string loadAfter in mod.LoadAfterByVersion[_coreVersion].Where(x => _loadAfter.ContainsKey(x.ToLower())))
-							_loadAfter[packageId].Add(loadAfter.ToLower());
+						foreach (string loadAfter in mod.LoadAfterByVersion[_coreVersion].Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
+							_loadAfter[packageId].Add(loadAfter);
 				}
 
 				// If mod is not listed as an early loader, then set to load after every early loading mod
@@ -75,8 +82,9 @@ namespace ModManager.Logic.Autosorting
 					foreach (string earlyLoader in _loadEarly)
 					{
 						// If mod is set to load after any other early loaders, then do nothing
-						if (_loadAfter[earlyLoader].Contains(packageId))
-							mustLoadBeforeEarly = true;
+						if (_loadAfter.TryGetValue(earlyLoader, out List<string> collection))
+							if (collection.Contains(packageId))
+								mustLoadBeforeEarly = true;
 					}
 
 					if (mustLoadBeforeEarly == false)
@@ -98,9 +106,20 @@ namespace ModManager.Logic.Autosorting
 						// Assign all late loaders to load after this mod.
 						foreach (string lateLoader in _loadLate)
 						{
-							if (_loadAfter[lateLoader].Contains(packageId) == false)
-								_loadAfter[lateLoader].Add(packageId);
+							if (_loadAfter.TryGetValue(lateLoader, out List<string> collection))
+								if (collection.Contains(packageId) == false)
+									collection.Add(packageId);
 						}
+					}
+				}
+
+				// Apply additional rulesets:
+				foreach (ICommunityRuleset ruleset in _communityRulesets)
+				{
+					foreach (var item in ruleset.GetLoadAfters())
+					{
+						if (_loadAfter.TryGetValue(item.Key, out List<string> ruleEntries))
+							ruleEntries.AddRange(item.Value);
 					}
 				}
 			}

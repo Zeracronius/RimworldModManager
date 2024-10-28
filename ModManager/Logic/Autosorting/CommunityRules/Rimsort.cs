@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace ModManager.Logic.Autosorting.CommunityRules
 {
-	internal class Rimsort : ICommunityPatch
+	internal class Rimsort : ICommunityRuleset
 	{
 		RuleSet _rules;
 
@@ -19,25 +19,43 @@ namespace ModManager.Logic.Autosorting.CommunityRules
             
         }
 
-		public IEnumerable<string> GetLoadAfter(string packageId)
+		public Dictionary<string, List<string>> GetLoadAfters()
 		{
+			if (_rules == null)
+				Load();
+
 			if (_rules == null)
 				return null;
 
-			if (_rules.Rules.TryGetValue(packageId, out RuleEntry entry))
+			Dictionary<string, List<string>> result = new Dictionary<string, List<string>>();
+
+			foreach (KeyValuePair<string, RuleEntry> item in _rules.Rules)
 			{
-				List<string> result = new List<string>();
-				foreach (var item in entry.LoadBefore)
+				string currentPackageId = item.Key.ToLower();
+				if (item.Value.LoadBefore != null)
+					foreach (var packageId in item.Value.LoadBefore.Keys.Select(x => x.ToLower()))
+					{
+						if (result.TryGetValue(packageId, out List<string> loadAfterOtherRules) == false)
+							loadAfterOtherRules = result[packageId] = new List<string>();
+
+						if (loadAfterOtherRules.Contains(currentPackageId) == false)
+							loadAfterOtherRules.Add(currentPackageId);
+					}
+
+				if (item.Value.LoadAfter != null)
 				{
+					if (result.TryGetValue(currentPackageId, out List<string> loadAfterRules) == false)
+						loadAfterRules = result[currentPackageId] = new List<string>();
 
-				}
-
-				foreach (var item in entry.LoadAfter)
-				{
-
+					foreach (var packageId in item.Value.LoadAfter.Keys.Select(x => x.ToLower()))
+					{
+						if (loadAfterRules.Contains(packageId) == false)
+							loadAfterRules.Add(packageId);
+					}
 				}
 			}
-			return null;
+
+			return result;
 		}
 
 		public void Load()
