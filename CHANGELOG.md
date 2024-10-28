@@ -1,4 +1,1 @@
-- Completely replaced mod lists with trees to allow grouping mods together.
-- Added mod filtering.
-- Added mod sorting.
-- Added mod grouping.
+- Small fixes

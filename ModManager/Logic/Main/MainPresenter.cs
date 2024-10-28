@@ -367,7 +367,9 @@ namespace ModManager.Logic.Main
 		public void Sort()
 		{
 			var sorter = new Autosorting.ModSorter(_activeMods.Where(x => x.Value != null).Select(x => x.Value.ModMeta), CoreVersion);
-			sorter.AddCommunityRules(new Rimsort());
+
+			if (RimsortCommunityRules)
+				sorter.AddCommunityRules(new Rimsort());
 
 			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
 
