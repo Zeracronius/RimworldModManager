@@ -496,12 +496,12 @@ namespace ModManager.Gui
 			}
 		}
 
-		private void ActiveModsListView_DoubleClick(object sender, MouseEventArgs e)
+		private void ActiveModsListView_DoubleClick(object sender, EventArgs e)
 		{
 			ToggleSelectedMod(ActiveModsListView, ModsListView);
 		}
 
-		private void ModsListView_DoubleClick(object sender, MouseEventArgs e)
+		private void ModsListView_DoubleClick(object sender, EventArgs e)
 		{
 			ToggleSelectedMod(ModsListView, ActiveModsListView);
 		}
