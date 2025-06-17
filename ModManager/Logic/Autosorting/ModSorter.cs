@@ -56,24 +56,12 @@ namespace ModManager.Logic.Autosorting
 			{
 				string packageId = mod.PackageId.ToLower();
 
-				if (mod.LoadBefore != null)
-					foreach (string loadBefore in mod.LoadBefore.Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
-						_loadAfter[loadBefore].Add(packageId);
 
-				if (mod.LoadAfter != null)
-					foreach (string loadAfter in mod.LoadAfter.Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
-						_loadAfter[packageId].Add(loadAfter);
+				foreach (string loadBefore in mod.GetLoadBefore(_coreVersion).Where(x => _loadAfter.ContainsKey(x)))
+					_loadAfter[loadBefore].Add(packageId);
 
-				if (_coreVersion != null)
-				{
-					if (mod.LoadBeforeByVersion != null)
-						foreach (string loadBefore in mod.LoadBeforeByVersion[_coreVersion].Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
-							_loadAfter[loadBefore].Add(packageId);
-
-					if (mod.LoadAfterByVersion != null)
-						foreach (string loadAfter in mod.LoadAfterByVersion[_coreVersion].Select(x => x.ToLower()).Where(x => _loadAfter.ContainsKey(x)))
-							_loadAfter[packageId].Add(loadAfter);
-				}
+				foreach (string loadAfter in mod.GetLoadAfter(_coreVersion).Where(x => _loadAfter.ContainsKey(x)))
+					_loadAfter[packageId].Add(loadAfter);
 
 				// If mod is not listed as an early loader, then set to load after every early loading mod
 				if (_loadEarly.Contains(packageId) == false)

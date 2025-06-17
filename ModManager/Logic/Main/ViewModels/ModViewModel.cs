@@ -34,49 +34,13 @@ namespace ModManager.Logic.Main.ViewModels
 
 			Downloaded = directory.CreationTime.ToString("yyyy/MM/dd hh:mm");
 			SupportedVersions = modMeta.SupportedVersions != null ? String.Join(", ", modMeta.SupportedVersions.Select(x => x.Trim())) : modMeta.TargetVersion;
-			Description = modMeta.Description;
-
-
-			LoadBefore = new List<string>();
-			if (modMeta.LoadBefore != null)
-				LoadBefore.AddRange(modMeta.LoadBefore.Select(x => x.ToLower()));
-
-			LoadAfter = new List<string>();
-			if (modMeta.LoadAfter != null)
-				LoadAfter.AddRange(modMeta.LoadAfter.Select(x => x.ToLower()));
+			Description = modMeta.GetDescription(coreVersion);
+			LoadBefore = modMeta.GetLoadBefore(coreVersion).ToList();
+			LoadAfter = modMeta.GetLoadAfter(coreVersion).ToList();
 
 			Dependencies = new Dictionary<string, string>();
-			if (modMeta.Dependencies != null)
-			{
-				foreach (ModMetaData.ModDependancy dependancy in modMeta.Dependencies)
-					Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
-			}
-
-			// Couldn't figure out a better way to make xml deserialization dynamically create object members based on available version nodes.
-			if (modMeta.LoadBeforeByVersion != null)
-			{
-				var loadBefore = modMeta.LoadBeforeByVersion[coreVersion];
-				if (loadBefore != null)
-					LoadBefore.AddRange(loadBefore.Select(x => x.ToLower()));
-			}
-
-			if (modMeta.LoadAfterByVersion != null)
-			{
-				var loadAfter = modMeta.LoadAfterByVersion[coreVersion];
-				if (loadAfter != null)
-					LoadAfter.AddRange(loadAfter.Select(x => x.ToLower()));
-			}
-
-			if (modMeta.DependenciesByVersion != null)
-			{
-				var versionDependancies = modMeta.DependenciesByVersion[coreVersion];
-				if (versionDependancies != null)
-				{
-					foreach (ModMetaData.ModDependancy dependancy in versionDependancies)
-						Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
-				}
-			}
-
+			foreach (ModMetaData.ModDependancy dependancy in modMeta.GetDependencies(coreVersion))
+				Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
 
 			string imagePath = Path.Combine(directory.FullName, "About", "Preview.png");
 			if (File.Exists(imagePath))
