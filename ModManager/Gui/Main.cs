@@ -494,6 +494,9 @@ namespace ModManager.Gui
 				else
 					mod.Background = Color.Transparent;
 			}
+
+			ModsListView.Reload();
+			ActiveModsListView.Reload();
 		}
 
 		private void ActiveModsListView_DoubleClick(object sender, EventArgs e)
