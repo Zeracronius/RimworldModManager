@@ -31,21 +31,39 @@ namespace ModManager.Logic.Model
 
         public class ByVersion<T> : IXmlSerializable
 		{
-			public Dictionary<string, T[]> _versions = new Dictionary<string, T[]>();
+			public Dictionary<string, T> _versions = new Dictionary<string, T>();
 
-			public T[] this[string version]
+			public bool ContainsKey(string version)
+			{
+				if (version == null)
+					return false;
+
+				return _versions.ContainsKey(version);
+			}
+
+			public T this[string version]
 			{
 				get
 				{
 					if (_versions.TryGetValue(version, out var value))
 						return value;
-					return Array.Empty<T>();
+					return default;
 				}
 			}
 
 			public void ReadXml(XmlReader reader)
 			{
-				XmlSerializer deserializer = new XmlSerializer(typeof(T), new XmlRootAttribute("li"));
+				Type elementType = null;
+				XmlSerializer itemSerializer = null;
+				if (typeof(T).IsArray)
+				{
+					elementType = typeof(T).GetElementType();
+					itemSerializer = new XmlSerializer(elementType, new XmlRootAttribute("li"));
+				}
+
+				XmlSerializer serializer = new XmlSerializer(typeof(T), new XmlRootAttribute("li"));
+				List<object> list = new List<object>();
+
 
 				reader.MoveToContent();
 				reader.ReadStartElement();
@@ -54,29 +72,40 @@ namespace ModManager.Logic.Model
 				{
 					if (reader.NodeType == XmlNodeType.Element)
 					{
-
 						string name = reader.Name.TrimStart('v');
-						reader.ReadStartElement();
-						List<T> result = new List<T>();
+						reader.ReadStartElement(); // Enter <vX.X>
 
-						while (reader.NodeType != XmlNodeType.EndElement)
+						if (typeof(T).IsArray)
 						{
-							if (reader.NodeType == XmlNodeType.Element && reader.Name == "li")
-							{
-								// Deserialize each <li> element automatically
-								result.Add((T)deserializer.Deserialize(reader));
-							}
-							else
-							{
-								reader.Skip();
-							}
-						}
-						reader.ReadEndElement();
+							// Handle array of T
+							list.Clear();
 
-						_versions[name] = result.ToArray();
+							while (reader.NodeType == XmlNodeType.Element || reader.NodeType == XmlNodeType.Comment)
+							{
+								if (reader.NodeType == XmlNodeType.Comment)
+									reader.Skip();
+
+								var item = itemSerializer.Deserialize(reader);
+								list.Add(item);
+							}
+
+							// If only one <li>, still works
+							var array = Array.CreateInstance(elementType, list.Count);
+							list.ToArray().CopyTo(array, 0);
+							_versions[name] = (T)(object)array;
+						}
+						else
+						{
+							// Handle single object T
+							_versions[name] = (T)serializer.Deserialize(reader);
+						}
+
+						reader.ReadEndElement(); // Exit </vX.X>
 					}
 					else
+					{
 						reader.Skip();
+					}
 				}
 
 				reader.ReadEndElement();
@@ -125,16 +154,109 @@ namespace ModManager.Logic.Model
         [XmlArrayItem("li")]
         public string[] LoadAfter { get; set; }
 
+		[XmlArray("forceLoadBefore")]
+		[XmlArrayItem("li")]
+		public string[] ForceLoadBefore { get; set; }
+
+		[XmlArray("forceLoadAfter")]
+		[XmlArrayItem("li")]
+		public string[] ForceLoadAfter { get; set; }
+
+		[XmlArray("incompatibleWith")]
+		[XmlArrayItem("li")]
+		public string[] IncompatibleWith { get; set; }
 
 
-        [XmlElement("loadAfterByVersion")]
-        public ByVersion<string> LoadAfterByVersion { get; set; }
+
+		[XmlElement("descriptionsByVersion")]
+		public ByVersion<string> DescriptionsByVersion { get; set; }
+
+		[XmlElement("loadAfterByVersion")]
+        public ByVersion<string[]> LoadAfterByVersion { get; set; }
 
         [XmlElement("loadBeforeByVersion")]
-        public ByVersion<string> LoadBeforeByVersion { get; set; }
+        public ByVersion<string[]> LoadBeforeByVersion { get; set; }
 
-        [XmlElement("modDependenciesByVersion")]
-        public ByVersion<ModDependancy> DependenciesByVersion { get; set; }
+		[XmlElement("incompatibleWithByVersion")]
+		public ByVersion<string[]> IncompatibleWithByVersion { get; set; }
 
-    }
+		[XmlElement("modDependenciesByVersion")]
+        public ByVersion<ModDependancy[]> DependenciesByVersion { get; set; }
+
+		public string GetDescription(string version)
+		{
+			if (DescriptionsByVersion?.ContainsKey(version) == true)
+				return DescriptionsByVersion[version];
+
+			return Description;
+		}
+
+		public IEnumerable<string> GetLoadBefore(string version)
+		{
+			List<string> loadBefore = new List<string>();
+			// Add version specific if any
+			if (LoadBeforeByVersion?.ContainsKey(version) == true)
+				loadBefore.AddRange(LoadBeforeByVersion[version]);
+
+			// If no version specific, use default.
+			if (loadBefore.Count == 0 && LoadBefore != null)
+				loadBefore.AddRange(LoadBefore);
+
+			// Add forced
+			if (ForceLoadBefore != null)
+				loadBefore.AddRange(ForceLoadBefore);
+
+			return loadBefore.Select(x => x.ToLower());
+		}
+
+		public IEnumerable<string> GetLoadAfter(string version)
+		{
+			List<string> loadAfter = new List<string>();
+			// Add version specific if any
+			if (LoadAfterByVersion?.ContainsKey(version) == true)
+				loadAfter.AddRange(LoadAfterByVersion[version]);
+
+			// If no version specific, use default.
+			if (loadAfter.Count == 0 && LoadAfter != null)
+				loadAfter.AddRange(LoadAfter);
+
+			// Add forced
+			if (ForceLoadAfter != null)
+				loadAfter.AddRange(ForceLoadAfter);
+
+			return loadAfter.Select(x => x.ToLower());
+		}
+
+		public IEnumerable<ModDependancy> GetDependencies(string version)
+		{
+			List<ModDependancy> dependencies = new List<ModDependancy>();
+			// Add version specific if any
+			if (DependenciesByVersion?.ContainsKey(version) == true)
+			{
+				var versionDependencies = DependenciesByVersion[version];
+				if (versionDependencies != null)
+					dependencies.AddRange(versionDependencies);
+			}
+
+			// If no version specific, use default.
+			if (dependencies.Count == 0 && Dependencies != null)
+				dependencies.AddRange(Dependencies);
+
+			return dependencies;
+		}
+
+		public IEnumerable<string> GetIncompatible(string version)
+		{
+			List<string> conflicts = new List<string>();
+			// Add version specific if any
+			if (IncompatibleWithByVersion?.ContainsKey(version) == true)
+				conflicts.AddRange(IncompatibleWithByVersion[version]);
+
+			// If no version specific, use default.
+			if (conflicts.Count == 0 && IncompatibleWith != null)
+				conflicts.AddRange(IncompatibleWith);
+
+			return conflicts.Select(x => x.ToLower());
+		}
+	}
 }
