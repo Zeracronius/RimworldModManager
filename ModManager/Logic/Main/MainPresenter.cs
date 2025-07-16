@@ -48,13 +48,19 @@ namespace ModManager.Logic.Main
 
                 if (String.IsNullOrWhiteSpace(value?.PreviewPath) == false)
                 {
-                    using (var fileStream = new FileStream(value.PreviewPath, FileMode.Open, FileAccess.Read))
-                    {
-                        PreviewImage = Image.FromStream(fileStream);
+					if (File.Exists(value.PreviewPath))
+					{
+						try
+						{
+							PreviewImage = Image.FromFile(value.PreviewPath);
+							return;
+						}
+						catch
+						{ }
                     }
                 }
-                else
-                    PreviewImage = null;
+
+                PreviewImage = null;
             }
         }
 
