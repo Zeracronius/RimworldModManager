@@ -22,6 +22,7 @@ namespace ModManager.Logic.Main.ViewModels
 		}
 
 		public ModViewModel(ModMetaData modMeta, DirectoryInfo directory, string coreVersion, ModType type)
+			: base()
 		{
 			ModKey = directory.Name;
 
@@ -65,6 +66,8 @@ namespace ModManager.Logic.Main.ViewModels
 					SupportedVersions = coreVersion;
 					break;
 			}
+
+			SearchString = Caption + " " + SupportedVersions;
         }
 
 		public string ModKey { get; }
