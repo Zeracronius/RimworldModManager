@@ -21,6 +21,7 @@ namespace ModManager.Logic.Main.ViewModels
 		public List<ITreeListViewItem> Children { get; set; }
 		public ITreeListViewItem Parent { get; set; }
 		public string Caption { get; set; }
+		protected string SearchString { get; set; }
 		public abstract string Key { get; }
 		public IEnumerable<ITreeListViewItem> FilteredChildren
 		{
@@ -52,7 +53,9 @@ namespace ModManager.Logic.Main.ViewModels
 
 		public void ApplyFilter(string filterText)
 		{
-			_visible = Caption.ToLower().Contains(filterText);
+			string searchString = string.IsNullOrWhiteSpace(SearchString) == false ? SearchString : Caption;
+
+			_visible = searchString.ToLower().Contains(filterText);
 			if (_visible)
 			{
 				var parent = Parent;
