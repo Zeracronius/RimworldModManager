@@ -38,6 +38,7 @@ namespace ModManager.Logic.Main.ViewModels
 			Description = modMeta.GetDescription(coreVersion);
 			LoadBefore = modMeta.GetLoadBefore(coreVersion).ToList();
 			LoadAfter = modMeta.GetLoadAfter(coreVersion).ToList();
+			Incompatibles = modMeta.GetIncompatible(coreVersion).ToList();
 
 			Dependencies = new Dictionary<string, string>();
 			foreach (ModMetaData.ModDependancy dependancy in modMeta.GetDependencies(coreVersion))
@@ -82,6 +83,7 @@ namespace ModManager.Logic.Main.ViewModels
 		public Dictionary<string, string> Dependencies { get; set; }
 		public List<string> LoadBefore { get; set; }
 		public List<string> LoadAfter { get; set; }
+		public List<string> Incompatibles { get; set; }
 
 
 		public string SupportedVersions { get; private set; }
