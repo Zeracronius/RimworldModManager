@@ -466,7 +466,7 @@ namespace ModManager.Gui
 							int dependentIndex = activeMods.IndexOf(referencedMod);
 							if (dependentIndex > currentIndex)
 							{
-								tooltip.AppendLine("This should be loaded after " + referencedMod.Caption);
+								tooltip.AppendLine("Should be loaded after: " + referencedMod.Caption);
 							}
 						}
 					}
@@ -482,8 +482,21 @@ namespace ModManager.Gui
 							int dependentIndex = activeMods.IndexOf(referencedMod);
 							if (dependentIndex < currentIndex)
 							{
-								tooltip.AppendLine("This should be loaded before " + referencedMod.Caption);
+								tooltip.AppendLine("Should be loaded before: " + referencedMod.Caption);
 							}
+						}
+					}
+				}
+
+
+				if (mod.Incompatibles != null)
+				{
+					foreach (string incompatible in mod.Incompatibles)
+					{
+						ModViewModel incompatibleMod = activeMods.FirstOrDefault(x => x.PackageId == incompatible);
+						if (incompatibleMod != null)
+						{
+							tooltip.AppendLine("Incompatible with: " + incompatibleMod.Caption);
 						}
 					}
 				}
