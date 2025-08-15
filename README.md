@@ -45,7 +45,8 @@ This tool is designed to be very light weight; A single executable file that req
 
 
 Contains basic auto-sorting.
-Rimsort is a much more powerful alternative that does support auto-sorting the load order.
+
+Rimsort is a much more powerful alternative that does support auto-sorting the load order.  
 https://github.com/RimSort/RimSort/releases
 
 ## Credits:
