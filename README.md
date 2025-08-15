@@ -44,9 +44,9 @@ This tool is designed to be very light weight; A single executable file that req
     - rediscovers mods from mod folders, and reloads the current active mods from the rimworld configuration file.  
 
 
-Note that there is no functionality to auto-sort load order.
-RimPy is a much more powerful alternative that does support auto-sorting the load order.  
-https://steamcommunity.com/sharedfiles/filedetails/?id=1847679158
+Contains basic auto-sorting.
+Rimsort is a much more powerful alternative that does support auto-sorting the load order.
+https://github.com/RimSort/RimSort/releases
 
 ## Credits:
 Uses TreeListView as a base.  
