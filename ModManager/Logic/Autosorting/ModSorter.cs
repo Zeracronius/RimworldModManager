@@ -136,6 +136,7 @@ namespace ModManager.Logic.Autosorting
 			Queue<string> unsorted = new Queue<string>(_loadAfter.OrderBy(x => x.Value.Count).Select(x => x.Key.ToLower()));
 			List<string> result = new List<string>();
 
+			int timeout = 0;
 			while (unsorted.Count > 0)
 			{
 				string packageId = unsorted.Dequeue();
@@ -146,9 +147,22 @@ namespace ModManager.Logic.Autosorting
 				var presentRequirementsLoaded = presentRequirements.All(x => result.Contains(x));
 
 				if (presentRequirementsLoaded)
+				{
 					result.Add(packageId);
+					timeout = 0;
+				}
 				else
+				{
 					unsorted.Enqueue(packageId);
+					timeout++;
+					if (timeout > 1000)
+					{
+						// If no mod have been sorted for 1000 iterations, then slap what remains at the end.
+						StatusChanged?.Invoke(this, $"Timeout reached while sorting mods. Adding remaining unsorted mods to the end of the list.");
+						result.AddRange(unsorted);
+						break;
+					}
+				}
 			}
 
 			return result;

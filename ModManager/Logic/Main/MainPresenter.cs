@@ -383,6 +383,11 @@ namespace ModManager.Logic.Main
 			if (RimsortCommunityRules)
 				sorter.AddCommunityRules(new Rimsort());
 
+			sorter.StatusChanged += (sender, status) =>
+			{
+				MessageBox.Show(status, "Sorting mods");
+			};
+
 			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
 
 			var buffer = _activeMods.OrderBy(x => ordering.IndexOf(x.Value.PackageId.ToLower())).ToList();
