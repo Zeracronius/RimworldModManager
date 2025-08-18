@@ -1,6 +1,7 @@
 ﻿using ModManager.Gui.Components.Native;
 using ModManager.Logic.Autosorting.CommunityRules;
 using ModManager.Logic.Model;
+using ModManager.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,7 +86,34 @@ namespace ModManager.Logic.Autosorting
 						}
 					}
 				}
-				
+
+				if (Settings.Default.LoadAfterDependencies)
+				{
+					foreach (var dependency in mod.GetDependencies(_coreVersion))
+					{
+						if (_loadAfter[packageId].Any(_loadLate.Contains) == false)
+						{
+							_loadAfter[packageId].Add(dependency.PackageId);
+						}
+					}
+				}
+			}
+
+			// Apply additional rulesets:
+			foreach (ICommunityRuleset ruleset in _communityRulesets)
+			{
+				foreach (var item in ruleset.GetLoadAfters())
+				{
+					if (_loadAfter.TryGetValue(item.Key.ToLower(), out List<string> ruleEntries))
+						ruleEntries.AddRange(item.Value.Select(x => x.ToLower()));
+				}
+			}
+
+			// Adjust for load late.
+			foreach (ModMetaData mod in _mods)
+			{
+				string packageId = mod.PackageId.ToLower();
+
 				if (_loadLate.Contains(packageId) == false)
 				{
 					// If this mod needs to load after any late loaders, then do nothing.
@@ -100,17 +128,10 @@ namespace ModManager.Logic.Autosorting
 						}
 					}
 				}
-
-				// Apply additional rulesets:
-				foreach (ICommunityRuleset ruleset in _communityRulesets)
-				{
-					foreach (var item in ruleset.GetLoadAfters())
-					{
-						if (_loadAfter.TryGetValue(item.Key, out List<string> ruleEntries))
-							ruleEntries.AddRange(item.Value);
-					}
-				}
 			}
+
+
+
 
 			Queue<string> unsorted = new Queue<string>(_loadAfter.OrderBy(x => x.Value.Count).Select(x => x.Key.ToLower()));
 			List<string> result = new List<string>();

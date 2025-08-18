@@ -922,5 +922,10 @@ namespace ModManager.Gui
 		{
 			_presenter.RimsortCommunityRules = rimsortToolStripMenuItem.Checked;
 		}
+
+		private void loadaToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			_presenter.SortAfterDependencies = loadaToolStripMenuItem.Checked;
+		}
 	}
 }

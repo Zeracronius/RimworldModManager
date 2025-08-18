@@ -34,7 +34,13 @@ namespace ModManager.Logic.Main
 		public bool RimsortCommunityRules 
 		{ 
 			get => Settings.Default.UseRimsortRules; 
-			set => Settings.Default.UseRimsortRules = value; 
+			set => Settings.Default.UseRimsortRules = value;
+		}
+
+		public bool SortAfterDependencies
+		{
+			get => Settings.Default.LoadAfterDependencies;
+			set => Settings.Default.LoadAfterDependencies = value;
 		}
 
 		public ViewModels.ModViewModel SelectedMod
