@@ -22,7 +22,11 @@ namespace ModManager.Logic.Model
             [XmlElement("packageId")]
             public string PackageId { get; set; }
 
-            [XmlElement("displayName")]
+			[XmlArray("alternativePackageIds")]
+			[XmlArrayItem("li")]
+			public string[] AlternativePackageIds { get; set; }
+
+			[XmlElement("displayName")]
             public string Name { get; set; }
 
             [XmlElement("steamWorkshopUrl")]
@@ -131,7 +135,7 @@ namespace ModManager.Logic.Model
         [XmlElement("packageId")]
         public string PackageId { get; set; }
 
-        [XmlArray("supportedVersions")]
+		[XmlArray("supportedVersions")]
         [XmlArrayItem("li")]
         public string[] SupportedVersions { get; set; }
 

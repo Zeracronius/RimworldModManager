@@ -94,6 +94,9 @@ namespace ModManager.Logic.Autosorting
 						if (_loadAfter[packageId].Any(_loadLate.Contains) == false)
 						{
 							_loadAfter[packageId].Add(dependency.PackageId);
+
+							if (dependency.AlternativePackageIds != null)
+								_loadAfter[packageId].AddRange(dependency.AlternativePackageIds);
 						}
 					}
 				}
