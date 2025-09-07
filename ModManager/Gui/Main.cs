@@ -13,6 +13,7 @@ using ModManager.Logic.Autosorting.CommunityRules;
 using ModManager.Logic.Configuration;
 using ModManager.Logic.Main;
 using ModManager.Logic.Main.ViewModels;
+using ModManager.Logic.Model;
 using ModManager.Logic.TextDialog;
 using ModManager.Properties;
 
@@ -446,11 +447,15 @@ namespace ModManager.Gui
 
 				if (mod.Dependencies != null)
 				{
-					foreach (KeyValuePair<string, string> dependancy in mod.Dependencies)
+					foreach (KeyValuePair<string, ModMetaData.ModDependancy> dependancy in mod.Dependencies)
 					{
-						ModViewModel referencedMod = activeMods.FirstOrDefault(x => x.PackageId == dependancy.Key);
-						if (referencedMod == null)
-							tooltip.AppendLine("Missing dependancy: " + dependancy.Value);
+						// Is any active mods the main package ID?
+						if (activeMods.Any(x => string.Equals(x.PackageId, dependancy.Value.PackageId, StringComparison.InvariantCultureIgnoreCase)) == false)
+						{
+							// Is any active mods contained in alternative package ids?
+							if (dependancy.Value.AlternativePackageIds == null || activeMods.Any(x => dependancy.Value.AlternativePackageIds.Contains(x.PackageId, StringComparer.InvariantCultureIgnoreCase)) == false)
+								tooltip.AppendLine("Missing dependancy: " + dependancy.Value.Name);
+						}
 					}
 				}
 
@@ -921,6 +926,11 @@ namespace ModManager.Gui
 		private void rimsortToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			_presenter.RimsortCommunityRules = rimsortToolStripMenuItem.Checked;
+		}
+
+		private void loadaToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			_presenter.SortAfterDependencies = loadaToolStripMenuItem.Checked;
 		}
 	}
 }

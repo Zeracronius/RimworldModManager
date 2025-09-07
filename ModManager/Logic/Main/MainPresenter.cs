@@ -34,7 +34,13 @@ namespace ModManager.Logic.Main
 		public bool RimsortCommunityRules 
 		{ 
 			get => Settings.Default.UseRimsortRules; 
-			set => Settings.Default.UseRimsortRules = value; 
+			set => Settings.Default.UseRimsortRules = value;
+		}
+
+		public bool SortAfterDependencies
+		{
+			get => Settings.Default.LoadAfterDependencies;
+			set => Settings.Default.LoadAfterDependencies = value;
 		}
 
 		public ViewModels.ModViewModel SelectedMod
@@ -376,6 +382,11 @@ namespace ModManager.Logic.Main
 
 			if (RimsortCommunityRules)
 				sorter.AddCommunityRules(new Rimsort());
+
+			sorter.StatusChanged += (sender, status) =>
+			{
+				MessageBox.Show(status, "Sorting mods");
+			};
 
 			var ordering = sorter.Sort().Select(x => x.ToLower()).ToList();
 

@@ -40,9 +40,9 @@ namespace ModManager.Logic.Main.ViewModels
 			LoadAfter = modMeta.GetLoadAfter(coreVersion).ToList();
 			Incompatibles = modMeta.GetIncompatible(coreVersion).ToList();
 
-			Dependencies = new Dictionary<string, string>();
+			Dependencies = new Dictionary<string, ModMetaData.ModDependancy>();
 			foreach (ModMetaData.ModDependancy dependancy in modMeta.GetDependencies(coreVersion))
-				Dependencies[dependancy.PackageId.ToLower()] = dependancy.Name;
+				Dependencies[dependancy.PackageId.ToLower()] = dependancy;
 
 			string imagePath = Path.Combine(directory.FullName, "About", "Preview.png");
 			if (File.Exists(imagePath))
@@ -80,7 +80,7 @@ namespace ModManager.Logic.Main.ViewModels
 		public string Description { get; private set; }
 
 
-		public Dictionary<string, string> Dependencies { get; set; }
+		public Dictionary<string, ModMetaData.ModDependancy> Dependencies { get; set; }
 		public List<string> LoadBefore { get; set; }
 		public List<string> LoadAfter { get; set; }
 		public List<string> Incompatibles { get; set; }

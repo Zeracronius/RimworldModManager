@@ -71,6 +71,7 @@
 			this.sortingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.rulesetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.rimsortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.loadaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.sortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tableLayoutPanel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.ModBindingSource)).BeginInit();
@@ -555,23 +556,32 @@
 			// rulesetsToolStripMenuItem
 			// 
 			this.rulesetsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.rimsortToolStripMenuItem});
+            this.rimsortToolStripMenuItem,
+            this.loadaToolStripMenuItem});
 			this.rulesetsToolStripMenuItem.Name = "rulesetsToolStripMenuItem";
-			this.rulesetsToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-			this.rulesetsToolStripMenuItem.Text = "Rulesets";
+			this.rulesetsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.rulesetsToolStripMenuItem.Text = "Rules";
 			// 
 			// rimsortToolStripMenuItem
 			// 
 			this.rimsortToolStripMenuItem.CheckOnClick = true;
 			this.rimsortToolStripMenuItem.Name = "rimsortToolStripMenuItem";
-			this.rimsortToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
-			this.rimsortToolStripMenuItem.Text = "Rimsorts";
+			this.rimsortToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.rimsortToolStripMenuItem.Text = "Rimsorts community rules";
 			this.rimsortToolStripMenuItem.Click += new System.EventHandler(this.rimsortToolStripMenuItem_Click);
+			// 
+			// loadaToolStripMenuItem
+			// 
+			this.loadaToolStripMenuItem.CheckOnClick = true;
+			this.loadaToolStripMenuItem.Name = "loadaToolStripMenuItem";
+			this.loadaToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.loadaToolStripMenuItem.Text = "Load after dependencies";
+			this.loadaToolStripMenuItem.Click += new System.EventHandler(this.loadaToolStripMenuItem_Click);
 			// 
 			// sortToolStripMenuItem
 			// 
 			this.sortToolStripMenuItem.Name = "sortToolStripMenuItem";
-			this.sortToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+			this.sortToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.sortToolStripMenuItem.Text = "Sort";
 			this.sortToolStripMenuItem.Click += new System.EventHandler(this.AutoSortButton_Click);
 			// 
@@ -663,5 +673,6 @@
 		private System.Windows.Forms.ToolStripMenuItem rulesetsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem rimsortToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem sortToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem loadaToolStripMenuItem;
 	}
 }
