@@ -210,7 +210,7 @@ namespace ModManager.Logic.Model
 			if (ForceLoadBefore != null)
 				loadBefore.AddRange(ForceLoadBefore);
 
-			return loadBefore.Select(x => x.ToLower());
+			return loadBefore.Select(x => x?.ToLower());
 		}
 
 		public IEnumerable<string> GetLoadAfter(string version)
@@ -228,7 +228,7 @@ namespace ModManager.Logic.Model
 			if (ForceLoadAfter != null)
 				loadAfter.AddRange(ForceLoadAfter);
 
-			return loadAfter.Select(x => x.ToLower());
+			return loadAfter.Select(x => x?.ToLower());
 		}
 
 		public IEnumerable<ModDependancy> GetDependencies(string version)
@@ -260,7 +260,7 @@ namespace ModManager.Logic.Model
 			if (conflicts.Count == 0 && IncompatibleWith != null)
 				conflicts.AddRange(IncompatibleWith);
 
-			return conflicts.Select(x => x.ToLower());
+			return conflicts.Select(x => x?.ToLower());
 		}
 	}
 }
