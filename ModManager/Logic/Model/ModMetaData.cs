@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
@@ -35,24 +30,44 @@ namespace ModManager.Logic.Model
 
         public class ByVersion<T> : IXmlSerializable
 		{
-			public Dictionary<string, T> _versions = new Dictionary<string, T>();
+			private Dictionary<string, T> _versions = new Dictionary<string, T>();
 
-			public bool ContainsKey(string version)
+			public bool GetByVersion(string version, out T value)
 			{
 				if (version == null)
-					return false;
-
-				return _versions.ContainsKey(version);
-			}
-
-			public T this[string version]
-			{
-				get
 				{
-					if (_versions.TryGetValue(version, out var value))
-						return value;
-					return default;
+					value = default;
+					return false;
 				}
+
+				if (_versions.Count > 0)
+				{
+					if (_versions.TryGetValue(version, out value))
+						return true;
+
+					// If no direct version match, then take latest one that is less than current version.
+					decimal versionNumber = decimal.Parse(version);
+					T result = default;
+					bool found = false;
+					foreach (KeyValuePair<string, T> metadataVersions in _versions)
+					{
+						decimal currentVersion = decimal.Parse(metadataVersions.Key);
+						if (currentVersion <= versionNumber)
+						{
+							found = true;
+							result = metadataVersions.Value;
+						}
+					}
+
+					if (found)
+					{
+						value = result;
+						return true;
+					}
+				}
+
+				value = default;
+				return false;
 			}
 
 			public void ReadXml(XmlReader reader)
@@ -189,8 +204,8 @@ namespace ModManager.Logic.Model
 
 		public string GetDescription(string version)
 		{
-			if (DescriptionsByVersion?.ContainsKey(version) == true)
-				return DescriptionsByVersion[version];
+			if (DescriptionsByVersion?.GetByVersion(version, out string value) == true)
+				return value;
 
 			return Description;
 		}
@@ -199,8 +214,8 @@ namespace ModManager.Logic.Model
 		{
 			List<string> loadBefore = new List<string>();
 			// Add version specific if any
-			if (LoadBeforeByVersion?.ContainsKey(version) == true)
-				loadBefore.AddRange(LoadBeforeByVersion[version]);
+			if (LoadBeforeByVersion?.GetByVersion(version, out string[] value) == true)
+				loadBefore.AddRange(value);
 
 			// If no version specific, use default.
 			if (loadBefore.Count == 0 && LoadBefore != null)
@@ -217,8 +232,8 @@ namespace ModManager.Logic.Model
 		{
 			List<string> loadAfter = new List<string>();
 			// Add version specific if any
-			if (LoadAfterByVersion?.ContainsKey(version) == true)
-				loadAfter.AddRange(LoadAfterByVersion[version]);
+			if (LoadAfterByVersion?.GetByVersion(version, out string[] value) == true)
+				loadAfter.AddRange(value);
 
 			// If no version specific, use default.
 			if (loadAfter.Count == 0 && LoadAfter != null)
@@ -235,12 +250,8 @@ namespace ModManager.Logic.Model
 		{
 			List<ModDependancy> dependencies = new List<ModDependancy>();
 			// Add version specific if any
-			if (DependenciesByVersion?.ContainsKey(version) == true)
-			{
-				var versionDependencies = DependenciesByVersion[version];
-				if (versionDependencies != null)
-					dependencies.AddRange(versionDependencies);
-			}
+			if (DependenciesByVersion?.GetByVersion(version, out ModDependancy[] value) == true)
+					dependencies.AddRange(value);
 
 			// If no version specific, use default.
 			if (dependencies.Count == 0 && Dependencies != null)
@@ -253,8 +264,8 @@ namespace ModManager.Logic.Model
 		{
 			List<string> conflicts = new List<string>();
 			// Add version specific if any
-			if (IncompatibleWithByVersion?.ContainsKey(version) == true)
-				conflicts.AddRange(IncompatibleWithByVersion[version]);
+			if (IncompatibleWithByVersion?.GetByVersion(version, out string[] value) == true)
+				conflicts.AddRange(value);
 
 			// If no version specific, use default.
 			if (conflicts.Count == 0 && IncompatibleWith != null)
