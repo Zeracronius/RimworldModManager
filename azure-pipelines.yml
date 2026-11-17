@@ -56,7 +56,7 @@ stages:
     - task: GitHubRelease@1
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       inputs:
-        gitHubConnection: 'Github'
+        gitHubConnection: 'RimworldModManager'
         repositoryName: 'Zeracronius/RimworldModManager'
         action: 'create'
         target: '$(Build.SourceVersion)'
