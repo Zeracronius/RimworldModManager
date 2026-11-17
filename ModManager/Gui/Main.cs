@@ -440,9 +440,6 @@ namespace ModManager.Gui
 
 			foreach (ModViewModel mod in activeMods)
 			{
-				if (mod.Background == _presenter.IncompatibleColor)
-					continue;
-
 				StringBuilder tooltip = new StringBuilder();
 
 				if (mod.Dependencies != null)
@@ -506,10 +503,14 @@ namespace ModManager.Gui
 					}
 				}
 
+				bool hasWarnings = tooltip.Length > 0;
+				if (mod.Background == _presenter.IncompatibleColor)
+					tooltip.AppendLine("Incompatible with current version.");
+
 				mod.Tooltip = tooltip.ToString();
-				if (mod.Tooltip.Length > 0)
+				if (hasWarnings)
 					mod.Background = _presenter.WarningColor;
-				else
+				else if (mod.Background != _presenter.IncompatibleColor)
 					mod.Background = Color.Transparent;
 			}
 
