@@ -91,6 +91,9 @@ namespace ModManager.Logic.Autosorting
 				{
 					foreach (var dependency in mod.GetDependencies(_coreVersion))
 					{
+						if (_loadAfter.TryGetValue(dependency.PackageId, out List<string> values) && values.Contains(packageId))
+							continue;
+
 						if (_loadAfter[packageId].Any(_loadLate.Contains) == false)
 						{
 							_loadAfter[packageId].Add(dependency.PackageId);
